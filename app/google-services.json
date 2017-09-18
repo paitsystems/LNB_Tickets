@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1004202721199",
+    "firebase_url": "https://smart-ticket-178505.firebaseio.com",
+    "project_id": "smart-ticket-178505",
+    "storage_bucket": "smart-ticket-178505.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004202721199:android:6214226ecefc0c62",
+        "android_client_info": {
+          "package_name": "com.lnbinfotech.lnb_tickets"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1004202721199-ton34chfif1s78q2vcnkeksfh7a07t1n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lnbinfotech.lnb_tickets",
+            "certificate_hash": "cecf8d8d8f4954cf3951979cabd750912d109f95"
+          }
+        },
+        {
+          "client_id": "1004202721199-9lhdemfddmkbr44g3355cv8b5n1tkbrc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDZC1qpURT4GwGypJMIU-Upz4ia4ezwlM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1004202721199-9lhdemfddmkbr44g3355cv8b5n1tkbrc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

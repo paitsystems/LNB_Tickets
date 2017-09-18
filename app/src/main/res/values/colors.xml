@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--<color name="colorAccent">#FF4081</color>-->
+
+    <color name="white">#ffffff</color>
+    <color name="maroon">#990000</color>
+    <color name="black">#000000</color>
+    <color name="darkgreen">#2B9C09</color>
+    <color name="lightgreen">#00A933</color>
+    <color name="lightyellow">#FFCC00</color>
+    <color name="lightgray">#b3b3b3</color>
+    <color name="faintgray">#CABBBBBB</color>
+    <color name="orange">#fa6c04</color>
+    <color name="red">#FF0000</color>
+    <color name="purpule">#660394</color>
+    <color name="test">#f8551f</color>
+</resources>
