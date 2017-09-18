@@ -66,6 +66,8 @@ public class AllTicketListAdapter extends BaseAdapter {
             holder.tv_closed_date = (TextView) view.findViewById(R.id.tv_closed_date);
             holder.tv_closed_time = (TextView) view.findViewById(R.id.tv_closed_time);
             holder.lay_closed_by = (LinearLayout) view.findViewById(R.id.lay_closed_by);
+            holder.tv_point_type = (TextView) view.findViewById(R.id.tv_point_type);
+
             //holder.status_lay = (LinearLayout) view.findViewById(R.id.status_lay);
             view.setTag(holder);
         }else{
@@ -116,12 +118,13 @@ public class AllTicketListAdapter extends BaseAdapter {
         holder.tv_ticket_no.setText(pendingTicketClass.getTicketNo());
         holder.tv_assignto.setText(pendingTicketClass.getAssignTO());
         holder.tv_client_name.setText(pendingTicketClass.getClientName());
+        holder.tv_point_type.setText(pendingTicketClass.getPointtype());
         return view;
     }
 
     private class ViewHolder{
         TextView tv_date, tv_time, tv_subject, tv_desc, tv_status, tv_comments, tv_ticket_no, tv_assignto,
-                    tv_client_name,tv_cr_by, tv_closed_by, tv_closed_date, tv_closed_time;
+                    tv_client_name,tv_cr_by, tv_closed_by, tv_closed_date, tv_closed_time, tv_point_type;
         LinearLayout lay_closed_by;
     }
 
@@ -146,6 +149,12 @@ public class AllTicketListAdapter extends BaseAdapter {
                     } else if (ticketMasterClass.getParticular().toLowerCase(Locale.getDefault()).contains(searchText)) {
                         pendingTicketClassList.add(ticketMasterClass);
                     } else if (ticketMasterClass.getAssignTO().toLowerCase(Locale.getDefault()).contains(searchText)) {
+                        pendingTicketClassList.add(ticketMasterClass);
+                    }else if (ticketMasterClass.getClientName().toLowerCase(Locale.getDefault()).contains(searchText)) {
+                        pendingTicketClassList.add(ticketMasterClass);
+                    }else if (ticketMasterClass.getCrBy().toLowerCase(Locale.getDefault()).contains(searchText)) {
+                        pendingTicketClassList.add(ticketMasterClass);
+                    }else if (ticketMasterClass.getModBy().toLowerCase(Locale.getDefault()).contains(searchText)) {
                         pendingTicketClassList.add(ticketMasterClass);
                     }
                 }

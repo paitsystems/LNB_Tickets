@@ -94,6 +94,52 @@
                     android:src="@drawable/search24" />
             </LinearLayout>
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/lay_pointtype">
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ticket Related To" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Software"
+                        style="@style/textViewMob"
+                        android:id="@+id/rdo_sw"
+                        android:layout_weight="0.5"
+                        android:singleLine="true" />
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hardware"
+                        style="@style/textViewMob"
+                        android:id="@+id/rdo_hw"
+                        android:layout_weight="0.5"
+                        android:singleLine="true" />
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Internal"
+                        style="@style/textViewMob"
+                        android:id="@+id/rdo_it"
+                        android:layout_weight="0.5"
+                        android:singleLine="true" />
+                </LinearLayout>
+            </LinearLayout>
+
             <TextView
                 style="@style/textViewMob"
                 android:layout_width="match_parent"

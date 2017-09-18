@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String user = FirstActivity.pref.getString(getString(R.string.pref_username), "");
             String pass = FirstActivity.pref.getString(getString(R.string.pref_password), "");
             String url = Constant.ipaddress + "/getEmpValid?UserName=" + user + "&Password=" + pass;
-            writeLog("CustomerMainActivity_refreshUserData_"+url);
+            writeLog("MainActivity_refreshUserData_"+url);
             Constant.showLog(url);
             StringRequest request = new StringRequest(url,
                     new Response.Listener<String>() {
@@ -227,9 +227,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 db.deleteTabel(DBHandler.SMLMAST_Table);
                                 isDiaShowed = 0;
                                 loadData();
-                                writeLog("CustomerMainActivity_refreshUserData_Success");
+                                writeLog("MainActivity_refreshUserData_Success");
                             }else{
-                                writeLog("CustomerMainActivity_refreshUserData_UnSuccess");
+                                writeLog("MainActivity_refreshUserData_UnSuccess");
                                 showDia(5);
                             }
                             constant.showPD();
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            writeLog("CustomerMainActivity_refreshUserData_volley_"+ error.getMessage());
+                            writeLog("MainActivity_refreshUserData_volley_"+ error.getMessage());
                             error.printStackTrace();
                             constant.showPD();
                             showDia(5);
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
             queue.add(request);
         }catch (Exception e){
-            writeLog("CustomerMainActivity_refreshUserData_"+e.getMessage());
+            writeLog("MainActivity_refreshUserData_"+e.getMessage());
             e.printStackTrace();
             toast.setText("Something Went Wrong");
             toast.show();
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("CustomerMainActivity_loadData_countRequest_"+ error.getMessage());
+                        writeLog("MainActivity_loadData_countRequest_"+ error.getMessage());
                         SharedPreferences.Editor editor = FirstActivity.pref.edit();
                         editor.putInt(getString(R.string.pref_ticketTotal),0);
                         editor.apply();
@@ -336,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("CustomerMainActivity_loadData_descRequest_"+ error.getMessage());
+                        writeLog("MainActivity_loadData_descRequest_"+ error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
                         if(taskLeft==0) {
@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("CustomerMainActivity_loadData_custRequest_"+ error.getMessage());
+                        writeLog("MainActivity_loadData_custRequest_"+ error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
                         if(taskLeft==0) {
@@ -577,10 +577,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void exportfile(){
         if(new CopyLog().copyLog(getApplicationContext())) {
-            writeLog("CustomerMainActivity_exportfile_Log_File_Exported");
+            writeLog("MainActivity_exportfile_Log_File_Exported");
             sendMail1();
         }else{
-            writeLog("CustomerMainActivity_exportfile_Error_While_Log_File_Exporting");
+            writeLog("MainActivity_exportfile_Error_While_Log_File_Exporting");
         }
     }
 
@@ -633,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 sender.sendMail(Constant.mail_subject,Constant.mail_body,Constant.automailID,res);
                 return "1";
             } catch (Exception e) {
-                writeLog("CustomerMainActivity_sendMailClass_"+e.getMessage());
+                writeLog("MainActivity_sendMailClass_"+e.getMessage());
                 e.printStackTrace();
                 return "0";
             }
@@ -647,22 +647,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Constant.showLog("sendMail Work Counter " + tasksLeft);
                 if(result.equals("1")) {
                     if (tasksLeft == 0) {
-                        writeLog("CustomerMainActivity_sendMailClass_Mail_Send_Successfully");
+                        writeLog("MainActivity_sendMailClass_Mail_Send_Successfully");
                         Constant.showLog("sendMail END MULTI THREAD");
                         Constant.showLog("sendMail Work Counter END " + tasksLeft);
                         toast.setText("File Exported Successfully");
                     } else {
-                        writeLog("CustomerMainActivity_sendMailClass_Mail_Send_UnSuccessfull1");
+                        writeLog("MainActivity_sendMailClass_Mail_Send_UnSuccessfull1");
                         toast.setText("Error While Sending Mail");
                     }
                 }else{
                     toast.setText("Error While Exporting Log File");
-                    writeLog("CustomerMainActivity_sendMailClass_Mail_Send_UnSuccessfull");
+                    writeLog("MainActivity_sendMailClass_Mail_Send_UnSuccessfull");
                 }
                 toast.show();
                 pd.dismiss();
             }catch (Exception e){
-                writeLog("CustomerMainActivity_sendMailClass_"+e.getMessage());
+                writeLog("MainActivity_sendMailClass_"+e.getMessage());
                 e.printStackTrace();
                 pd.dismiss();
             }

@@ -97,7 +97,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Total" />
+                            android:text="Total"
+                            android:singleLine="true" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -148,7 +149,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="Pending" />
+                            android:text="Pending"
+                            android:singleLine="true" />
                     </LinearLayout>
 
                 </LinearLayout>

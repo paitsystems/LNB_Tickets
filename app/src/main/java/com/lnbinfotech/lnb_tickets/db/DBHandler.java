@@ -22,7 +22,7 @@ import java.util.Locale;
 public class DBHandler extends SQLiteOpenHelper {
 
     public static final String Database_Name = "APITTECH.db";
-    public static final int Database_Version = 3;
+    public static final int Database_Version = 4;
 
     public static final String Ticket_Master_Table = "TicketMaster";
     public static final String TicketM_Auto = "Auto";
@@ -50,6 +50,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String TicketM_AssignByDate = "AssignByDate";
     public static final String TicketM_AssignByTime = "AssignByTime";
     public static final String TicketM_Branch = "Branch";
+    public static final String TicketM_PointType = "PointType";
 
     public static final String Ticket_Detail_Table = "TicketDetail";
     public static final String TicketD_Auto = "Auto";
@@ -73,6 +74,8 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String SMLMAST_FTPImgFolder = "FTPImgFolder";
     public static final String SMLMAST_CustomerName = "CustomerName";
     public static final String SMLMAST_GroupId = "GroupId";
+    public static final String SMLMAST_isHO = "isHO";
+    public static final String SMLMAST_isHWapplicable = "isHWapplicable";
 
     private String create_table_master = "create table if not exists "+ Ticket_Master_Table+"("+
             TicketM_Auto+" int,"+TicketM_Id+" int,"+TicketM_ClientAuto+" int,"+TicketM_ClientName+" text,"+
@@ -83,7 +86,7 @@ public class DBHandler extends SQLiteOpenHelper {
             TicketM_ModDate+" text,"+TicketM_ModTime+" text,"+TicketM_AssignTo+" text,"+
             TicketM_AssignDate+" text,"+TicketM_AssignTime+" text,"+TicketM_Type+" text,"+
             TicketM_GenType+" text,"+TicketM_AssignBy+" text,"+TicketM_AssignByDate+" text,"+TicketM_AssignByTime+" text,"+
-            TicketM_Branch+" text);";
+            TicketM_Branch+" text,"+TicketM_PointType+" text);";
 
     private String create_table_detail = "create table if not exists "+ Ticket_Detail_Table+"("+
             TicketD_Auto+" int,"+TicketD_MastAuto+" int,"+TicketD_Description+" text,"+
@@ -94,7 +97,7 @@ public class DBHandler extends SQLiteOpenHelper {
             SMLMAST_Auto+" int,"+SMLMAST_ClientID+" text,"+SMLMAST_ClientName+" text,"+
             SMLMAST_Mobile+" text,"+SMLMAST_Email+" text,"+SMLMAST_FTPLocation+" text,"+
             SMLMAST_FTPUser+" text,"+SMLMAST_FTPPass+" text,"+SMLMAST_FTPImgFolder+" text,"+
-            SMLMAST_CustomerName+" text,"+SMLMAST_GroupId+" int);";
+            SMLMAST_CustomerName+" text,"+SMLMAST_GroupId+" int,"+SMLMAST_isHO+" text,"+SMLMAST_isHWapplicable+" text);";
 
     public DBHandler(Context context) {
         super(context, Database_Name, null, Database_Version);
@@ -138,6 +141,8 @@ public class DBHandler extends SQLiteOpenHelper {
         cv.put(SMLMAST_FTPImgFolder,custClass.getFTPImgFolder());
         cv.put(SMLMAST_CustomerName,custClass.getCustomerName());
         cv.put(SMLMAST_GroupId,custClass.getGroupId());
+        cv.put(SMLMAST_isHO,custClass.getIsHO());
+        cv.put(SMLMAST_isHWapplicable,custClass.getIsHWapplicable());
         getWritableDatabase().insert(SMLMAST_Table,null,cv);
     }
 
@@ -168,6 +173,7 @@ public class DBHandler extends SQLiteOpenHelper {
         cv.put(TicketM_AssignByDate,ticketMaster.getAssignByDate());
         cv.put(TicketM_AssignByTime,ticketMaster.getAssignByTime());
         cv.put(TicketM_Branch,ticketMaster.getBranch());
+        cv.put(TicketM_PointType,ticketMaster.getPointtype());
         getWritableDatabase().insert(Ticket_Master_Table,null,cv);
     }
 
@@ -279,6 +285,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
                 pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
                 pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
                 pendingTicketClassList.add(pendingTicketClass);
             }while (res.moveToNext());
         }
