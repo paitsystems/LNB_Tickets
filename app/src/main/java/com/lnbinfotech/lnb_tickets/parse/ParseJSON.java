@@ -79,7 +79,8 @@ public class ParseJSON {
             JSONArray jsonArray = new JSONArray(json);
             if (jsonArray.length() >= 1) {
                 int auto = 0, groupId = 0;
-                String ClientID=null,ClientName=null,FTPUser=null,FTPPass=null,FTPFolder=null,CustomerName=null, mobile="0", FTPLocation = null, type=null;
+                String ClientID=null,ClientName=null,FTPUser=null,FTPPass=null,FTPFolder=null,
+                        CustomerName=null, mobile="0", FTPLocation = null, type=null, isHWapplicable=null;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     auto = jsonArray.getJSONObject(i).getInt("Auto");
                     ClientID = jsonArray.getJSONObject(i).getString("ClientID");
@@ -91,6 +92,7 @@ public class ParseJSON {
                     FTPFolder = jsonArray.getJSONObject(i).getString("FTPImgFolder");
                     CustomerName = jsonArray.getJSONObject(i).getString("CustomerName");
                     type = jsonArray.getJSONObject(i).getString("type");
+                    isHWapplicable = jsonArray.getJSONObject(i).getString("isHWapplicable");
                     groupId = jsonArray.getJSONObject(i).getInt("GroupId");
                     result = 1;
                 }
@@ -116,6 +118,7 @@ public class ParseJSON {
                 editor.putString(context.getString(R.string.pref_CustomerName), CustomerName);
                 editor.putString(context.getString(R.string.pref_emptype), type);
                 editor.putInt(context.getString(R.string.pref_groupid), groupId);
+                editor.putString(context.getString(R.string.pref_isHWapplicable), isHWapplicable);
                 editor.apply();
             }
         } catch (Exception e) {
@@ -146,6 +149,8 @@ public class ParseJSON {
                     custClass.setCustomerName(jsonArray.getJSONObject(i).getString("CustomerName"));
                     custClass.setEmail(jsonArray.getJSONObject(i).getString("Email"));
                     custClass.setGroupId(jsonArray.getJSONObject(i).getInt("GroupId"));
+                    custClass.setIsHO(jsonArray.getJSONObject(i).getString("isHO"));
+                    custClass.setIsHWapplicable(jsonArray.getJSONObject(i).getString("isHWapplicable"));
                     db.addSMLMAST(custClass);
                     result = 1;
                 }
@@ -192,6 +197,7 @@ public class ParseJSON {
                     pendingTicketClass.setType(jsonArray.getJSONObject(i).getString("type"));
                     pendingTicketClass.setGenType(jsonArray.getJSONObject(i).getString("GenType"));
                     pendingTicketClass.setBranch(jsonArray.getJSONObject(i).getString("Branch"));
+                    pendingTicketClass.setPointtype(jsonArray.getJSONObject(i).getString("PointType"));
                     list.add(pendingTicketClass);
                     db.addTicketMaster(pendingTicketClass);
                 }

@@ -5,7 +5,26 @@ package com.lnbinfotech.lnb_tickets.model;
 public class SMLMASTClass {
 
     public int Auto, groupId;
-    public String ClientID,ClientName,Mobile,Email,FTPLocation,FTPUser,FTPPass,FTPImgFolder,CustomerName;
+    public String ClientID;
+    public String ClientName;
+    public String Mobile;
+    public String Email;
+    public String FTPLocation;
+    public String FTPUser;
+    public String FTPPass;
+    public String FTPImgFolder;
+    public String CustomerName;
+    public String isHO;
+
+    public String getIsHWapplicable() {
+        return isHWapplicable;
+    }
+
+    public void setIsHWapplicable(String isHWapplicable) {
+        this.isHWapplicable = isHWapplicable;
+    }
+
+    public String isHWapplicable;
 
     public int getAuto() {
         return Auto;
@@ -93,5 +112,13 @@ public class SMLMASTClass {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public String getIsHO() {
+        return isHO;
+    }
+
+    public void setIsHO(String isHO) {
+        this.isHO = isHO;
     }
 }

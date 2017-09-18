@@ -20,6 +20,7 @@
     <string name="pref_clientID">clientID</string>
     <string name="pref_emptype">emptype</string>
     <string name="pref_ticketTotal">tickettotal</string>
+    <string name="pref_isHWapplicable">isHWapplicable</string>
 
     <string name="pref_auto">auto</string>
     <string name="pref_groupid">groupid</string>

@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -47,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -54,20 +57,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class AddNewTicketActivity extends AppCompatActivity implements View.OnClickListener{
 
-    EditText ed_subject, ed_description, ed_search;
-    LinearLayout lay_attachment, lay_branch_search;
-    ImageView img;
-    Button btn_generate_ticket, btn_attachment;
-    Toast toast;
-    String imagePath = "";
-    Constant constant;
-    AtomicInteger atomicInteger;
-    Spinner sp_branch;
+    private EditText ed_subject, ed_description, ed_search;
+    private LinearLayout lay_attachment, lay_branch_search, lay_pointtype;
+    private ImageView img;
+    private Button btn_generate_ticket, btn_attachment;
+    private Toast toast;
+    private String imagePath = "", empType = "", isHWapplicable = "";
+    private Constant constant;
+    private AtomicInteger atomicInteger;
+    private Spinner sp_branch;
     //List<String> branchList;
-    DBHandler db;
+    private DBHandler db;
     public static String selBranch = null;
-    AdView mAdView;
-    int isDataImageSaved = -1;
+    private AdView mAdView;
+    private int isDataImageSaved = -1, REQUEST_IMAGE_PICK_UP = 2, REQUEST_IMAGE_TAKE = 3;
+    private RadioButton rdo_sw, rdo_hw, rdo_it;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,10 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         btn_generate_ticket.setOnClickListener(this);
         btn_attachment.setOnClickListener(this);
         ed_search.setOnClickListener(this);
+
+        rdo_sw.setOnClickListener(this);
+        rdo_hw.setOnClickListener(this);
+        rdo_it.setOnClickListener(this);
 
         mAdView = (AdView) findViewById(R.id.adView);
 
@@ -133,17 +141,32 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.lay_attachment:
-                takeimage();
+                showDia(5);
                 break;
             case R.id.ed_search:
                 startActivity(new Intent(getApplicationContext(),ClientSearchActivity.class));
                 overridePendingTransition(R.anim.enter,R.anim.exit);
                 break;
             case R.id.btn_attachment:
-                takeimage();
+                showDia(5);
                 break;
             case R.id.btn_generate_ticket:
                 validation();
+                break;
+            case R.id.rdo_sw:
+                rdo_sw.setChecked(true);
+                rdo_hw.setChecked(false);
+                rdo_it.setChecked(false);
+                break;
+            case R.id.rdo_hw:
+                rdo_sw.setChecked(false);
+                rdo_hw.setChecked(true);
+                rdo_it.setChecked(false);
+                break;
+            case R.id.rdo_it:
+                rdo_sw.setChecked(false);
+                rdo_hw.setChecked(false);
+                rdo_it.setChecked(true);
                 break;
         }
     }
@@ -166,7 +189,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1 && resultCode==RESULT_OK){
+        if(requestCode==REQUEST_IMAGE_TAKE && resultCode==RESULT_OK){
             try {
                 img.setVisibility(View.VISIBLE);
                 String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + "temp.jpg");
@@ -203,6 +226,34 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 writeLog("AddNewTicketActivity_onActivityResult_"+e.getMessage());
                 e.printStackTrace();
             }
+        }else if (requestCode == REQUEST_IMAGE_PICK_UP && resultCode == RESULT_OK && data!=null) {
+            try {
+                Uri selectedImage = data.getData();
+                String[] filepathcoloum = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage, filepathcoloum, null, null, null);
+                if(cursor!=null) {
+                    if (cursor.moveToFirst()) {
+                        int columnindex = cursor.getColumnIndex(filepathcoloum[0]);
+                        String imgDecodedString = cursor.getString(columnindex);
+                        long datetime = System.currentTimeMillis();
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd_MMM_yyyy_HH_mm_ss", Locale.ENGLISH);
+                        Date resultdate = new Date(datetime);
+                        String clientID = FirstActivity.pref.getString(getString(R.string.pref_clientID), "");
+                        String fname = clientID + "_" + sdf.format(resultdate);
+                        File sourcefile = new File(imgDecodedString);
+                        File destinationfile = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + "/" + fname + ".jpg");
+                        copyImage(sourcefile, destinationfile);
+                        cursor.close();
+                    }
+                }else{
+                    toast.setText("Please Try Again");
+                    toast.show();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                toast.setText("Something Went Wrong");
+                toast.show();
+            }
         }
     }
 
@@ -215,12 +266,36 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         ed_description = (EditText) findViewById(R.id.ed_description);
         lay_attachment = (LinearLayout) findViewById(R.id.lay_attachment);
         lay_branch_search = (LinearLayout) findViewById(R.id.lay_branch_search);
+        lay_pointtype = (LinearLayout) findViewById(R.id.lay_pointtype);
         img = (ImageView) findViewById(R.id.img);
         toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER,0,0);
         constant = new Constant(AddNewTicketActivity.this);
         db = new DBHandler(getApplicationContext());
         sp_branch = (Spinner) findViewById(R.id.sp_branch);
+
+        rdo_sw = (RadioButton) findViewById(R.id.rdo_sw);
+        rdo_hw = (RadioButton) findViewById(R.id.rdo_hw);
+        rdo_it = (RadioButton) findViewById(R.id.rdo_it);
+
+        empType = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+        isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+
+        if(empType.equals("C")){
+            rdo_it.setVisibility(View.GONE);
+            if(isHWapplicable.equals("S")){
+                rdo_sw.setVisibility(View.VISIBLE);
+                rdo_sw.setChecked(true);
+                rdo_hw.setVisibility(View.GONE);
+            }else if(isHWapplicable.equals("H")){
+                rdo_sw.setVisibility(View.GONE);
+                rdo_hw.setVisibility(View.VISIBLE);
+                rdo_hw.setChecked(true);
+            }else if(isHWapplicable.equals("SH")){
+                rdo_sw.setVisibility(View.VISIBLE);
+                rdo_hw.setVisibility(View.VISIBLE);
+            }
+        }
         /*branchList = db.getDistinctBranch();
         if(branchList!=null){
             if(branchList.size()!=0){
@@ -236,7 +311,71 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         File f = Constant.checkFolder(Constant.folder_name);
         f = new File(f.getAbsolutePath(),"temp.jpg");
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-        startActivityForResult(intent,1);
+        startActivityForResult(intent,REQUEST_IMAGE_TAKE);
+    }
+
+    void openGallery(){
+        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(gallery,REQUEST_IMAGE_PICK_UP);
+    }
+
+    void copyImage(File source, File destination){
+        try {
+            FileChannel sourcechannel, destinationchannel;
+            sourcechannel = new FileInputStream(source).getChannel();
+            destinationchannel = new FileOutputStream(destination).getChannel();
+            if(sourcechannel!=null){
+                destinationchannel.transferFrom(sourcechannel,0,sourcechannel.size());
+            }
+            if(sourcechannel!=null){
+                sourcechannel.close();
+            }
+            destinationchannel.close();
+            setImage(destination, 1);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    void setImage(File f, int i){
+        OutputStream outFile;
+        try {
+            img.setVisibility(View.VISIBLE);
+            Bitmap bitmap;
+            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+            bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(), bitmapOptions);
+            Bitmap bmp = scaleBitmap(f.getAbsolutePath());
+            img.setImageBitmap(bmp);
+            File file;
+            if(i == 0) {
+                String OImgPath = Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name+"/";
+                if (f.delete()) {
+                    Log.d("log", "log");
+                }
+                long datetime = System.currentTimeMillis();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd_MMM_yyyy_HH_mm_ss", Locale.ENGLISH);
+                Date resultdate = new Date(datetime);
+                String clientID = FirstActivity.pref.getString(getString(R.string.pref_clientID), "");
+                String fname = clientID+"_" + sdf.format(resultdate);
+                file = new File(OImgPath, "/" + fname + ".jpg");
+                //imagePath = file.getAbsolutePath();
+                imagePath = fname + ".jpg";
+            }else{
+                file = f;
+                imagePath = f.getAbsolutePath();
+                imagePath = f.getName();
+            }
+            try {
+                outFile = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 15, outFile);
+                outFile.flush();
+                outFile.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     void validation() {
@@ -259,6 +398,21 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             toast.setText("Please Enter Description");
             check = false;
         }
+
+        if(empType.equals("C")) {
+            if (!rdo_sw.isChecked() && !rdo_hw.isChecked()) {
+                toast.setText("Please Select Point Type");
+                check = false;
+                view = rdo_sw;
+            }
+        }else{
+            if (!rdo_sw.isChecked() && !rdo_hw.isChecked() && !rdo_it.isChecked()) {
+                toast.setText("Please Select Point Type");
+                check = false;
+                view = rdo_sw;
+            }
+        }
+
         if(check){
             generateTicket();
         }else{
@@ -271,8 +425,18 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         try {
             int clientAuto = 0, ok = 0;
             String type, clientName = null, mobno = null, _subject = null, _description = null,
-                    branch, _imagePath = imagePath, _status = "Open", imgFolder;
+                    branch, _imagePath = imagePath, _status = "Open", imgFolder, pointtype = null;
+
             type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+
+            if(rdo_sw.isChecked()){
+                pointtype = "S";
+            }else if(rdo_hw.isChecked()){
+                pointtype = "H";
+            }else if(rdo_it.isChecked()){
+                pointtype = "I";
+            }
+
             if (type.equals("C")) {
                 clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
                 clientName = FirstActivity.pref.getString(getString(R.string.pref_ClientName), "0");
@@ -308,13 +472,18 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 _status = URLEncoder.encode(_status, "UTF-8");
                 mobno = URLEncoder.encode(mobno, "UTF-8");
                 branch = URLEncoder.encode(branch, "UTF-8");
-                Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch);
+                pointtype = URLEncoder.encode(pointtype, "UTF-8");
+
+                Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch+"-"+pointtype);
 
                 String url = Constant.ipaddress + "/AddTicketMaster?clientAuto=" + clientAuto +
                         "&subject=" + _subject + "&desc=" + _description + "&imagePath=" + _imagePath +
-                        "&status=" + _status + "&CrBy=" + clientName + "&type=" + type + "&mobno=" + mobno + "&branch=" + branch;
+                        "&status=" + _status + "&CrBy=" + clientName + "&type=" + type + "&mobno=" + mobno +
+                        "&branch=" + branch + "&ptype="+pointtype;
+
                 writeLog("AddNewTicketActivity_generateTicket_" + url);
                 Constant.showLog(url);
+
                 if (ConnectivityTest.getNetStat(getApplicationContext())) {
                     if (!imagePath.equals("") && imagePath != null) {
                         atomicInteger = new AtomicInteger(2);
@@ -561,6 +730,22 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                     new Constant(AddNewTicketActivity.this).doFinish();
+                }
+            });
+        }else if(a==5) {
+            builder.setMessage("Select Attachment From...");
+            builder.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    openGallery();
+                }
+            });
+            builder.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    takeimage();
                 }
             });
         }

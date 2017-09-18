@@ -7,7 +7,7 @@ import java.io.Serializable;
 public class TicketMasterClass implements Serializable{
 
     public String finyr, ticketNo,Particular,Subject,ImagePAth,Status,CrBy,CrDate,CrTime,ModBy,
-            ModDate,ModTime, type, genType, assignTO, assignTODate, assignTOTime, assignBy, assignByDate, assignByTime,branch, clientName;
+            ModDate,ModTime, type, genType, assignTO, assignTODate, assignTOTime, assignBy, assignByDate, assignByTime,branch, clientName, pointtype;
     public int auto, id, clientAuto;
 
     public String getTicketNo() {
@@ -208,5 +208,13 @@ public class TicketMasterClass implements Serializable{
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+    }
+
+    public String getPointtype() {
+        return pointtype;
+    }
+
+    public void setPointtype(String pointtype) {
+        this.pointtype = pointtype;
     }
 }
