@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -72,6 +73,8 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     private AdView mAdView;
     private int isDataImageSaved = -1, REQUEST_IMAGE_PICK_UP = 2, REQUEST_IMAGE_TAKE = 3;
     private RadioButton rdo_sw, rdo_hw, rdo_it;
+    private PowerManager pm;
+    private PowerManager.WakeLock wl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +176,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public void onBackPressed() {
+        wl.release();
         new Constant(AddNewTicketActivity.this).doFinish();
     }
 
@@ -180,6 +184,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
+                wl.release();
                 new Constant(AddNewTicketActivity.this).doFinish();
                 break;
         }
@@ -273,6 +278,10 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         constant = new Constant(AddNewTicketActivity.this);
         db = new DBHandler(getApplicationContext());
         sp_branch = (Spinner) findViewById(R.id.sp_branch);
+
+        pm = (PowerManager) getSystemService(POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,"Log");
+        wl.acquire();
 
         rdo_sw = (RadioButton) findViewById(R.id.rdo_sw);
         rdo_hw = (RadioButton) findViewById(R.id.rdo_hw);
@@ -665,6 +674,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
     void showDia(int a){
         AlertDialog.Builder builder = new AlertDialog.Builder(AddNewTicketActivity.this);
+        builder.setCancelable(false);
         if(a==0) {
             builder.setMessage("Do You Want To Go Back?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -746,6 +756,12 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                     takeimage();
+                }
+            });
+            builder.setNeutralButton("Cancel",new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                 }
             });
         }

@@ -54,6 +54,22 @@ public class ParseJSON {
         return data;
     }
 
+    public String parseVersion() {
+        String data = null;
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    data = jsonArray.getJSONObject(i).getString("mobversion");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeLog("ParseJSON_parseVersion_"+e.getMessage());
+        }
+        return data;
+    }
+
     public ArrayList<ShortDescClass> parseShortDesc(){
         ArrayList<ShortDescClass> list = new ArrayList<>();
         try{

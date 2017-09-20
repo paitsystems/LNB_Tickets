@@ -101,18 +101,18 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_reply:
-                if(!ed_reply.getText().toString().equals("")) {
+                if(!ed_reply.getText().toString().equals("") && ed_reply.getText().toString().length()!=0) {
                     addTicketDetail();
                 }else{
-                    toast.setText("Please Enter Comment");
+                    toast.setText("Please Enter Message");
                     toast.show();
                 }
                 break;
             case R.id.img_reply:
-                if(!ed_reply.getText().toString().equals("")) {
+                if(!ed_reply.getText().toString().equals("") && ed_reply.getText().toString().length()!=0) {
                     addTicketDetail();
                 }else{
-                    toast.setText("Please Enter Comment");
+                    toast.setText("Please Enter Message");
                     toast.show();
                 }
                 break;
