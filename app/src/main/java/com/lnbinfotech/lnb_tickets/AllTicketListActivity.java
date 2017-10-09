@@ -35,15 +35,15 @@ import java.util.Locale;
 
 public class AllTicketListActivity extends AppCompatActivity {
 
-    ListView listView;
-    Constant constant;
-    Toast toast;
-    static int selPos;
-    static String selStat;
-    AllTicketListAdapter adapter;
-    EditText ed_search;
-    DBHandler db;
-    AdView mAdView;
+    private ListView listView;
+    private Constant constant;
+    private Toast toast;
+    public static int selPos;
+    public static String selStat;
+    private AllTicketListAdapter adapter;
+    private EditText ed_search;
+    private DBHandler db;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

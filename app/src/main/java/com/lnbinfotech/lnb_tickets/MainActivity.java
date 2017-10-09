@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -33,11 +35,13 @@ import com.lnbinfotech.lnb_tickets.adapter.ShortDescListAdapter;
 import com.lnbinfotech.lnb_tickets.connectivity.ConnectivityTest;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
+import com.lnbinfotech.lnb_tickets.interfaces.ServerCallback;
 import com.lnbinfotech.lnb_tickets.log.CopyLog;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.mail.GMailSender;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
+import com.lnbinfotech.lnb_tickets.volleyrequests.VolleyRequests;
 
 import org.jsoup.Jsoup;
 
@@ -49,19 +53,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    TextView tv_total, tv_complete, tv_pending;
-    Button btn_view_all, btn_add;
-    AutoCompleteTextView auto;
-    ImageView img_add_new, img_view_all;
-    Constant constant;
-    Toast toast;
-    ListView listView;
+    private TextView tv_total, tv_complete, tv_pending;
+    private Button btn_view_all, btn_add;
+    private AutoCompleteTextView auto;
+    private ImageView img_add_new, img_view_all;
+    private Constant constant;
+    private Toast toast;
+    private ListView listView;
     public static int isUpdate = 0;
     private DBHandler db;
-    AdView mAdView;
-    PowerManager pm;
-    PowerManager.WakeLock wl;
-    int isDiaShowed = 0;
+    private AdView mAdView;
+    private int isDiaShowed = 0;
+    private String version = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +91,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         mAdView.loadAd(adRequest);
 
-        loadData();
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionCode+"."+pInfo.versionName;
+            Constant.showLog(version);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            writeLog("MainActivity_"+e.getMessage());
+        }
+
+        if(ConnectivityTest.getNetStat(getApplicationContext())) {
+            loadData();
+        }else{
+            toast.setText("You Are Offline");
+            toast.show();
+        }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -149,7 +166,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 overridePendingTransition(R.anim.enter,R.anim.exit);
                 break;
             case R.id.btn_view_all:
-                startActivity(new Intent(getApplicationContext(),AllTicketListActivity.class));
+                //startActivity(new Intent(getApplicationContext(),AllTicketListActivity.class));
+                startActivity(new Intent(getApplicationContext(),AllTicketTabPagerActivity.class));
                 overridePendingTransition(R.anim.enter,R.anim.exit);
                 break;
             case R.id.img_add_new:
@@ -179,6 +197,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showDia(7);
         }else if(item.getItemId() == R.id.report_error){
             showDia(6);
+        }else if(item.getItemId() == R.id.changePassword){
+            startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
+            overridePendingTransition(R.anim.enter,R.anim.exit);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -199,9 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toast.setGravity(Gravity.CENTER,0,0);
         constant = new Constant(MainActivity.this);
         db = new DBHandler(getApplicationContext());
-        pm = (PowerManager) getSystemService(POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,"Log");
-        wl.acquire();
+
     }
 
     void refreshUserData(){
@@ -257,57 +276,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void loadData(){
         constant.showPD();
-        final AtomicInteger atomicInteger = new AtomicInteger(2);
+        final AtomicInteger atomicInteger = new AtomicInteger(4);
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        db.deleteTabel(DBHandler.Ticket_Master_Table);
-        db.deleteTabel(DBHandler.SMLMAST_Table);
+        String isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+
         int autoId = db.getMaxAutoId(type);
-        String url1 = Constant.ipaddress+"/GetCount?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0);
+        String moddate1 = db.getLatestModDate1();
+
+        String url1 = Constant.ipaddress+"/GetVersion";
         String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
-                "&type="+type+"&autoId="+autoId;
+                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable;
         String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
                 "&auto="+db.getSMLMASTMaxAuto();
+        String url4 = Constant.ipaddress+"/GetUpdatedTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
+                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable+"&moddate="+moddate1;
 
-        //Constant.showLog(url1);
+        Constant.showLog(url1);
         Constant.showLog(url2);
         Constant.showLog(url3);
+        Constant.showLog(url4);
 
-        StringRequest countRequest = new StringRequest(url1,
+        StringRequest versionRequest = new StringRequest(url1,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String result) {
                         Constant.showLog(result);
                         result = result.replace("\\", "");
                         result = result.replace("''", "");
-                        result = result.substring(1,result.length()-1);
-                        String _data = new ParseJSON(result).parseGetCountData();
+                        result = result.substring(1, result.length() - 1);
+                        String _data = new ParseJSON(result).parseVersion();
                         int taskLeft = atomicInteger.decrementAndGet();
-                        if(taskLeft==0) {
+                        if (taskLeft == 0) {
                             constant.showPD();
                         }
-                        SharedPreferences.Editor editor = FirstActivity.pref.edit();
-                        int total = 0;
-                        if(_data!=null && !_data.equals("0")){
-                            String[] data = _data.split("\\^");
-                            total = Integer.parseInt(data[0]);
-                            tv_total.setText(data[0]);
-                            tv_complete.setText(data[1]);
-                            tv_pending.setText(data[2]);
-                        }else if(_data== null){
+                        if (_data != null && !_data.equals("0")) {
+                            if (version.equals(_data)) {
+                                SharedPreferences.Editor editor = FirstActivity.pref.edit();
+                                editor.putString(getString(R.string.pref_version), _data);
+                                editor.apply();
+                            }else{
+                                showDia(8);
+                            }
+                        } else if (_data == null) {
                             showDia(3);
                         }
-                        editor.putInt(getString(R.string.pref_ticketTotal),total);
-                        editor.apply();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("MainActivity_loadData_countRequest_"+ error.getMessage());
-                        SharedPreferences.Editor editor = FirstActivity.pref.edit();
-                        editor.putInt(getString(R.string.pref_ticketTotal),0);
-                        editor.apply();
-                        error.printStackTrace();
+                        writeLog("MainActivity_loadData_versionRequest_"+ error.getMessage());
                         int taskLeft = atomicInteger.decrementAndGet();
                         if(taskLeft==0) {
                             constant.showPD();
@@ -385,10 +403,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         );
 
+        StringRequest updateRequest = new StringRequest(url4,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        Constant.showLog(result);
+                        result = result.replace("\\", "");
+                        result = result.replace("''", "");
+                        result = result.substring(1, result.length() - 1);
+                        new ParseJSON(result, getApplicationContext()).parseUpdatedTicket();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if (taskLeft == 0) {
+                            constant.showPD();
+                            setData();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        writeLog("MainActivity_loadData_updateRequest_"+ error.getMessage());
+                        error.printStackTrace();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if(taskLeft==0) {
+                            constant.showPD();
+                        }
+                        if(isDiaShowed!=1) {
+                            showDia(3);
+                            isDiaShowed = 1;
+                        }
+                    }
+                }
+        );
+
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        //queue.add(countRequest);
+        queue.add(versionRequest);
         queue.add(descRequest);
         queue.add(custRequest);
+        queue.add(updateRequest);
     }
 
     private class FetchAppVersionFromGooglePlayStore extends AsyncTask<String, Void, String> {
@@ -415,6 +467,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Constant.showLog(string);
             constant.showPD();
         }
+    }
+
+    private void loadVersionCode(){
+        constant.showPD();
+        String url1 = Constant.ipaddress+"/GetVersion";
+        Constant.showLog(url1);
+
+        VolleyRequests requests = new VolleyRequests(MainActivity.this);
+        requests.checkVersion(url1, new ServerCallback() {
+            @Override
+            public void onSuccess(String _data) {
+                if (_data != null && !_data.equals("0")) {
+                    if (version.equals(_data)) {
+                        SharedPreferences.Editor editor = FirstActivity.pref.edit();
+                        editor.putString(getString(R.string.pref_version), _data);
+                        editor.apply();
+                        //loadTicketData();
+                    }else{
+                        constant.showPD();
+                        showDia(8);
+                    }
+                } else if (_data == null) {
+                    constant.showPD();
+                    showDia(3);
+                }
+            }
+
+            @Override
+            public void onFailure(String result) {
+                constant.showPD();
+                showDia(3);
+            }
+        });
+    }
+
+    private void loadTicketData(){
+        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+        db.deleteTabel(DBHandler.Ticket_Master_Table);
+        db.deleteTabel(DBHandler.SMLMAST_Table);
+        int autoId = db.getMaxAutoId(type);
+        String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
+                "&type="+type+"&autoId="+autoId;
+        String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
+                "&auto="+db.getSMLMASTMaxAuto();
+
+        Constant.showLog(url2);
+        Constant.showLog(url3);
+
+        VolleyRequests requests = new VolleyRequests(MainActivity.this);
+        requests.loadTicketData(url2, new ServerCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onFailure(String result) {
+                constant.showPD();
+            }
+        });
+
+        VolleyRequests requests1 = new VolleyRequests(MainActivity.this);
+        requests.loadCustomerData(url3, new ServerCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onFailure(String result) {
+                constant.showPD();
+            }
+        });
+
     }
 
     private void setData(){
@@ -466,7 +592,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    refreshUserData();
+                    if(ConnectivityTest.getNetStat(getApplicationContext())) {
+                        refreshUserData();
+                    }else{
+                        toast.setText("You Are Offline");
+                        toast.show();
+                    }
                     dialogInterface.dismiss();
                 }
             });
@@ -482,7 +613,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Constant.deleteLogFile();
-                    wl.release();
                     new Constant(MainActivity.this).doFinish();
                     dialogInterface.dismiss();
                 }
@@ -522,7 +652,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    refreshUserData();
+                    if(ConnectivityTest.getNetStat(getApplicationContext())) {
+                        refreshUserData();
+                    }else{
+                        toast.setText("You Are Offline");
+                        toast.show();
+                    }
                     dialog.dismiss();
                 }
             });
@@ -568,6 +703,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+        }else if(i==8) {
+            builder.setTitle("Update App");
+            builder.setMessage("Smart Ticket's New Version Is Available");
+            builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    FirstActivity.pref.edit().clear().commit();
+                    db.deleteTabel(DBHandler.Ticket_Master_Table);
+                    db.deleteTabel(DBHandler.SMLMAST_Table);
+                    new Constant(MainActivity.this).doFinish();
+                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                    }
+                    catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
+                    }
                     dialog.dismiss();
                 }
             });

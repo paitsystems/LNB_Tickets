@@ -41,6 +41,7 @@ import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
+import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
 import com.lnbinfotech.lnb_tickets.services.DownloadImageService;
 
 import java.io.File;
@@ -49,6 +50,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UpdateTicketActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -70,6 +72,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     private AdView mAdView;
     private ProgressBar pb;
     private DBHandler db;
+    private int isDiaShowed = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +113,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     protected void onResume() {
         super.onResume();
         constant = new Constant(UpdateTicketActivity.this);
+        isDiaShowed = 0;
         if(mAdView!=null){
             mAdView.resume();
         }
@@ -259,7 +263,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                     "&finyr="+finyr+"&status="+_status+"&modBy="+clientName+"&ticketno="+ticketno+"&mobno="+mobno;
             Constant.showLog(url);
 
-            db.updateTicketStatus(auto,id,clientAuto,_finyr,status,_clientName,ticketno);
+            //db.updateTicketStatus(auto,id,clientAuto,_finyr,status,_clientName,ticketno);
 
             StringRequest request = new StringRequest(url,
                     new Response.Listener<String>() {
@@ -270,7 +274,8 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                             result = result.replace("''", "");
                             result = result.replace("\"","");
                             if(!result.equals("0") && !result.equals("")){
-                                showDia(1);
+                                //showDia(1);
+                                loadData();
                             }else{
                                 showDia(3);
                             }
@@ -297,6 +302,131 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             e.printStackTrace();
             constant.showPD();
         }
+    }
+
+    void loadData(){
+        constant.showPD();
+        final AtomicInteger atomicInteger = new AtomicInteger(3);
+        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+        String isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+        isDiaShowed = 0;
+        int autoId = db.getMaxAutoId(type);
+        String moddate1 = db.getLatestModDate1();
+
+        String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
+                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable;
+        String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
+                "&auto="+db.getSMLMASTMaxAuto();
+        String url4 = Constant.ipaddress+"/GetUpdatedTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
+                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable+"&moddate="+moddate1;
+
+        Constant.showLog(url2);
+        Constant.showLog(url3);
+        Constant.showLog(url4);
+
+        StringRequest descRequest = new StringRequest(url2,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        Constant.showLog(result);
+                        result = result.replace("\\", "");
+                        result = result.replace("''", "");
+                        result = result.substring(1, result.length() - 1);
+                        new ParseJSON(result, getApplicationContext()).parseAllTicket();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if (taskLeft == 0) {
+                            constant.showPD();
+                            showDia(1);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        writeLog("UpdateTicketActivity_loadData_descRequest_"+ error.getMessage());
+                        error.printStackTrace();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if(taskLeft==0) {
+                            constant.showPD();
+                        }
+                        if(isDiaShowed!=1) {
+                            showDia(3);
+                            isDiaShowed = 1;
+                        }
+                    }
+                }
+        );
+
+        StringRequest custRequest = new StringRequest(url3,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        Constant.showLog(result);
+                        result = result.replace("\\", "");
+                        result = result.replace("''", "");
+                        result = result.substring(1,result.length()-1);
+                        new ParseJSON(result, getApplicationContext()).parseSMLMASTData();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if (taskLeft == 0) {
+                            constant.showPD();
+                            showDia(1);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        writeLog("UpdateTicketActivity_loadData_custRequest_"+ error.getMessage());
+                        error.printStackTrace();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if(taskLeft==0) {
+                            constant.showPD();
+                        }
+                        if(isDiaShowed!=1) {
+                            showDia(3);
+                            isDiaShowed = 1;
+                        }
+                    }
+                }
+        );
+
+        StringRequest updateRequest = new StringRequest(url4,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        Constant.showLog(result);
+                        result = result.replace("\\", "");
+                        result = result.replace("''", "");
+                        result = result.substring(1, result.length() - 1);
+                        new ParseJSON(result, getApplicationContext()).parseUpdatedTicket();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if (taskLeft == 0) {
+                            constant.showPD();
+                            showDia(1);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        writeLog("UpdateTicketActivity_loadData_updateRequest_"+ error.getMessage());
+                        error.printStackTrace();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if(taskLeft==0) {
+                            constant.showPD();
+                        }
+                        if(isDiaShowed!=1) {
+                            showDia(3);
+                            isDiaShowed = 1;
+                        }
+                    }
+                }
+        );
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        queue.add(descRequest);
+        queue.add(custRequest);
+        queue.add(updateRequest);
     }
 
     void setImage(){

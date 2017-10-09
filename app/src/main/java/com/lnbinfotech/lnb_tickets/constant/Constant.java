@@ -23,6 +23,8 @@ import java.util.Locale;
 public class Constant {
 
     //TODO: Check VersionCode and Version Name
+    //TODO: Update VersionCode and Version Name In Version Table in LiveDatabase
+    //TODO: Uncomment SendSMS in Webservice
 
     public static String folder_name = "Ticket",
             log_file_name = "Ticket",
@@ -36,15 +38,13 @@ public class Constant {
             ftp_password = "support$456";
             //ftp_directory = "SMVisit_Indus";
 
-    //TODO: Check Ip Address
-    //public static final String ipaddress = "http://172.30.1.38/LNBTCK/service.svc";
-    public static final String ipaddress = "http://172.30.1.38/LNBTCK_7_7/service.svc";
+    //TODO: Check Ip AddressAd
+    //public static final String ipaddress = "http://172.30.1.38/LNBTCK_8_8/service.svc";
 
-    //public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK/service.svc";
-    //public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_3_3/service.svc";
+    public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_8_8/service.svc";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
-    public static int liveTestFlag = 0;
+    public static int liveTestFlag = 1;
 
     Activity activity;
     Context context;

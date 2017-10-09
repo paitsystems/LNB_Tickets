@@ -57,17 +57,24 @@ public class FirstActivity extends AppCompatActivity {
     }
 
     void doThis(){
-        if (pref.contains(getString(R.string.pref_logged))) {
-            if (pref.getBoolean(getString(R.string.pref_logged), false)) {
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        if (!pref.contains(getString(R.string.pref_isHWapplicable))) {
+            writeLog("FirstActivity_doThis_Pref_Deleted");
+            FirstActivity.pref.edit().clear().commit();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            doFinish();
+        }else {
+            if (pref.contains(getString(R.string.pref_logged))) {
+                if (pref.getBoolean(getString(R.string.pref_logged), false)) {
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                } else {
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                }
             } else {
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
-        } else {
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            doFinish();
         }
-        overridePendingTransition(R.anim.enter,R.anim.exit);
-        doFinish();
+
     }
 
     @Override

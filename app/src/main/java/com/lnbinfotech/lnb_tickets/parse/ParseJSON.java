@@ -15,7 +15,10 @@ import com.lnbinfotech.lnb_tickets.model.TicketDetailClass;
 
 import org.json.JSONArray;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 // Created by lnb on 8/11/2016.
 
@@ -50,6 +53,22 @@ public class ParseJSON {
         } catch (Exception e) {
             e.printStackTrace();
             writeLog("ParseJSON_parseGetCountData_"+e.getMessage());
+        }
+        return data;
+    }
+
+    public String parseVersion() {
+        String data = null;
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    data = jsonArray.getJSONObject(i).getString("mobversion");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeLog("ParseJSON_parseVersion_"+e.getMessage());
         }
         return data;
     }
@@ -135,7 +154,7 @@ public class ParseJSON {
         try {
             JSONArray jsonArray = new JSONArray(json);
             if (jsonArray.length() >= 1) {
-                db.deleteTabel(DBHandler.SMLMAST_Table);
+                //db.deleteTabel(DBHandler.SMLMAST_Table);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     SMLMASTClass custClass = new SMLMASTClass();
                     custClass.setAuto(jsonArray.getJSONObject(i).getInt("Auto"));
@@ -169,7 +188,6 @@ public class ParseJSON {
             JSONArray jsonArray = new JSONArray(json);
             Constant.showLog(""+jsonArray.length());
             if (jsonArray.length() >= 1) {
-                //db.deleteTabel(DBHandler.Ticket_Master_Table);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     TicketMasterClass pendingTicketClass = new TicketMasterClass();
                     pendingTicketClass.setAuto(jsonArray.getJSONObject(i).getInt("auto"));
@@ -186,7 +204,8 @@ public class ParseJSON {
                     pendingTicketClass.setCrDate(jsonArray.getJSONObject(i).getString("CrDate"));
                     pendingTicketClass.setCrTime(jsonArray.getJSONObject(i).getString("CrTime"));
                     pendingTicketClass.setModBy(jsonArray.getJSONObject(i).getString("ModBy"));
-                    pendingTicketClass.setModDate(jsonArray.getJSONObject(i).getString("ModDate"));
+                    String moddate = jsonArray.getJSONObject(i).getString("ModDate");
+                    pendingTicketClass.setModDate(moddate);
                     pendingTicketClass.setModTime(jsonArray.getJSONObject(i).getString("ModTime"));
                     pendingTicketClass.setAssignTO(jsonArray.getJSONObject(i).getString("AssignTo"));
                     pendingTicketClass.setAssignTODate(jsonArray.getJSONObject(i).getString("AssignDate"));
@@ -198,6 +217,12 @@ public class ParseJSON {
                     pendingTicketClass.setGenType(jsonArray.getJSONObject(i).getString("GenType"));
                     pendingTicketClass.setBranch(jsonArray.getJSONObject(i).getString("Branch"));
                     pendingTicketClass.setPointtype(jsonArray.getJSONObject(i).getString("PointType"));
+                    String moddate1 = "null";
+                    if(!moddate.equals("null")) {
+                        Date d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(moddate);
+                        moddate1 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(d);
+                    }
+                    pendingTicketClass.setModdate1(moddate1);
                     list.add(pendingTicketClass);
                     db.addTicketMaster(pendingTicketClass);
                 }
@@ -205,6 +230,58 @@ public class ParseJSON {
         }catch (Exception e){
             e.printStackTrace();
             writeLog("ParseJSON_parseAllTicket_"+e.getMessage());
+        }
+        return list;
+    }
+
+    public ArrayList<TicketMasterClass> parseUpdatedTicket(){
+        ArrayList<TicketMasterClass> list = new ArrayList<>();
+        try{
+            JSONArray jsonArray = new JSONArray(json);
+            Constant.showLog(""+jsonArray.length());
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                    pendingTicketClass.setAuto(jsonArray.getJSONObject(i).getInt("auto"));
+                    pendingTicketClass.setId(jsonArray.getJSONObject(i).getInt("id"));
+                    pendingTicketClass.setClientAuto(jsonArray.getJSONObject(i).getInt("ClientAuto"));
+                    pendingTicketClass.setClientName(jsonArray.getJSONObject(i).getString("ClientName"));
+                    pendingTicketClass.setFinyr(jsonArray.getJSONObject(i).getString("finyr"));
+                    pendingTicketClass.setTicketNo(jsonArray.getJSONObject(i).getString("ticketNo"));
+                    pendingTicketClass.setParticular(jsonArray.getJSONObject(i).getString("Particular"));
+                    pendingTicketClass.setSubject(jsonArray.getJSONObject(i).getString("Subject"));
+                    pendingTicketClass.setImagePAth(jsonArray.getJSONObject(i).getString("ImagePAth"));
+                    pendingTicketClass.setStatus(jsonArray.getJSONObject(i).getString("Status"));
+                    pendingTicketClass.setCrBy(jsonArray.getJSONObject(i).getString("CrBy"));
+                    pendingTicketClass.setCrDate(jsonArray.getJSONObject(i).getString("CrDate"));
+                    pendingTicketClass.setCrTime(jsonArray.getJSONObject(i).getString("CrTime"));
+                    pendingTicketClass.setModBy(jsonArray.getJSONObject(i).getString("ModBy"));
+                    String moddate = jsonArray.getJSONObject(i).getString("ModDate");
+                    pendingTicketClass.setModDate(moddate);
+                    pendingTicketClass.setModTime(jsonArray.getJSONObject(i).getString("ModTime"));
+                    pendingTicketClass.setAssignTO(jsonArray.getJSONObject(i).getString("AssignTo"));
+                    pendingTicketClass.setAssignTODate(jsonArray.getJSONObject(i).getString("AssignDate"));
+                    pendingTicketClass.setAssignTOTime(jsonArray.getJSONObject(i).getString("AssignTime"));
+                    pendingTicketClass.setAssignBy(jsonArray.getJSONObject(i).getString("Assignby"));
+                    pendingTicketClass.setAssignByDate(jsonArray.getJSONObject(i).getString("AssignbyDate"));
+                    pendingTicketClass.setAssignByTime(jsonArray.getJSONObject(i).getString("AssignbyTime"));
+                    pendingTicketClass.setType(jsonArray.getJSONObject(i).getString("type"));
+                    pendingTicketClass.setGenType(jsonArray.getJSONObject(i).getString("GenType"));
+                    pendingTicketClass.setBranch(jsonArray.getJSONObject(i).getString("Branch"));
+                    pendingTicketClass.setPointtype(jsonArray.getJSONObject(i).getString("PointType"));
+                    String moddate1 = "null";
+                    if(!moddate.equals("null")) {
+                        Date d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(moddate);
+                        moddate1 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(d);
+                    }
+                    pendingTicketClass.setModdate1(moddate1);
+                    list.add(pendingTicketClass);
+                    db.updateTicketMaster(pendingTicketClass);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            writeLog("ParseJSON_parseUpdateTicket_"+e.getMessage());
         }
         return list;
     }

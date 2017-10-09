@@ -22,7 +22,7 @@ import java.util.Locale;
 public class DBHandler extends SQLiteOpenHelper {
 
     public static final String Database_Name = "APITTECH.db";
-    public static final int Database_Version = 4;
+    public static final int Database_Version = 5;
 
     public static final String Ticket_Master_Table = "TicketMaster";
     public static final String TicketM_Auto = "Auto";
@@ -51,6 +51,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String TicketM_AssignByTime = "AssignByTime";
     public static final String TicketM_Branch = "Branch";
     public static final String TicketM_PointType = "PointType";
+    public static final String TicketM_ModDate1 = "ModDate1";
 
     public static final String Ticket_Detail_Table = "TicketDetail";
     public static final String TicketD_Auto = "Auto";
@@ -86,7 +87,7 @@ public class DBHandler extends SQLiteOpenHelper {
             TicketM_ModDate+" text,"+TicketM_ModTime+" text,"+TicketM_AssignTo+" text,"+
             TicketM_AssignDate+" text,"+TicketM_AssignTime+" text,"+TicketM_Type+" text,"+
             TicketM_GenType+" text,"+TicketM_AssignBy+" text,"+TicketM_AssignByDate+" text,"+TicketM_AssignByTime+" text,"+
-            TicketM_Branch+" text,"+TicketM_PointType+" text);";
+            TicketM_Branch+" text,"+TicketM_PointType+" text,"+TicketM_ModDate1+" text);";
 
     private String create_table_detail = "create table if not exists "+ Ticket_Detail_Table+"("+
             TicketD_Auto+" int,"+TicketD_MastAuto+" int,"+TicketD_Description+" text,"+
@@ -174,6 +175,7 @@ public class DBHandler extends SQLiteOpenHelper {
         cv.put(TicketM_AssignByTime,ticketMaster.getAssignByTime());
         cv.put(TicketM_Branch,ticketMaster.getBranch());
         cv.put(TicketM_PointType,ticketMaster.getPointtype());
+        cv.put(TicketM_ModDate1,ticketMaster.getModdate1());
         getWritableDatabase().insert(Ticket_Master_Table,null,cv);
     }
 
@@ -233,9 +235,9 @@ public class DBHandler extends SQLiteOpenHelper {
     public String getCount(){
         String count  = "0-0-0";
         String str = "select " +
-                "(select count("+TicketM_Auto+") from "+Ticket_Master_Table+") as Total," +
-                "(select count("+TicketM_Auto+") from "+Ticket_Master_Table+" where "+TicketM_Status+"='Closed' or "+TicketM_Status+"='Cancel' or "+TicketM_Status+"='ClientClosed') as Complete," +
-                "(select count("+TicketM_Auto+") from "+Ticket_Master_Table+" where "+TicketM_Status+"<>'Closed' and "+TicketM_Status+"<>'Cancel' and "+TicketM_Status+"<>'ClientClosed') as Pending";
+                "(select count("+TicketM_Auto+") from "+Ticket_Master_Table+" where "+TicketM_PointType+"<>'I') as Total," +
+                "(select count("+TicketM_Auto+") from "+Ticket_Master_Table+" where "+TicketM_Status+" in ('Closed','Cancel','ClientClosed') and "+TicketM_PointType+"<>'I') as Complete," +
+                "(select count("+TicketM_Auto+") from "+Ticket_Master_Table+" where "+TicketM_Status+"<>'Closed' and "+TicketM_Status+"<>'Cancel' and "+TicketM_Status+"<>'ClientClosed' and "+TicketM_PointType+"<>'I') as Pending";
         Cursor res = getWritableDatabase().rawQuery(str,null);
         if(res.moveToFirst()){
             do{
@@ -252,14 +254,17 @@ public class DBHandler extends SQLiteOpenHelper {
         if(type.equals("E")) {
             if (limit != 0) {
                 str = "select * from " + Ticket_Master_Table + " where " + TicketM_CrBy + "='" + crby + "' or " + TicketM_AssignTo +
-                        "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Closed' and " + TicketM_Status + "<>'Cancel' and " + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;
+                        "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Closed' and " +
+                        TicketM_Status + "<>'Cancel' and " + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;
             } else {
                 str = "select * from " + Ticket_Master_Table + " where " + TicketM_CrBy + "='" + crby + "' or " + TicketM_AssignTo +
-                        "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Cancel' order by " + TicketM_Auto + " desc";
+                        "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Cancel' order by " +
+                        TicketM_Auto + " desc";
             }
         }else {
             if (limit != 0) {
-                str = "select * from " + Ticket_Master_Table + " where "+ TicketM_Status + "<>'Closed' and " + TicketM_Status + "<>'Cancel' and " + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;
+                str = "select * from " + Ticket_Master_Table + " where "+ TicketM_Status + "<>'Closed' and " + TicketM_Status + "<>'Cancel' and "
+                        + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;
             } else {
                 str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + "<>'Cancel' order by " + TicketM_Auto + " desc";
             }
@@ -293,10 +298,238 @@ public class DBHandler extends SQLiteOpenHelper {
         return pendingTicketClassList;
     }
 
+    public ArrayList<TicketMasterClass> getPendingTicket(String isHWApplicable){
+        ArrayList<TicketMasterClass> pendingTicketClassList = new ArrayList<>();
+        String str = null;
+        if(isHWApplicable.equals("S") || isHWApplicable.equals("SH")) {
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Open','Pending','ReOpen') and " +
+                    TicketM_PointType + "='S' order by " + TicketM_Auto + " desc";
+        }else if(isHWApplicable.equals("H")) {
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Open','Pending','ReOpen') and " +
+                    TicketM_PointType + "='H' order by " + TicketM_Auto + " desc";
+        }
+
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            do {
+                TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                pendingTicketClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_Auto)));
+                pendingTicketClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketM_Id)));
+                pendingTicketClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_ClientAuto)));
+                pendingTicketClass.setClientName(res.getString(res.getColumnIndex(DBHandler.TicketM_ClientName)));
+                pendingTicketClass.setFinyr(res.getString(res.getColumnIndex(DBHandler.TicketM_FinYr)));
+                pendingTicketClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
+                pendingTicketClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
+                pendingTicketClass.setSubject(res.getString(res.getColumnIndex(DBHandler.TicketM_Subject)));
+                pendingTicketClass.setImagePAth(res.getString(res.getColumnIndex(DBHandler.TicketM_ImagePath)));
+                pendingTicketClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
+                pendingTicketClass.setCrBy(res.getString(res.getColumnIndex(DBHandler.TicketM_CrBy)));
+                pendingTicketClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
+                pendingTicketClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketM_CrTime)));
+                pendingTicketClass.setModBy(res.getString(res.getColumnIndex(DBHandler.TicketM_ModBy)));
+                pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
+                pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
+                pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClassList.add(pendingTicketClass);
+            }while (res.moveToNext());
+        }
+        res.close();
+        return pendingTicketClassList;
+    }
+
+    public ArrayList<TicketMasterClass> getClosedTicket(String isHWApplicable){
+        ArrayList<TicketMasterClass> pendingTicketClassList = new ArrayList<>();
+        String str = null;
+        if(isHWApplicable.equals("S") || isHWApplicable.equals("SH")) {
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Closed','ClientClosed') and "
+                    + TicketM_PointType + "='S' order by " + TicketM_Auto + " desc";
+        }else if(isHWApplicable.equals("H")){
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Closed','ClientClosed') and "
+                    + TicketM_PointType + "='H' order by " + TicketM_Auto + " desc";
+        }
+
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            do {
+                TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                pendingTicketClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_Auto)));
+                pendingTicketClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketM_Id)));
+                pendingTicketClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_ClientAuto)));
+                pendingTicketClass.setClientName(res.getString(res.getColumnIndex(DBHandler.TicketM_ClientName)));
+                pendingTicketClass.setFinyr(res.getString(res.getColumnIndex(DBHandler.TicketM_FinYr)));
+                pendingTicketClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
+                pendingTicketClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
+                pendingTicketClass.setSubject(res.getString(res.getColumnIndex(DBHandler.TicketM_Subject)));
+                pendingTicketClass.setImagePAth(res.getString(res.getColumnIndex(DBHandler.TicketM_ImagePath)));
+                pendingTicketClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
+                pendingTicketClass.setCrBy(res.getString(res.getColumnIndex(DBHandler.TicketM_CrBy)));
+                pendingTicketClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
+                pendingTicketClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketM_CrTime)));
+                pendingTicketClass.setModBy(res.getString(res.getColumnIndex(DBHandler.TicketM_ModBy)));
+                pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
+                pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
+                pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClassList.add(pendingTicketClass);
+            }while (res.moveToNext());
+        }
+        res.close();
+        return pendingTicketClassList;
+    }
+
+    public ArrayList<TicketMasterClass> getHoldTicket(String isHWApplicable){
+        ArrayList<TicketMasterClass> pendingTicketClassList = new ArrayList<>();
+        String str = null;
+        if(isHWApplicable.equals("S") || isHWApplicable.equals("SH")) {
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Hold','hold') and "
+                    + TicketM_PointType + "='S' order by " + TicketM_Auto + " desc";
+        }else if(isHWApplicable.equals("H")){
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Hold','hold') and "
+                    + TicketM_PointType + "='H' order by " + TicketM_Auto + " desc";
+        }
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            do {
+                TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                pendingTicketClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_Auto)));
+                pendingTicketClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketM_Id)));
+                pendingTicketClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_ClientAuto)));
+                pendingTicketClass.setClientName(res.getString(res.getColumnIndex(DBHandler.TicketM_ClientName)));
+                pendingTicketClass.setFinyr(res.getString(res.getColumnIndex(DBHandler.TicketM_FinYr)));
+                pendingTicketClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
+                pendingTicketClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
+                pendingTicketClass.setSubject(res.getString(res.getColumnIndex(DBHandler.TicketM_Subject)));
+                pendingTicketClass.setImagePAth(res.getString(res.getColumnIndex(DBHandler.TicketM_ImagePath)));
+                pendingTicketClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
+                pendingTicketClass.setCrBy(res.getString(res.getColumnIndex(DBHandler.TicketM_CrBy)));
+                pendingTicketClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
+                pendingTicketClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketM_CrTime)));
+                pendingTicketClass.setModBy(res.getString(res.getColumnIndex(DBHandler.TicketM_ModBy)));
+                pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
+                pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
+                pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClassList.add(pendingTicketClass);
+            }while (res.moveToNext());
+        }
+        res.close();
+        return pendingTicketClassList;
+    }
+
+    public ArrayList<TicketMasterClass> getCancelTicket(String isHWApplicable){
+        ArrayList<TicketMasterClass> pendingTicketClassList = new ArrayList<>();
+        String str = null;
+        if(isHWApplicable.equals("S") || isHWApplicable.equals("SH")) {
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Cancel') and "
+                    + TicketM_PointType + "='S' order by " + TicketM_Auto + " desc";
+        }else if(isHWApplicable.equals("H")) {
+            str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Cancel') and "
+                    + TicketM_PointType + "='H' order by " + TicketM_Auto + " desc";
+        }
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            do {
+                TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                pendingTicketClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_Auto)));
+                pendingTicketClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketM_Id)));
+                pendingTicketClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_ClientAuto)));
+                pendingTicketClass.setClientName(res.getString(res.getColumnIndex(DBHandler.TicketM_ClientName)));
+                pendingTicketClass.setFinyr(res.getString(res.getColumnIndex(DBHandler.TicketM_FinYr)));
+                pendingTicketClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
+                pendingTicketClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
+                pendingTicketClass.setSubject(res.getString(res.getColumnIndex(DBHandler.TicketM_Subject)));
+                pendingTicketClass.setImagePAth(res.getString(res.getColumnIndex(DBHandler.TicketM_ImagePath)));
+                pendingTicketClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
+                pendingTicketClass.setCrBy(res.getString(res.getColumnIndex(DBHandler.TicketM_CrBy)));
+                pendingTicketClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
+                pendingTicketClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketM_CrTime)));
+                pendingTicketClass.setModBy(res.getString(res.getColumnIndex(DBHandler.TicketM_ModBy)));
+                pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
+                pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
+                pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClassList.add(pendingTicketClass);
+            }while (res.moveToNext());
+        }
+        res.close();
+        return pendingTicketClassList;
+    }
+
+    public ArrayList<TicketMasterClass> getHardwarePoint(){
+        ArrayList<TicketMasterClass> pendingTicketClassList = new ArrayList<>();
+        String str = null;
+        str = "select * from " + Ticket_Master_Table + " where " + TicketM_PointType + "='H' order by " +
+                TicketM_Auto + " desc";
+
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            do {
+                TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                pendingTicketClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_Auto)));
+                pendingTicketClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketM_Id)));
+                pendingTicketClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_ClientAuto)));
+                pendingTicketClass.setClientName(res.getString(res.getColumnIndex(DBHandler.TicketM_ClientName)));
+                pendingTicketClass.setFinyr(res.getString(res.getColumnIndex(DBHandler.TicketM_FinYr)));
+                pendingTicketClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
+                pendingTicketClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
+                pendingTicketClass.setSubject(res.getString(res.getColumnIndex(DBHandler.TicketM_Subject)));
+                pendingTicketClass.setImagePAth(res.getString(res.getColumnIndex(DBHandler.TicketM_ImagePath)));
+                pendingTicketClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
+                pendingTicketClass.setCrBy(res.getString(res.getColumnIndex(DBHandler.TicketM_CrBy)));
+                pendingTicketClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
+                pendingTicketClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketM_CrTime)));
+                pendingTicketClass.setModBy(res.getString(res.getColumnIndex(DBHandler.TicketM_ModBy)));
+                pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
+                pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
+                pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClassList.add(pendingTicketClass);
+            }while (res.moveToNext());
+        }
+        res.close();
+        return pendingTicketClassList;
+    }
+
+    public ArrayList<TicketMasterClass> getInternalePoint(){
+        ArrayList<TicketMasterClass> pendingTicketClassList = new ArrayList<>();
+        String str;
+        str = "select * from " + Ticket_Master_Table + " where " + TicketM_PointType + "='I' order by " +
+                TicketM_Auto + " desc";
+
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            do {
+                TicketMasterClass pendingTicketClass = new TicketMasterClass();
+                pendingTicketClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_Auto)));
+                pendingTicketClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketM_Id)));
+                pendingTicketClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketM_ClientAuto)));
+                pendingTicketClass.setClientName(res.getString(res.getColumnIndex(DBHandler.TicketM_ClientName)));
+                pendingTicketClass.setFinyr(res.getString(res.getColumnIndex(DBHandler.TicketM_FinYr)));
+                pendingTicketClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
+                pendingTicketClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
+                pendingTicketClass.setSubject(res.getString(res.getColumnIndex(DBHandler.TicketM_Subject)));
+                pendingTicketClass.setImagePAth(res.getString(res.getColumnIndex(DBHandler.TicketM_ImagePath)));
+                pendingTicketClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
+                pendingTicketClass.setCrBy(res.getString(res.getColumnIndex(DBHandler.TicketM_CrBy)));
+                pendingTicketClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
+                pendingTicketClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketM_CrTime)));
+                pendingTicketClass.setModBy(res.getString(res.getColumnIndex(DBHandler.TicketM_ModBy)));
+                pendingTicketClass.setModDate(res.getString(res.getColumnIndex(DBHandler.TicketM_ModDate)));
+                pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
+                pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
+                pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClassList.add(pendingTicketClass);
+            }while (res.moveToNext());
+        }
+        res.close();
+        return pendingTicketClassList;
+    }
+
     public String getAutoFolder(String clienID){
         String data = "0";
         String str = "select "+SMLMAST_Auto+","+SMLMAST_FTPImgFolder+" from "+SMLMAST_Table+" where "+SMLMAST_GroupId+
-                "=(select "+SMLMAST_GroupId+" from "+SMLMAST_Table+" where "+SMLMAST_ClientID+"='"+clienID+"') and "+SMLMAST_FTPLocation+"<>'null'";
+                "=(select "+SMLMAST_GroupId+" from "+SMLMAST_Table+" where "+SMLMAST_ClientID+"='"+clienID+"') and "+SMLMAST_isHO+"='Y'";
         Cursor res = getWritableDatabase().rawQuery(str,null);
         if(res.moveToFirst()){
             data = res.getString(0)+"^"+res.getString(1);
@@ -347,8 +580,40 @@ public class DBHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(auto),String.valueOf(id),String.valueOf(clientAuto),finyr,ticketno});
     }
 
+    public void updateTicketMaster(TicketMasterClass master){
+        ContentValues cv = new ContentValues();
+        cv.put(TicketM_Status,master.getStatus());
+        cv.put(TicketM_ModBy,master.getModBy());
+        cv.put(TicketM_ModDate,master.getModDate());
+        cv.put(TicketM_ModTime,master.getModTime());
+        cv.put(TicketM_ModDate1,master.getModdate1());
+        cv.put(TicketM_AssignTo,master.getAssignTO());
+        cv.put(TicketM_AssignDate,master.getAssignTODate());
+        cv.put(TicketM_AssignTime,master.getAssignTOTime());
+        cv.put(TicketM_AssignBy,master.getAssignBy());
+        cv.put(TicketM_AssignByDate,master.getAssignByDate());
+        cv.put(TicketM_AssignByTime,master.getAssignByTime());
+
+        getWritableDatabase().update(Ticket_Master_Table,cv,
+                TicketM_Auto+"=? and "+TicketM_Id+"=? and "+TicketM_ClientAuto+"=? and "+
+                        TicketM_FinYr+"=? and "+TicketM_TicketNo+"=?",
+                new String[]{String.valueOf(master.getAuto()),String.valueOf(master.getId()),
+                        String.valueOf(master.getClientAuto()),master.getFinyr(),master.getTicketNo()});
+    }
+
     public void deleteTabel(String tableName){
         getWritableDatabase().execSQL("delete from "+tableName);
+    }
+
+    public String getLatestModDate1(){
+        String data = "0";
+        String str = "SELECT max("+TicketM_ModDate1+") FROM "+Ticket_Master_Table+" where "+TicketM_ModDate1+"<>'null'";
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            data = res.getString(0);
+        }
+        res.close();
+        return data;
     }
 }
 
