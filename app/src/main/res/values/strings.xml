@@ -3,8 +3,8 @@
     <string name="app_name">Smart Ticket</string>
     <string name="title_activity_login">Smart Ticket</string>
 
-    <string name="error_invalid_password">This field is required</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_password">Required</string>
+    <string name="error_field_required">Required</string>
     <string name="footer">© Copyright 2017 LNB Infotech Pvt.Ltd. All Rights Reserved.</string>
 
     <!-- PREF -->
@@ -146,6 +146,7 @@
     <string name="cess_per">Cess Per</string>
     <string name="report_error">Report Error</string>
     <string name="clear_data">Clear Data</string>
+    <string name="change_password">Change Password</string>
 
     <string name="banner_home_footer">ca-app-pub-3940256099942544/6300978111</string>
 
@@ -155,7 +156,8 @@
     <string name="ticket_list_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="update_ticket_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="massage_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="fullimg_activity_banner">ca-app-pub-3940256099942544/6300978111</string>-->
+    <string name="fullimg_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
+    -->
 
     <!--TODO: Uncomment for Live-->
 

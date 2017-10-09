@@ -52,7 +52,6 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
         }
 
         mAdView.loadAd(adRequest);
-
         setViewPager();
         tabLayout.setupWithViewPager(pager);
     }

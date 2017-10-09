@@ -32,6 +32,7 @@ public class HardwarePointFragment extends Fragment {
     private DBHandler db;
     private EditText ed_search;
     public static int selPos;
+    private String searchText = null;
 
     public HardwarePointFragment(){
 
@@ -63,9 +64,9 @@ public class HardwarePointFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String text = ed_search.getText().toString().toLowerCase(Locale.getDefault());
+                searchText = ed_search.getText().toString().toLowerCase(Locale.getDefault());
                 if(adapter!=null) {
-                    adapter.filter(text);
+                    adapter.filter(searchText);
                 }
             }
 
@@ -94,9 +95,18 @@ public class HardwarePointFragment extends Fragment {
     private void setData(){
         ArrayList<TicketMasterClass> pendingTicketClassList = db.getHardwarePoint();
         if (pendingTicketClassList.size()!= 0) {
-            listView.setAdapter(null);
-            adapter = new AllTicketListAdapter(getContext(),pendingTicketClassList);
-            listView.setAdapter(adapter);
+            if(searchText==null) {
+                listView.setAdapter(null);
+                adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                listView.setAdapter(adapter);
+            }else{
+                listView.setAdapter(null);
+                adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                listView.setAdapter(adapter);
+                if(adapter!=null) {
+                    adapter.filter(searchText);
+                }
+            }
         }
     }
 

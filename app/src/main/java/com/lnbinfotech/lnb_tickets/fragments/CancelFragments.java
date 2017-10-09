@@ -32,6 +32,7 @@ public class CancelFragments extends Fragment {
     private DBHandler db;
     private EditText ed_search;
     public static int selPos;
+    private String searchText = null;
 
     public CancelFragments(){
 
@@ -63,9 +64,9 @@ public class CancelFragments extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String text = ed_search.getText().toString().toLowerCase(Locale.getDefault());
+                searchText = ed_search.getText().toString().toLowerCase(Locale.getDefault());
                 if(adapter!=null) {
-                    adapter.filter(text);
+                    adapter.filter(searchText);
                 }
             }
 
@@ -95,9 +96,18 @@ public class CancelFragments extends Fragment {
         String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
         ArrayList<TicketMasterClass> pendingTicketClassList = db.getCancelTicket(isHWApplicable);
         if (pendingTicketClassList.size()!= 0) {
-            listView.setAdapter(null);
-            adapter = new AllTicketListAdapter(getContext(),pendingTicketClassList);
-            listView.setAdapter(adapter);
+            if(searchText==null) {
+                listView.setAdapter(null);
+                adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                listView.setAdapter(adapter);
+            }else{
+                listView.setAdapter(null);
+                adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                listView.setAdapter(adapter);
+                if(adapter!=null) {
+                    adapter.filter(searchText);
+                }
+            }
         }
     }
 

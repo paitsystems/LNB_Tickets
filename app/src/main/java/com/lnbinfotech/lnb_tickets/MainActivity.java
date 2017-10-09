@@ -35,11 +35,13 @@ import com.lnbinfotech.lnb_tickets.adapter.ShortDescListAdapter;
 import com.lnbinfotech.lnb_tickets.connectivity.ConnectivityTest;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
+import com.lnbinfotech.lnb_tickets.interfaces.ServerCallback;
 import com.lnbinfotech.lnb_tickets.log.CopyLog;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.mail.GMailSender;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
+import com.lnbinfotech.lnb_tickets.volleyrequests.VolleyRequests;
 
 import org.jsoup.Jsoup;
 
@@ -195,6 +197,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showDia(7);
         }else if(item.getItemId() == R.id.report_error){
             showDia(6);
+        }else if(item.getItemId() == R.id.changePassword){
+            startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
+            overridePendingTransition(R.anim.enter,R.anim.exit);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -271,23 +276,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void loadData(){
         constant.showPD();
-        final AtomicInteger atomicInteger = new AtomicInteger(3);
+        final AtomicInteger atomicInteger = new AtomicInteger(4);
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        db.deleteTabel(DBHandler.Ticket_Master_Table);
-        db.deleteTabel(DBHandler.SMLMAST_Table);
+        String isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+
         int autoId = db.getMaxAutoId(type);
-        //String url1 = Constant.ipaddress+"/GetCount?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0);
+        String moddate1 = db.getLatestModDate1();
+
         String url1 = Constant.ipaddress+"/GetVersion";
         String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
-                "&type="+type+"&autoId="+autoId;
+                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable;
         String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
                 "&auto="+db.getSMLMASTMaxAuto();
+        String url4 = Constant.ipaddress+"/GetUpdatedTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
+                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable+"&moddate="+moddate1;
 
         Constant.showLog(url1);
         Constant.showLog(url2);
         Constant.showLog(url3);
+        Constant.showLog(url4);
 
-        StringRequest countRequest = new StringRequest(url1,
+        StringRequest versionRequest = new StringRequest(url1,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -316,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("MainActivity_loadData_countRequest_"+ error.getMessage());
+                        writeLog("MainActivity_loadData_versionRequest_"+ error.getMessage());
                         int taskLeft = atomicInteger.decrementAndGet();
                         if(taskLeft==0) {
                             constant.showPD();
@@ -394,10 +403,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         );
 
+        StringRequest updateRequest = new StringRequest(url4,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        Constant.showLog(result);
+                        result = result.replace("\\", "");
+                        result = result.replace("''", "");
+                        result = result.substring(1, result.length() - 1);
+                        new ParseJSON(result, getApplicationContext()).parseUpdatedTicket();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if (taskLeft == 0) {
+                            constant.showPD();
+                            setData();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        writeLog("MainActivity_loadData_updateRequest_"+ error.getMessage());
+                        error.printStackTrace();
+                        int taskLeft = atomicInteger.decrementAndGet();
+                        if(taskLeft==0) {
+                            constant.showPD();
+                        }
+                        if(isDiaShowed!=1) {
+                            showDia(3);
+                            isDiaShowed = 1;
+                        }
+                    }
+                }
+        );
+
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        queue.add(countRequest);
+        queue.add(versionRequest);
         queue.add(descRequest);
         queue.add(custRequest);
+        queue.add(updateRequest);
     }
 
     private class FetchAppVersionFromGooglePlayStore extends AsyncTask<String, Void, String> {
@@ -424,6 +467,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Constant.showLog(string);
             constant.showPD();
         }
+    }
+
+    private void loadVersionCode(){
+        constant.showPD();
+        String url1 = Constant.ipaddress+"/GetVersion";
+        Constant.showLog(url1);
+
+        VolleyRequests requests = new VolleyRequests(MainActivity.this);
+        requests.checkVersion(url1, new ServerCallback() {
+            @Override
+            public void onSuccess(String _data) {
+                if (_data != null && !_data.equals("0")) {
+                    if (version.equals(_data)) {
+                        SharedPreferences.Editor editor = FirstActivity.pref.edit();
+                        editor.putString(getString(R.string.pref_version), _data);
+                        editor.apply();
+                        //loadTicketData();
+                    }else{
+                        constant.showPD();
+                        showDia(8);
+                    }
+                } else if (_data == null) {
+                    constant.showPD();
+                    showDia(3);
+                }
+            }
+
+            @Override
+            public void onFailure(String result) {
+                constant.showPD();
+                showDia(3);
+            }
+        });
+    }
+
+    private void loadTicketData(){
+        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+        db.deleteTabel(DBHandler.Ticket_Master_Table);
+        db.deleteTabel(DBHandler.SMLMAST_Table);
+        int autoId = db.getMaxAutoId(type);
+        String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
+                "&type="+type+"&autoId="+autoId;
+        String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
+                "&auto="+db.getSMLMASTMaxAuto();
+
+        Constant.showLog(url2);
+        Constant.showLog(url3);
+
+        VolleyRequests requests = new VolleyRequests(MainActivity.this);
+        requests.loadTicketData(url2, new ServerCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onFailure(String result) {
+                constant.showPD();
+            }
+        });
+
+        VolleyRequests requests1 = new VolleyRequests(MainActivity.this);
+        requests.loadCustomerData(url3, new ServerCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onFailure(String result) {
+                constant.showPD();
+            }
+        });
+
     }
 
     private void setData(){
@@ -596,6 +713,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     FirstActivity.pref.edit().clear().commit();
+                    db.deleteTabel(DBHandler.Ticket_Master_Table);
+                    db.deleteTabel(DBHandler.SMLMAST_Table);
                     new Constant(MainActivity.this).doFinish();
                     final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
                     try {
