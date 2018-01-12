@@ -224,7 +224,7 @@ public class ParseJSON {
                     }
                     pendingTicketClass.setModdate1(moddate1);
                     list.add(pendingTicketClass);
-                    db.addTicketMaster(pendingTicketClass);
+                    //db.addTicketMaster(pendingTicketClass);
                 }
             }
         }catch (Exception e){

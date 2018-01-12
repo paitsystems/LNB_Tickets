@@ -1,5 +1,6 @@
 package com.lnbinfotech.lnb_tickets;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +41,7 @@ import com.lnbinfotech.lnb_tickets.connectivity.ConnectivityTest;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
+import com.lnbinfotech.lnb_tickets.post.Post;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -423,6 +426,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
 
         if(check){
+            ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_generate_ticket.getWindowToken(),0);
             generateTicket();
         }else{
             view.requestFocus();
@@ -494,7 +498,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 Constant.showLog(url);
 
                 if (ConnectivityTest.getNetStat(getApplicationContext())) {
-                    if (!imagePath.equals("") && imagePath != null) {
+                    /*if (!imagePath.equals("") && imagePath != null) {
                         atomicInteger = new AtomicInteger(2);
                     } else {
                         atomicInteger = new AtomicInteger(1);
@@ -508,7 +512,8 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                         }else{
                             isDataImageSaved = 2;
                         }
-                    }
+                    }*/
+                    new saveTicket().execute(url);
                 } else {
                     writeLog("AddNewTicketActivity_generateTicket_Network_Connection_Error");
                     toast.setText("Network Connection Error");
@@ -567,6 +572,17 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
     private class UploadImage extends AsyncTask<Void,Void,String>{
 
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(AddNewTicketActivity.this);
+            pd.setMessage("Uploading Image...");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
         @Override
         protected String doInBackground(Void... voids) {
             String result;
@@ -603,26 +619,70 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            pd.dismiss();
             switch (result) {
                 case "1":
-                    if (atomicInteger.decrementAndGet() == 0) {
+                    /*if (atomicInteger.decrementAndGet() == 0) {
                         constant.showPD();
                         isDataImageSaved  = 2;
                         showDia(1);
-                    }
+                    }*/
+                    showDia(1);
                     break;
                 case "0":
-                    if (atomicInteger.decrementAndGet() == 0) {
+                    /*if (atomicInteger.decrementAndGet() == 0) {
                         constant.showPD();
                         showDia(3);
-                    }
+                    }*/
+                    showDia(3);
                     break;
                 case "2":
-                    if (atomicInteger.decrementAndGet() == 0) {
+                    /*if (atomicInteger.decrementAndGet() == 0) {
                         constant.showPD();
                         showDia(4);
-                    }
+                    }*/
+                    showDia(4);
                     break;
+            }
+        }
+    }
+
+    private class saveTicket extends AsyncTask<String,Void,String>{
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(AddNewTicketActivity.this);
+            pd.setMessage("Please Wait...");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return Post.POST(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            pd.dismiss();
+            result = result.replace("\\", "");
+            result = result.replace("''", "");
+            result = result.replace("\"", "");
+            Constant.showLog(result);
+            if (!result.equals("0") && !result.equals("")) {
+                writeLog("AddNewTicketActivity_saveTicket_Success");
+                if (!imagePath.equals("") && imagePath != null) {
+                    new UploadImage().execute();
+                }else{
+                    showDia(1);
+                }
+            } else {
+                writeLog("AddNewTicketActivity_saveTicket_UnSuccess");
+                showDia(2);
             }
         }
     }
@@ -721,7 +781,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     atomicInteger = new AtomicInteger(1);
-                    constant.showPD();
+                    //constant.showPD();
                     new UploadImage().execute();
                     dialog.dismiss();
                 }

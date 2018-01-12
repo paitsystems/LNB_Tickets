@@ -59,14 +59,10 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
     @Override
     protected void onResume() {
         super.onResume();
-/*
-        if(MainActivity.isUpdate==1) {
-            ed_search.setText(null);
-            constant = new Constant(AllTicketListActivity.this);
-            //loadData();
-            setData();
-        }
-*/
+
+        /*if(MainActivity.isUpdate==1) {
+            new PendingFragments().setData();
+        }*/
 
         if(mAdView!=null){
             mAdView.resume();

@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.view.Gravity;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -19,9 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
-import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
-import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
 
 import java.net.URLEncoder;
 
