@@ -44,7 +44,7 @@ public class Constant {
     public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_8_8/service.svc";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
-    public static int liveTestFlag = 1;
+    public static int liveTestFlag = 0;
 
     Activity activity;
     Context context;

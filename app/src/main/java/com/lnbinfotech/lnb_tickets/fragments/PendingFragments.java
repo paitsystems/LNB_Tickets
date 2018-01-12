@@ -47,6 +47,7 @@ public class PendingFragments extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+        Constant.showLog("PendingFragments_onResume");
         setData();
     }
 
@@ -93,7 +94,7 @@ public class PendingFragments extends Fragment{
         return view;
     }
 
-    private void setData(){
+    public void setData(){
         Constant.showLog("setData");
         String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
 

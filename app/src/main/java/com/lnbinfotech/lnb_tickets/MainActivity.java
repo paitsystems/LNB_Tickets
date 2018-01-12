@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,20 +34,33 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.lnbinfotech.lnb_tickets.adapter.ShortDescListAdapter;
 import com.lnbinfotech.lnb_tickets.connectivity.ConnectivityTest;
+import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.interfaces.ServerCallback;
 import com.lnbinfotech.lnb_tickets.log.CopyLog;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.mail.GMailSender;
+import com.lnbinfotech.lnb_tickets.model.SMLMASTClass;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
+import com.lnbinfotech.lnb_tickets.post.Post;
 import com.lnbinfotech.lnb_tickets.volleyrequests.VolleyRequests;
 
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.jsoup.Jsoup;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // Created by lnb on 8/11/2016.
@@ -65,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AdView mAdView;
     private int isDiaShowed = 0;
     private String version = "0";
+    private ArrayList<TicketMasterClass> updateList,addList;
+    private String writeFilename = "Write.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 overridePendingTransition(R.anim.enter,R.anim.exit);
                 break;
             case R.id.img_view_all:
-                startActivity(new Intent(getApplicationContext(),AllTicketListActivity.class));
+                startActivity(new Intent(getApplicationContext(),AllTicketTabPagerActivity.class));
                 overridePendingTransition(R.anim.enter,R.anim.exit);
                 break;
         }
@@ -229,6 +245,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             String user = FirstActivity.pref.getString(getString(R.string.pref_username), "");
             String pass = FirstActivity.pref.getString(getString(R.string.pref_password), "");
+            user = URLEncoder.encode(user,"UTF-8");
+            pass = URLEncoder.encode(pass,"UTF-8");
             String url = Constant.ipaddress + "/getEmpValid?UserName=" + user + "&Password=" + pass;
             writeLog("MainActivity_refreshUserData_"+url);
             Constant.showLog(url);
@@ -275,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void loadData(){
+        constant = new Constant(MainActivity.this);
         constant.showPD();
         final AtomicInteger atomicInteger = new AtomicInteger(4);
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
@@ -284,8 +303,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String moddate1 = db.getLatestModDate1();
 
         String url1 = Constant.ipaddress+"/GetVersion";
+
         String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
                 "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable;
+
+
+        new getTicketMaster(autoId,atomicInteger).execute(url2);
+
         String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
                 "&auto="+db.getSMLMASTMaxAuto();
         String url4 = Constant.ipaddress+"/GetUpdatedTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
@@ -306,19 +330,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         result = result.substring(1, result.length() - 1);
                         String _data = new ParseJSON(result).parseVersion();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("versionRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
+                            setData();
                         }
                         if (_data != null && !_data.equals("0")) {
-                            if (version.equals(_data)) {
+                            /*if (version.equals(_data)) {
                                 SharedPreferences.Editor editor = FirstActivity.pref.edit();
                                 editor.putString(getString(R.string.pref_version), _data);
                                 editor.apply();
                             }else{
                                 showDia(8);
+                            }*/
+                            String versionArr[] = version.split("\\.");
+                            String dataArr[] = _data.split("\\.");
+                            int currVersion = Integer.parseInt(versionArr[0]);
+                            int dataVersion = Integer.parseInt(dataArr[0]);
+
+                            if (currVersion>dataVersion) {
+                                SharedPreferences.Editor editor = FirstActivity.pref.edit();
+                                editor.putString(getString(R.string.pref_version), _data);
+                                editor.apply();
+                            }else if (currVersion<=dataVersion){
+                                showDia(8);
                             }
                         } else if (_data == null) {
-                            showDia(3);
+                            if(isDiaShowed!=1) {
+                                showDia(3);
+                                isDiaShowed = 1;
+                            }
                         }
                     }
                 },
@@ -327,10 +368,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onErrorResponse(VolleyError error) {
                         writeLog("MainActivity_loadData_versionRequest_"+ error.getMessage());
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("versionRequest_ErrorListener_"+taskLeft);
                         if(taskLeft==0) {
                             constant.showPD();
                         }
-                        showDia(3);
+                        if(isDiaShowed!=1) {
+                            showDia(3);
+                            isDiaShowed = 1;
+                        }
                     }
                 }
         );
@@ -343,8 +388,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         result = result.replace("\\", "");
                         result = result.replace("''", "");
                         result = result.substring(1, result.length() - 1);
-                        new ParseJSON(result, getApplicationContext()).parseAllTicket();
+                        addList = new ParseJSON(result, getApplicationContext()).parseAllTicket();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("descRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
                             setData();
@@ -357,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         writeLog("MainActivity_loadData_descRequest_"+ error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("descRequest_ErrorListener_"+taskLeft);
                         if(taskLeft==0) {
                             constant.showPD();
                         }
@@ -378,10 +425,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         result = result.substring(1,result.length()-1);
                         new ParseJSON(result, getApplicationContext()).parseSMLMASTData();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("custRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
-                            //constant.showPD();
-                            //new FetchAppVersionFromGooglePlayStore().execute();
                             setData();
                         }
                     }
@@ -392,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         writeLog("MainActivity_loadData_custRequest_"+ error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("custRequest_ErrorListener_"+taskLeft);
                         if(taskLeft==0) {
                             constant.showPD();
                         }
@@ -411,8 +458,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         result = result.replace("\\", "");
                         result = result.replace("''", "");
                         result = result.substring(1, result.length() - 1);
-                        new ParseJSON(result, getApplicationContext()).parseUpdatedTicket();
+                        updateList = new ParseJSON(result, getApplicationContext()).parseUpdatedTicket();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("updateRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
                             setData();
@@ -425,6 +473,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         writeLog("MainActivity_loadData_updateRequest_"+ error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
+                        Constant.showLog("updateRequest_ErrorListener_"+taskLeft);
                         if(taskLeft==0) {
                             constant.showPD();
                         }
@@ -436,11 +485,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         );
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(versionRequest,"ABC");
+        //AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(descRequest,"ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(custRequest,"ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(updateRequest,"ABC");
+
+        /*RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         queue.add(versionRequest);
         queue.add(descRequest);
         queue.add(custRequest);
-        queue.add(updateRequest);
+        queue.add(updateRequest);*/
     }
 
     private class FetchAppVersionFromGooglePlayStore extends AsyncTask<String, Void, String> {
@@ -544,6 +598,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setData(){
+        /*if(addList.size()!=0){
+            for(TicketMasterClass mast : addList) {
+                db.addTicketMaster(mast);
+            }
+        }*/
+        if(updateList.size()!=0){
+            for (TicketMasterClass mast : updateList){
+                db.updateTicketMaster(mast);
+            }
+        }
+
         String crby = FirstActivity.pref.getString(getString(R.string.pref_ClientName),"");
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
         ArrayList<TicketMasterClass> pendingTicketClassList = db.getTicketMaster(3,crby,type);
@@ -562,7 +627,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = FirstActivity.pref.edit();
         editor.putInt(getString(R.string.pref_ticketTotal),total);
         editor.apply();
-
     }
 
     private void showDia(int i){
@@ -668,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }else if(i==6) {
-            builder.setMessage("Do You Want To Report Error?");
+            builder.setMessage("Do You Want To Report An Issue?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -826,6 +890,283 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void writeLog(String _data){
         new WriteLog().writeLog(getApplicationContext(),_data);
+    }
+
+    private class getTicketMaster extends AsyncTask<String, Void, String> {
+
+        private int to;
+        private AtomicInteger atomicInteger;
+
+        public getTicketMaster(int _to, AtomicInteger _atomicInteger) {
+            this.to = _to;
+            this.atomicInteger = _atomicInteger;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return Post.POST(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            response = response.substring(1, response.length() - 1);
+            new readJSON(response, "SizeNDesign", to,atomicInteger).execute();
+        }
+    }
+
+    private class readJSON extends AsyncTask<Void, Void, String> {
+        private int to;
+        private String result, parseType;
+        private AtomicInteger atomicInteger;
+
+        public readJSON(String _result, String _parseType, int _to, AtomicInteger _atomicInteger) {
+            this.result = _result;
+            this.parseType = _parseType;
+            this.to = _to;
+            this.atomicInteger = _atomicInteger;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            String retValue = "B";
+            File sdFile = Constant.checkFolder(Constant.folder_name);
+            FileWriter writer;
+            try {
+                String search = "\\\\", replace = "";
+                File writeFile = new File(sdFile, writeFilename);
+                writer = new FileWriter(writeFile);
+                int size = result.length();
+                if (size > 2) {
+                    Log.d("Log", "Replacing");
+                    int b = 50000;
+                    for (int i = 0; i < size; i++) {
+                        if (b >= size) {
+                            b = size;
+                        }
+                        String q = result.substring(i, b);
+                        String g = q.replaceAll(search, replace);
+                        System.gc();
+                        writer.append(g);
+                        i = b - 1;
+                        b = b + 50000;
+                    }
+                    retValue = "A";
+                }
+                writer.flush();
+                writer.close();
+                return retValue;
+            } catch (IOException | OutOfMemoryError e) {
+                int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_replace_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                }
+                try {
+                    writer = new FileWriter(new File(sdFile, "Log.txt"));
+                    writer.append(e.getMessage());
+                    writer.flush();
+                    writer.close();
+                } catch (Exception e1) {
+                    e.printStackTrace();
+                }
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("A")) {
+                new writeDB(parseType, to,atomicInteger).execute();
+            } else if (s.equals("B")){
+                int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_replace_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                    setData();
+                }
+            }else {
+                showDia(3);
+            }
+        }
+    }
+
+    private class writeDB extends AsyncTask<Void, String, String> {
+
+        private File writeFile;
+        private String parseType;
+        private int to;
+        private AtomicInteger atomicInteger;
+
+        public writeDB(String _parseType, int _to, AtomicInteger _atomicInteger) {
+            this.parseType = _parseType;
+            this.to = _to;
+            this.atomicInteger = _atomicInteger;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            File sdFile = Constant.checkFolder(Constant.folder_name);
+            JsonFactory f = new JsonFactory();
+            try {
+                writeFile = new File(sdFile, writeFilename);
+                JsonParser jp = f.createJsonParser(writeFile);
+                parseSizeNDesign(jp, to);
+                return "";
+            } catch (Exception e) {
+                int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                }
+                try {
+                    FileWriter writer = new FileWriter(new File(sdFile, "Log.txt"));
+                    writer.append(e.getMessage());
+                    writer.flush();
+                    writer.close();
+                } catch (Exception e1) {
+                    e.printStackTrace();
+                    return null;
+                }
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s != null) {
+                if (s.equals("")) {
+                    Constant.showLog("Success");
+                    int taskLeft = atomicInteger.decrementAndGet();
+                    Constant.showLog("descRequest_"+taskLeft);
+                    if (taskLeft == 0) {
+                        constant.showPD();
+                        setData();
+                    }
+                } else {
+                    showDia(3);
+                }
+            } else {
+                int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                }
+                showDia(3);
+            }
+        }
+    }
+
+    private void parseSizeNDesign(JsonParser jp, int to) {
+        try {
+            int count = 0;
+            List<TicketMasterClass> list = new ArrayList<>();
+            while (jp.nextToken() != JsonToken.END_ARRAY) {
+                count++;
+                TicketMasterClass ticketClass = new TicketMasterClass();
+                String moddate = "null";
+                while (jp.nextToken() != JsonToken.END_OBJECT) {
+                    String token = jp.getCurrentName();
+                    if ("auto".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAuto(jp.getValueAsInt());
+                    } else if ("id".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setId(jp.getValueAsInt());
+                    } else if ("ClientAuto".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setClientAuto(jp.getValueAsInt());
+                    } else if ("ClientName".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setClientName(jp.getText());
+                    } else if ("finyr".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setFinyr(jp.getText());
+                    } else if ("ticketNo".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setTicketNo(jp.getText());
+                    } else if ("Particular".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setParticular(jp.getText());
+                    } else if ("Subject".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setSubject(jp.getText());
+                    } else if ("ImagePAth".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setImagePAth(jp.getText());
+                    } else if ("Status".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setStatus(jp.getText());
+                    } else if ("CrBy".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setCrBy(jp.getText());
+                    } else if ("CrDate".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setCrDate(jp.getText());
+                    } else if ("CrTime".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setCrTime(jp.getText());
+                    } else if ("ModBy".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setModBy(jp.getText());
+                    } else if ("ModDate".equals(token)) {
+                        jp.nextToken();
+                        moddate = jp.getText();
+                        ticketClass.setModDate(moddate);
+                    } else if ("ModTime".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setModTime(jp.getText());
+                    } else if ("AssignTo".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAssignTO(jp.getText());
+                    } else if ("AssignDate".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAssignTODate(jp.getText());
+                    } else if ("AssignTime".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAssignTOTime(jp.getText());
+                    } else if ("Assignby".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAssignBy(jp.getText());
+                    } else if ("AssignbyDate".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAssignByDate(jp.getText());
+                    } else if ("AssignbyTime".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAssignByTime(jp.getText());
+                    } else if ("type".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setType(jp.getText());
+                    } else if ("GenType".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setGenType(jp.getText());
+                    } else if ("Branch".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setBranch(jp.getText());
+                    } else if ("PointType".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setPointtype(jp.getText());
+                        String moddate1 = "null";
+                        if (!moddate.equals("null")) {
+                            Date d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(moddate);
+                            moddate1 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(d);
+                        }
+                        ticketClass.setModdate1(moddate1);
+                    }
+                }
+                list.add(ticketClass);
+            }
+            db.addTicketMaster(list);
+            Constant.showLog("" + count);
+        } catch (Exception e) {
+            writeLog("parseTicketMaster_" + e.getMessage());
+            e.printStackTrace();
+            showDia(3);
+        }
     }
 
 }

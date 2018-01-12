@@ -29,14 +29,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.lnbinfotech.lnb_tickets.connectivity.ConnectivityTest;
+import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
@@ -294,8 +293,10 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                     }
             );
 
-            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-            queue.add(request);
+            //RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            //queue.add(request);
+
+            AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request,"ABC");
 
         }catch (Exception e){
             writeLog("UpdateTicketActivity_updateStatus_"+ e.getMessage());
@@ -423,10 +424,14 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 }
         );
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(descRequest,"ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(custRequest,"ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(updateRequest,"ABC");
+
+        /*RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         queue.add(descRequest);
         queue.add(custRequest);
-        queue.add(updateRequest);
+        queue.add(updateRequest);*/
     }
 
     void setImage(){
@@ -572,6 +577,9 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             stopService(startService);
         }
         new Constant(UpdateTicketActivity.this).doFinish();
+        /*finish();
+        startActivity(new Intent(getApplicationContext(),AllTicketTabPagerActivity.class));
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);*/
     }
 
     private void writeLog(String _data){

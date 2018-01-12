@@ -17,6 +17,7 @@ import com.lnbinfotech.lnb_tickets.FirstActivity;
 import com.lnbinfotech.lnb_tickets.R;
 import com.lnbinfotech.lnb_tickets.UpdateTicketActivity;
 import com.lnbinfotech.lnb_tickets.adapter.AllTicketListAdapter;
+import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 
@@ -46,6 +47,7 @@ public class InternalPointFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Constant.showLog("InternalPointFragment_onResume");
         setData();
     }
 

@@ -21,6 +21,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.lnbinfotech.lnb_tickets.adapter.ReplyResponseListAdapter;
+import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.model.TicketDetailClass;
@@ -180,8 +181,10 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                 }
         );
 
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-        queue.add(request);
+        //RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        //queue.add(request);
+
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request,"ABC");
     }
 
     void addTicketDetail(){

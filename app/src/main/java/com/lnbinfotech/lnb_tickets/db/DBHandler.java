@@ -179,6 +179,46 @@ public class DBHandler extends SQLiteOpenHelper {
         getWritableDatabase().insert(Ticket_Master_Table,null,cv);
     }
 
+    public void addTicketMaster(List<TicketMasterClass> ticketMasterList){
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        ContentValues cv = new ContentValues();
+        for(TicketMasterClass ticketMaster : ticketMasterList) {
+            cv.put(TicketM_Auto, ticketMaster.getAuto());
+            cv.put(TicketM_Id, ticketMaster.getId());
+            cv.put(TicketM_ClientAuto, ticketMaster.getClientAuto());
+            cv.put(TicketM_ClientName, ticketMaster.getClientName());
+            cv.put(TicketM_FinYr, ticketMaster.getFinyr());
+            cv.put(TicketM_TicketNo, ticketMaster.getTicketNo());
+            cv.put(TicketM_Particular, ticketMaster.getParticular());
+            cv.put(TicketM_Subject, ticketMaster.getSubject());
+            cv.put(TicketM_ImagePath, ticketMaster.getImagePAth());
+            cv.put(TicketM_Status, ticketMaster.getStatus());
+            cv.put(TicketM_CrBy, ticketMaster.getCrBy());
+            cv.put(TicketM_CrDate, ticketMaster.getCrDate());
+            cv.put(TicketM_CrTime, ticketMaster.getCrTime());
+            cv.put(TicketM_ModBy, ticketMaster.getModBy());
+            cv.put(TicketM_ModDate, ticketMaster.getModDate());
+            cv.put(TicketM_ModTime, ticketMaster.getModTime());
+            cv.put(TicketM_AssignTo, ticketMaster.getAssignTO());
+            cv.put(TicketM_AssignDate, ticketMaster.getAssignTODate());
+            cv.put(TicketM_AssignTime, ticketMaster.getAssignTOTime());
+            cv.put(TicketM_Type, ticketMaster.getType());
+            cv.put(TicketM_GenType, ticketMaster.getGenType());
+            cv.put(TicketM_AssignBy, ticketMaster.getAssignBy());
+            cv.put(TicketM_AssignByDate, ticketMaster.getAssignByDate());
+            cv.put(TicketM_AssignByTime, ticketMaster.getAssignByTime());
+            cv.put(TicketM_Branch, ticketMaster.getBranch());
+            cv.put(TicketM_PointType, ticketMaster.getPointtype());
+            cv.put(TicketM_ModDate1, ticketMaster.getModdate1());
+            db.insert(Ticket_Master_Table,null,cv);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
+
     public void addTicketDetail(TicketDetailClass ticketDetail){
         ContentValues cv = new ContentValues();
         cv.put(TicketD_Auto,ticketDetail.getAuto());
@@ -253,9 +293,11 @@ public class DBHandler extends SQLiteOpenHelper {
         String str;
         if(type.equals("E")) {
             if (limit != 0) {
-                str = "select * from " + Ticket_Master_Table + " where " + TicketM_CrBy + "='" + crby + "' or " + TicketM_AssignTo +
+                /*str = "select * from " + Ticket_Master_Table + " where " + TicketM_CrBy + "='" + crby + "' or " + TicketM_AssignTo +
                         "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Closed' and " +
-                        TicketM_Status + "<>'Cancel' and " + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;
+                        TicketM_Status + "<>'Cancel' and " + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;*/
+                str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " not in ('Closed','Cancel','ClientClosed')" +
+                        " order by " + TicketM_Auto + " desc limit " + limit;
             } else {
                 str = "select * from " + Ticket_Master_Table + " where " + TicketM_CrBy + "='" + crby + "' or " + TicketM_AssignTo +
                         "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Cancel' order by " +
@@ -263,8 +305,9 @@ public class DBHandler extends SQLiteOpenHelper {
             }
         }else {
             if (limit != 0) {
-                str = "select * from " + Ticket_Master_Table + " where "+ TicketM_Status + "<>'Closed' and " + TicketM_Status + "<>'Cancel' and "
-                        + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;
+                /*str = "select * from " + Ticket_Master_Table + " where "+ TicketM_Status + "<>'Closed' and " + TicketM_Status + "<>'Cancel' and "
+                        + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;*/
+                str = "select * from " + Ticket_Master_Table + " where "+ TicketM_Status + " not in ('Closed','Cancel','ClientClosed') order by " + TicketM_Auto + " desc limit " + limit;
             } else {
                 str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + "<>'Cancel' order by " + TicketM_Auto + " desc";
             }

@@ -26,13 +26,14 @@ import java.io.InputStream;
 public class FullImageActivity extends AppCompatActivity {
 
     private AdView mAdView;
+    TouchImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_image);
 
-        TouchImageView imageView;
+
         Toast toast;
 
         if (getSupportActionBar() != null) {
@@ -61,14 +62,42 @@ public class FullImageActivity extends AppCompatActivity {
         Constant.checkFolder(Constant.folder_name);
         File f = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
         if(f.length()!=0) {
-            String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
+            Constant.showLog(f.getAbsolutePath());
+            setPic(f.getAbsolutePath());
+            /*String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
             if (imageView != null) {
                 imageView.setImageBitmap(scaleBitmap(_imagePath));
-            }
+            }*/
         }else{
             toast.setText("File Not Found");
             toast.show();
         }
+    }
+
+    private void setPic(String path) {
+        // Get the dimensions of the View
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        Constant.showLog(targetW+"-"+targetH+"-"+photoW+"-"+photoH);
+
+        // Determine how much to scale down the image
+        //int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        //bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
+        imageView.setImageBitmap(bitmap);
     }
 
     @Override
