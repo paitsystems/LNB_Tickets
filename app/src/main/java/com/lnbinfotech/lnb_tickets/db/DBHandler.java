@@ -6,7 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.lnbinfotech.lnb_tickets.MainActivity;
+import com.lnbinfotech.lnb_tickets.UpdateTicketActivity;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
+import com.lnbinfotech.lnb_tickets.interfaces.DatabaseUpgradeInterface;
 import com.lnbinfotech.lnb_tickets.model.SMLMASTClass;
 import com.lnbinfotech.lnb_tickets.model.TicketDetailClass;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
@@ -21,8 +24,10 @@ import java.util.Locale;
 
 public class DBHandler extends SQLiteOpenHelper {
 
+    public DatabaseUpgradeInterface dbInterface;
+
     public static final String Database_Name = "APITTECH.db";
-    public static final int Database_Version = 5;
+    public static final int Database_Version = 6;
 
     public static final String Ticket_Master_Table = "TicketMaster";
     public static final String TicketM_Auto = "Auto";
@@ -62,6 +67,10 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String TicketD_CrTime = "CrTime";
     public static final String TicketD_Type = "Type";
     public static final String TicketD_GenType = "GenType";
+    public static final String TicketD_Id = "Id";
+    public static final String TicketD_ClientAuto = "ClientAuto";
+    public static final String TicketD_PointType = "PointType";
+    public static final String TicketD_CrDate1 = "CrDate1";
 
     public static final String SMLMAST_Table = "SMLMAST";
     public static final String SMLMAST_Auto = "Auto";
@@ -92,7 +101,8 @@ public class DBHandler extends SQLiteOpenHelper {
     private String create_table_detail = "create table if not exists "+ Ticket_Detail_Table+"("+
             TicketD_Auto+" int,"+TicketD_MastAuto+" int,"+TicketD_Description+" text,"+
             TicketD_CrBy+" text,"+TicketD_CrDate+" text,"+TicketD_CrTime+" text,"+
-            TicketD_Type+" text,"+TicketD_GenType+" text);";
+            TicketD_Type+" text,"+TicketD_GenType+" text,"+TicketD_Id+" int,"+TicketD_ClientAuto
+            +" int,"+TicketD_PointType+" text,"+TicketD_CrDate1+" text)";
 
     private String create_table_smlmast = "create table if not exists "+ SMLMAST_Table+"("+
             SMLMAST_Auto+" int,"+SMLMAST_ClientID+" text,"+SMLMAST_ClientName+" text,"+
@@ -102,6 +112,10 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public DBHandler(Context context) {
         super(context, Database_Name, null, Database_Version);
+    }
+
+    public void initInterface(MainActivity main) {
+        dbInterface = main;
     }
 
     @Override
@@ -116,17 +130,22 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if(oldVersion<newVersion){
-            db.execSQL("drop table "+Ticket_Master_Table);
-            db.execSQL("drop table "+Ticket_Detail_Table);
-            db.execSQL("drop table "+SMLMAST_Table);
-            db.execSQL(create_table_master);
-            db.execSQL(create_table_detail);
-            db.execSQL(create_table_smlmast);
-            Constant.showLog("Update "+create_table_smlmast);
-            Constant.showLog("Update "+create_table_detail);
-            Constant.showLog("Update "+create_table_master);
+        if(oldVersion<5){
+            String str1 = "alter table "+Ticket_Detail_Table+" add "+TicketD_Id+" int";
+            String str2 = "alter table "+Ticket_Detail_Table+" add "+TicketD_ClientAuto+" int";
+            String str3 = "alter table "+Ticket_Detail_Table+" add "+TicketD_PointType+" text";
+            String str4 = "alter table "+Ticket_Detail_Table+" add "+TicketD_CrDate1+" text";
+            db.execSQL(str1);
+            db.execSQL(str2);
+            db.execSQL(str3);
+            db.execSQL(str4);
+            Constant.showLog("Update Ticket Detail Table");
         }
+        if(oldVersion<6){
+            db.execSQL(create_table_detail);
+        }
+        dbInterface.dbUpgraded();
+
     }
 
     public void addSMLMAST(SMLMASTClass custClass){
@@ -218,7 +237,6 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-
     public void addTicketDetail(TicketDetailClass ticketDetail){
         ContentValues cv = new ContentValues();
         cv.put(TicketD_Auto,ticketDetail.getAuto());
@@ -228,7 +246,36 @@ public class DBHandler extends SQLiteOpenHelper {
         cv.put(TicketD_CrDate,ticketDetail.getCrDate());
         cv.put(TicketD_CrTime,ticketDetail.getCrTime());
         cv.put(TicketD_Type,ticketDetail.getType());
+        cv.put(TicketD_GenType, ticketDetail.getGenType());
+        cv.put(TicketD_Id, ticketDetail.getId());
+        cv.put(TicketD_ClientAuto, ticketDetail.getClientAuto());
+        cv.put(TicketD_PointType, ticketDetail.getPointType());
+        cv.put(TicketD_CrDate1, ticketDetail.getCrDate1());
         getWritableDatabase().insert(Ticket_Detail_Table,null,cv);
+    }
+
+    public void addTicketDetail(List<TicketDetailClass> ticketDetailList){
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        ContentValues cv = new ContentValues();
+        for(TicketDetailClass ticketDetail : ticketDetailList) {
+            cv.put(TicketD_Auto, ticketDetail.getAuto());
+            cv.put(TicketD_MastAuto, ticketDetail.getMastAuto());
+            cv.put(TicketD_Description, ticketDetail.getDesc());
+            cv.put(TicketD_CrBy, ticketDetail.getCrby());
+            cv.put(TicketD_CrDate, ticketDetail.getCrDate());
+            cv.put(TicketD_CrTime, ticketDetail.getCrTime());
+            cv.put(TicketD_Type, ticketDetail.getType());
+            cv.put(TicketD_GenType, ticketDetail.getGenType());
+            cv.put(TicketD_Id, ticketDetail.getId());
+            cv.put(TicketD_ClientAuto, ticketDetail.getClientAuto());
+            cv.put(TicketD_PointType, ticketDetail.getPointType());
+            cv.put(TicketD_CrDate1, ticketDetail.getCrDate1());
+            db.insert(Ticket_Detail_Table, null, cv);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
     }
 
     public int getSMLMASTMaxAuto(){
@@ -272,6 +319,18 @@ public class DBHandler extends SQLiteOpenHelper {
         return autoId;
     }
 
+    public int getAutoTD() {
+        int autoId = 0;
+        Cursor res;
+        String str = "select max(" + TicketD_Auto + ") from " + Ticket_Detail_Table;
+        res = getWritableDatabase().rawQuery(str, null);
+        if (res.moveToFirst()) {
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }
+
     public String getCount(){
         String count  = "0-0-0";
         String str = "select " +
@@ -293,9 +352,6 @@ public class DBHandler extends SQLiteOpenHelper {
         String str;
         if(type.equals("E")) {
             if (limit != 0) {
-                /*str = "select * from " + Ticket_Master_Table + " where " + TicketM_CrBy + "='" + crby + "' or " + TicketM_AssignTo +
-                        "='" + crby + "' or " + TicketM_AssignTo + "='NotAssigned' and " + TicketM_Status + "<>'Closed' and " +
-                        TicketM_Status + "<>'Cancel' and " + TicketM_Status + "<>'ClientClosed' order by " + TicketM_Auto + " desc limit " + limit;*/
                 str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " not in ('Closed','Cancel','ClientClosed')" +
                         " order by " + TicketM_Auto + " desc limit " + limit;
             } else {
@@ -374,6 +430,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 pendingTicketClass.setModTime(res.getString(res.getColumnIndex(DBHandler.TicketM_ModTime)));
                 pendingTicketClass.setAssignTO(res.getString(res.getColumnIndex(DBHandler.TicketM_AssignTo)));
                 pendingTicketClass.setPointtype(res.getString(res.getColumnIndex(DBHandler.TicketM_PointType)));
+                pendingTicketClass.setBranch(res.getString(res.getColumnIndex(DBHandler.TicketM_Branch)));
                 pendingTicketClassList.add(pendingTicketClass);
             }while (res.moveToNext());
         }
@@ -657,6 +714,52 @@ public class DBHandler extends SQLiteOpenHelper {
         }
         res.close();
         return data;
+    }
+
+    public Cursor getAllMDTicket(){
+        String str = "select * from "+Ticket_Master_Table +" order by "+TicketM_Auto + " desc";
+        return getWritableDatabase().rawQuery(str,null);
+    }
+
+    public Cursor getTicketDetail(int auto,String type){
+        String str;
+        if(type.equals("E")) {
+            str = "select TicketMaster.Auto,TicketMaster.ClientAuto,SMLMAST.ClientId, TicketMaster.TicketNo, TicketMaster.Subject, TicketMaster.Status," +
+                    "TicketDetail.Auto,TicketDetail.MastAuto,TicketDetail.Description, TicketDetail.CrBy, TicketDetail.CrDate," +
+                    "TicketDetail.CrTime " +
+                    "from TicketMaster,TicketDetail,SMLMAST " +
+                    "where TicketMaster.Auto = TicketDetail.MastAuto and SMLMAST.Auto = TicketMaster.ClientAuto and SMLMAST.Auto = TicketDetail.ClientAuto " +
+                    " and TicketDetail.Auto = (select MAX(TicketDetail.Auto) from TicketDetail where TicketDetail.MastAuto = TicketMaster.Auto) " +
+                    " order by TicketDetail.Auto desc ";
+        }else {
+            str = "select TicketMaster.Auto,TicketMaster.ClientAuto,SMLMAST.ClientId, TicketMaster.TicketNo, TicketMaster.Subject, TicketMaster.Status," +
+                    "TicketDetail.Auto,TicketDetail.MastAuto,TicketDetail.Description, TicketDetail.CrBy, TicketDetail.CrDate," +
+                    "TicketDetail.CrTime " +
+                    "from TicketMaster,TicketDetail,SMLMAST " +
+                    "where TicketMaster.Auto = TicketDetail.MastAuto and SMLMAST.Auto = TicketMaster.ClientAuto and SMLMAST.Auto = TicketDetail.ClientAuto " +
+                    " and TicketDetail.Auto = (select MAX(TicketDetail.Auto) from TicketDetail where TicketDetail.MastAuto = TicketMaster.Auto) " +
+                    " and TicketMaster.ClientAuto="+auto+
+                    " order by TicketDetail.Auto desc ";
+        }
+        return getWritableDatabase().rawQuery(str,null);
+    }
+
+    public Cursor getParticularTicketDetail(){
+        String str = "select * from "+Ticket_Detail_Table +" where "+TicketD_MastAuto+"="+UpdateTicketActivity.auto + " order by "+TicketD_Auto+" asc";
+        Constant.showLog(str);
+        return getWritableDatabase().rawQuery(str,null);
+    }
+
+    public int getIDTD() {
+        int autoId = 0;
+        Cursor res;
+        String str = "select max(" + TicketD_Id + ") from " + Ticket_Detail_Table + " where "+TicketD_MastAuto+"="+UpdateTicketActivity.auto;
+        res = getWritableDatabase().rawQuery(str, null);
+        if (res.moveToFirst()) {
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
     }
 }
 

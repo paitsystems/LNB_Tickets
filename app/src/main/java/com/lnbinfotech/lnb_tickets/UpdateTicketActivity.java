@@ -1,5 +1,6 @@
 package com.lnbinfotech.lnb_tickets;
 
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -72,6 +74,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     private ProgressBar pb;
     private DBHandler db;
     private int isDiaShowed = 0;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +145,9 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 updateStatus();
                 break;
             case R.id.btn_reply:
-                startActivity(new Intent(getApplicationContext(),ReplyResponseActivity.class));
+                Intent intent1 = new Intent(getApplicationContext(),ReplyResponseActivity.class);
+                intent1.putExtra("from","U");
+                startActivity(intent1);
                 overridePendingTransition(R.anim.enter,R.anim.exit);
                 break;
             case R.id.img:
@@ -164,16 +169,53 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.updateticketactivity_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                doFinish();
+            case R.id.share:
+                ArrayList<Uri> uri_list = new ArrayList<>();
+                uri_list.add(uri);
+                Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                String particular = ticketMasterClass.getParticular();
+                String ticketNo = ticketMasterClass.getTicketNo();
+                String crBy = ticketMasterClass.getCrBy();
+                String branch = ticketMasterClass.getBranch();
+                String status = ticketMasterClass.getStatus();
+                String crDate = ticketMasterClass.getCrDate();
+
+                String text = "Created By :- "+crBy+"\n"+ "Description :- "+particular+"\n"+
+                        "TicketNo :- "+ticketNo+"\n"+"Branch :- "+branch+"\n"+"Status :- "+status+
+                        "\n"+"Created Date :- "+crDate;
+
+                intent.putExtra(Intent.EXTRA_TEXT, text);
+                if(uri!=null) {
+                    intent.setType("image/*");
+                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uri_list);
+                }else {
+                    intent.setType("text/plain");
+                }
+                intent.setPackage("com.whatsapp");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.enter, R.anim.exit);
+                } catch (ActivityNotFoundException e) {
+                    e.printStackTrace();
+                    Toast toast = Toast.makeText(getApplicationContext(), "WhatsApp Have Not Been Installed", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    void init() {
+    private void init() {
         tv_subject = (TextView) findViewById(R.id.tv_subject);
         ed_description = (EditText) findViewById(R.id.ed_description);
         tv_ticket_no = (TextView) findViewById(R.id.tv_ticket_no);
@@ -215,7 +257,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
 
     }
 
-    void setData(){
+    private void setData(){
         auto = ticketMasterClass.auto;
         tv_subject.setText(ticketMasterClass.getSubject());
         tv_ticket_no.setText(ticketMasterClass.getTicketNo());
@@ -242,7 +284,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void updateStatus(){
+    private void updateStatus(){
         constant.showPD();
         try {
             int id = ticketMasterClass.getId();
@@ -305,7 +347,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void loadData(){
+    private void loadData(){
         constant.showPD();
         final AtomicInteger atomicInteger = new AtomicInteger(3);
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
@@ -434,7 +476,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         queue.add(updateRequest);*/
     }
 
-    void setImage(){
+    private void setImage(){
         File file = Constant.checkFolder(Constant.folder_name);
         File fileArray[] = file.listFiles();
         int isAvailable = 0;
@@ -444,6 +486,8 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                     if(f.length()!=0) {
                         String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
                         img.setImageBitmap(scaleBitmap(_imagePath));
+                        File fi1 = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + "/" + imageName);
+                        uri = Uri.fromFile(fi1);
                         isAvailable = 1;
                     }
                     break;
@@ -490,7 +534,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    public Bitmap scaleBitmap(String imagePath) {
+    private Bitmap scaleBitmap(String imagePath) {
         Bitmap resizedBitmap = null;
         try {
             int inWidth, inHeight;
@@ -524,7 +568,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         return resizedBitmap;
     }
 
-    void showDia(int a) {
+    private void showDia(int a) {
         AlertDialog.Builder builder = new AlertDialog.Builder(UpdateTicketActivity.this);
         if (a == 0) {
             builder.setMessage("Do You Want To Go Back?");
@@ -571,7 +615,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         builder.create().show();
     }
 
-    void doFinish(){
+    private void doFinish(){
         unregisterReceiver(receiver);
         if(startService!=null) {
             stopService(startService);

@@ -61,7 +61,11 @@ public class ShortDescListAdapter extends BaseAdapter{
         //ShortDescClass descClass = (ShortDescClass) getItem(i);
         //holder.tv_desc.setText(descClass.getDesc());
         TicketMasterClass pendingTicketClass = (TicketMasterClass) getItem(i);
-        holder.tv_desc.setText(pendingTicketClass.getSubject());
+        String desc = pendingTicketClass.getSubject();
+        if(desc==null) {
+            desc = "";
+        }
+        holder.tv_desc.setText(desc);
         return view;
     }
 

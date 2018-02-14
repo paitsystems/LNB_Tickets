@@ -298,12 +298,22 @@ public class ParseJSON {
                     ticketDetailClass.setMastAuto(jsonArray.getJSONObject(i).getInt("MastAuto"));
                     ticketDetailClass.setDesc(jsonArray.getJSONObject(i).getString("Description"));
                     ticketDetailClass.setCrby(jsonArray.getJSONObject(i).getString("CrBy"));
-                    ticketDetailClass.setCrDate(jsonArray.getJSONObject(i).getString("CrDate"));
+                    String crdate1 = jsonArray.getJSONObject(i).getString("CrDate");
+                    ticketDetailClass.setCrDate(crdate1);
                     ticketDetailClass.setCrTime(jsonArray.getJSONObject(i).getString("CrTime"));
                     ticketDetailClass.setType(jsonArray.getJSONObject(i).getString("Type"));
+                    ticketDetailClass.setId(jsonArray.getJSONObject(i).getInt("Id"));
+                    ticketDetailClass.setClientAuto(jsonArray.getJSONObject(i).getInt("ClientAuto"));
+                    ticketDetailClass.setPointType(jsonArray.getJSONObject(i).getString("PointType"));
+
+                    Date d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(crdate1);
+                    String crdate2 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(d);
+                    ticketDetailClass.setCrDate1(crdate2);
+
                     list.add(ticketDetailClass);
-                    db.addTicketDetail(ticketDetailClass);
+
                 }
+                db.addTicketDetail(list);
             }
         }catch (Exception e){
             e.printStackTrace();
