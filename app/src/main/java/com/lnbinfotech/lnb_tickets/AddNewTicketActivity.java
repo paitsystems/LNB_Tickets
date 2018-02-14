@@ -22,6 +22,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,7 +56,9 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -78,6 +81,8 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     private RadioButton rdo_sw, rdo_hw, rdo_it;
     private PowerManager pm;
     private PowerManager.WakeLock wl;
+    private Spinner sp_status;
+    private List<String> statusList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -265,7 +270,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void init(){
+    private void init(){
         selBranch = null;
         btn_generate_ticket = (Button) findViewById(R.id.btn_generate_ticket);
         btn_attachment = (Button) findViewById(R.id.btn_attachment);
@@ -281,6 +286,12 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         constant = new Constant(AddNewTicketActivity.this);
         db = new DBHandler(getApplicationContext());
         sp_branch = (Spinner) findViewById(R.id.sp_branch);
+        sp_status = (Spinner) findViewById(R.id.sp_status);
+
+        statusList = new ArrayList<>();
+        statusList.add("Open");statusList.add("Closed");statusList.add("Pending");statusList.add("Scheduled");
+        statusList.add("Hold");statusList.add("Cancel");statusList.add("ReOpen");statusList.add("ClientClosed");
+        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(),R.layout.custom_spinner,statusList));
 
         pm = (PowerManager) getSystemService(POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,"Log");
@@ -318,7 +329,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }*/
     }
 
-    void takeimage(){
+    private void takeimage(){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File f = Constant.checkFolder(Constant.folder_name);
         f = new File(f.getAbsolutePath(),"temp.jpg");
@@ -326,12 +337,12 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         startActivityForResult(intent,REQUEST_IMAGE_TAKE);
     }
 
-    void openGallery(){
+    private void openGallery(){
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(gallery,REQUEST_IMAGE_PICK_UP);
     }
 
-    void copyImage(File source, File destination){
+    private void copyImage(File source, File destination){
         try {
             FileChannel sourcechannel, destinationchannel;
             sourcechannel = new FileInputStream(source).getChannel();
@@ -349,7 +360,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void setImage(File f, int i){
+    private void setImage(File f, int i){
         OutputStream outFile;
         try {
             img.setVisibility(View.VISIBLE);
@@ -390,7 +401,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void validation() {
+    private void validation() {
         String _branch = ed_search.getText().toString();
         String _subject = ed_subject.getText().toString();
         String _description = ed_description.getText().toString();
@@ -434,13 +445,15 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void generateTicket(){
+    private void generateTicket(){
         try {
             int clientAuto = 0, ok = 0;
             String type, clientName = null, mobno = null, _subject = null, _description = null,
-                    branch, _imagePath = imagePath, _status = "Open", imgFolder, pointtype = null;
+                    branch, _imagePath = imagePath, _status, imgFolder, pointtype = null;
 
             type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+
+            _status = statusList.get(sp_status.getSelectedItemPosition());
 
             if(rdo_sw.isChecked()){
                 pointtype = "S";
@@ -530,7 +543,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    void saveTicket(String url){
+    private void saveTicket(String url){
         constant.showPD();
         StringRequest request = new StringRequest(url,
                 new Response.Listener<String>() {
@@ -732,7 +745,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         return resizedBitmap;
     }
 
-    void showDia(int a){
+    private void showDia(int a){
         AlertDialog.Builder builder = new AlertDialog.Builder(AddNewTicketActivity.this);
         builder.setCancelable(false);
         if(a==0) {
@@ -757,7 +770,8 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 public void onClick(DialogInterface dialog, int which) {
                     MainActivity.isUpdate = 1;
                     dialog.dismiss();
-                    new Constant(AddNewTicketActivity.this).doFinish();
+                    //new Constant(AddNewTicketActivity.this).doFinish();
+                    clearFields();
                 }
             });
         }else if(a==2) {
@@ -826,6 +840,14 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             });
         }
         builder.create().show();
+    }
+
+    private void clearFields(){
+        ed_subject.setText(null);
+        ed_subject.requestFocus();
+        ed_description.setText(null);
+        img.setImageResource(0);
+        img.setVisibility(View.GONE);
     }
 
     private void writeLog(String _data){

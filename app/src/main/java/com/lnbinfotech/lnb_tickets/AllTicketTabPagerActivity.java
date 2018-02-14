@@ -124,7 +124,7 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
         if(type.equals("E")) {
             adapter.addFragment(new InternalPointFragment(), "Internal");
         }
-        //adapter.addFragment(new MessageFragment(),"Message");
+        adapter.addFragment(new MessageFragment(),"Message");
         pager.setAdapter(adapter);
     }
 

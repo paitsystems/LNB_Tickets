@@ -20,10 +20,10 @@ public class FirstActivity extends AppCompatActivity {
 
     public static SharedPreferences pref;
     public static String PREF_NAME = "Tickets";
-    GetPermission permission;
-    Constant constant;
-    static Context context;
-    Toast toast;
+    private GetPermission permission;
+    private Constant constant;
+    public static Context context;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class FirstActivity extends AppCompatActivity {
         checkpermmission();
     }
 
-    void checkpermmission(){
+    private void checkpermmission(){
         if(!permission.checkCameraPermission(getApplicationContext())){
             permission.requestCameraPermission(getApplicationContext(),FirstActivity.this);//1
         }else if(!permission.checkReadExternalStoragePermission(getApplicationContext())){
@@ -56,7 +56,7 @@ public class FirstActivity extends AppCompatActivity {
         }
     }
 
-    void doThis(){
+    private void doThis(){
         if (!pref.contains(getString(R.string.pref_isHWapplicable))) {
             writeLog("FirstActivity_doThis_Pref_Deleted");
             FirstActivity.pref.edit().clear().commit();
@@ -109,7 +109,7 @@ public class FirstActivity extends AppCompatActivity {
         doFinish();
     }
 
-    void doFinish(){
+    private void doFinish(){
         finish();
         toast.cancel();
         overridePendingTransition(R.anim.enter,R.anim.exit);

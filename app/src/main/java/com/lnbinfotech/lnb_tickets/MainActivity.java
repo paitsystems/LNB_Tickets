@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,12 +39,14 @@ import com.lnbinfotech.lnb_tickets.connectivity.ConnectivityTest;
 import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
+import com.lnbinfotech.lnb_tickets.interfaces.DatabaseUpgradeInterface;
 import com.lnbinfotech.lnb_tickets.interfaces.ServerCallback;
 import com.lnbinfotech.lnb_tickets.log.CopyLog;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.mail.GMailSender;
-import com.lnbinfotech.lnb_tickets.model.SMLMASTClass;
+import com.lnbinfotech.lnb_tickets.model.TicketDetailClass;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
+import com.lnbinfotech.lnb_tickets.model.ViewReachToMDClass;
 import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
 import com.lnbinfotech.lnb_tickets.post.Post;
 import com.lnbinfotech.lnb_tickets.volleyrequests.VolleyRequests;
@@ -65,7 +69,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 // Created by lnb on 8/11/2016.
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DatabaseUpgradeInterface{
 
     private TextView tv_total, tv_complete, tv_pending;
     private Button btn_view_all, btn_add;
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
             version = pInfo.versionCode+"."+pInfo.versionName;
-            Constant.showLog(version);
+            Constant.showLog("App Version " + version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             writeLog("MainActivity_"+e.getMessage());
@@ -119,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(ConnectivityTest.getNetStat(getApplicationContext())) {
             loadData();
         }else{
+            setData();
             toast.setText("You Are Offline");
             toast.show();
         }
@@ -134,6 +139,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        Cursor cursor = SQLiteDatabase.openOrCreateDatabase(":memory:", null).rawQuery("select sqlite_version() AS sqlite_version", null);
+        String sqliteVersion = "";
+        while(cursor.moveToNext()){
+            sqliteVersion += cursor.getString(0);
+        }
+        cursor.close();
+        Constant.showLog("SqliteVersion "+sqliteVersion);
     }
 
     @Override
@@ -216,11 +228,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else if(item.getItemId() == R.id.changePassword){
             startActivity(new Intent(getApplicationContext(),ChangePasswordActivity.class));
             overridePendingTransition(R.anim.enter,R.anim.exit);
+        }else if(item.getItemId() == R.id.reach_to_md){
+            String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+            if(type.equals("E")) {
+                Intent intent = new Intent(getApplicationContext(), ViewReachToMDActivity.class);
+                intent.putExtra("type","E");
+                startActivity(intent);
+            }else if(type.equals("C")){
+                Intent intent = new Intent(getApplicationContext(), ReachToMDActivity.class);
+                intent.putExtra("type","C");
+                intent.putExtra("data",new ViewReachToMDClass());
+                startActivity(intent);
+            }
+            overridePendingTransition(R.anim.enter,R.anim.exit);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    void init(){
+    @Override
+    public void dbUpgraded() {
+        Constant.showLog("dbUpgraded Called");
+        //db.deleteTabel(DBHandler.Ticket_Detail_Table);
+    }
+
+    private void init(){
         auto = (AutoCompleteTextView) findViewById(R.id.auto);
         tv_total = (TextView) findViewById(R.id.tv_total);
         tv_complete = (TextView) findViewById(R.id.tv_complete);
@@ -236,10 +267,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toast.setGravity(Gravity.CENTER,0,0);
         constant = new Constant(MainActivity.this);
         db = new DBHandler(getApplicationContext());
-
+        db.initInterface(this);
+        updateList = new ArrayList<>();
     }
 
-    void refreshUserData(){
+    private void refreshUserData(){
         constant = new Constant(MainActivity.this);
         constant.showPD();
         try {
@@ -261,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if(new ParseJSON(result,getApplicationContext()).parseUserData() == 1){
                                 //showDia(4);
                                 db.deleteTabel(DBHandler.Ticket_Master_Table);
+                                db.deleteTabel(DBHandler.Ticket_Detail_Table);
                                 db.deleteTabel(DBHandler.SMLMAST_Table);
                                 isDiaShowed = 0;
                                 loadData();
@@ -292,10 +325,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    void loadData(){
+    private void loadData(){
         constant = new Constant(MainActivity.this);
         constant.showPD();
-        final AtomicInteger atomicInteger = new AtomicInteger(4);
+        final AtomicInteger atomicInteger = new AtomicInteger(3);
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
         String isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
 
@@ -333,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Constant.showLog("versionRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
-                            setData();
+                            //setData();
                         }
                         if (_data != null && !_data.equals("0")) {
                             /*if (version.equals(_data)) {
@@ -393,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Constant.showLog("descRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
-                            setData();
+                            //setData();
                         }
                     }
                 },
@@ -428,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Constant.showLog("custRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
-                            setData();
+                            //setData();
                         }
                     }
                 },
@@ -463,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Constant.showLog("updateRequest_"+taskLeft);
                         if (taskLeft == 0) {
                             constant.showPD();
-                            setData();
+                           // setData();
                         }
                     }
                 },
@@ -495,106 +528,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         queue.add(descRequest);
         queue.add(custRequest);
         queue.add(updateRequest);*/
-    }
-
-    private class FetchAppVersionFromGooglePlayStore extends AsyncTask<String, Void, String> {
-
-        protected String doInBackground(String... urls) {
-            try {
-                return
-                        Jsoup.connect("https://play.google.com/store/apps/details?id=com.lnbinfotech.lnb_tickets&hl=en")
-                                .timeout(10000)
-                                .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                                .referrer("http://www.google.com")
-                                .get()
-                                .select("div[itemprop=softwareVersion]")
-                                .first()
-                                .ownText();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "0.0";
-            }
-        }
-
-        protected void onPostExecute(String string) {
-            Constant.showLog(string);
-            constant.showPD();
-        }
-    }
-
-    private void loadVersionCode(){
-        constant.showPD();
-        String url1 = Constant.ipaddress+"/GetVersion";
-        Constant.showLog(url1);
-
-        VolleyRequests requests = new VolleyRequests(MainActivity.this);
-        requests.checkVersion(url1, new ServerCallback() {
-            @Override
-            public void onSuccess(String _data) {
-                if (_data != null && !_data.equals("0")) {
-                    if (version.equals(_data)) {
-                        SharedPreferences.Editor editor = FirstActivity.pref.edit();
-                        editor.putString(getString(R.string.pref_version), _data);
-                        editor.apply();
-                        //loadTicketData();
-                    }else{
-                        constant.showPD();
-                        showDia(8);
-                    }
-                } else if (_data == null) {
-                    constant.showPD();
-                    showDia(3);
-                }
-            }
-
-            @Override
-            public void onFailure(String result) {
-                constant.showPD();
-                showDia(3);
-            }
-        });
-    }
-
-    private void loadTicketData(){
-        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        db.deleteTabel(DBHandler.Ticket_Master_Table);
-        db.deleteTabel(DBHandler.SMLMAST_Table);
-        int autoId = db.getMaxAutoId(type);
-        String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
-                "&type="+type+"&autoId="+autoId;
-        String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
-                "&auto="+db.getSMLMASTMaxAuto();
-
-        Constant.showLog(url2);
-        Constant.showLog(url3);
-
-        VolleyRequests requests = new VolleyRequests(MainActivity.this);
-        requests.loadTicketData(url2, new ServerCallback() {
-            @Override
-            public void onSuccess(String result) {
-
-            }
-
-            @Override
-            public void onFailure(String result) {
-                constant.showPD();
-            }
-        });
-
-        VolleyRequests requests1 = new VolleyRequests(MainActivity.this);
-        requests.loadCustomerData(url3, new ServerCallback() {
-            @Override
-            public void onSuccess(String result) {
-
-            }
-
-            @Override
-            public void onFailure(String result) {
-                constant.showPD();
-            }
-        });
-
     }
 
     private void setData(){
@@ -794,7 +727,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.create().show();
     }
 
-    void exportfile(){
+    private void exportfile(){
         if(new CopyLog().copyLog(getApplicationContext())) {
             writeLog("MainActivity_exportfile_Log_File_Exported");
             sendMail1();
@@ -803,7 +736,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    void sendMail1(){
+    private void sendMail1(){
         try {
             File sdFile = Constant.checkFolder(Constant.folder_name);
             File writeFile = new File(sdFile, Constant.log_file_name);
@@ -896,6 +829,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         private int to;
         private AtomicInteger atomicInteger;
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Please Wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
 
         public getTicketMaster(int _to, AtomicInteger _atomicInteger) {
             this.to = _to;
@@ -910,8 +853,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
-            response = response.substring(1, response.length() - 1);
-            new readJSON(response, "SizeNDesign", to,atomicInteger).execute();
+            pd.dismiss();
+            if(response!=null) {
+                response = response.substring(1, response.length() - 1);
+                new readJSON(response, "SizeNDesign", to, atomicInteger).execute();
+            }else{
+                setData();
+            }
         }
     }
 
@@ -919,6 +867,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private int to;
         private String result, parseType;
         private AtomicInteger atomicInteger;
+        private File writeFile = null;
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Please Wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
 
         public readJSON(String _result, String _parseType, int _to, AtomicInteger _atomicInteger) {
             this.result = _result;
@@ -934,7 +894,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             FileWriter writer;
             try {
                 String search = "\\\\", replace = "";
-                File writeFile = new File(sdFile, writeFilename);
+                writeFile = new File(sdFile, writeFilename);
                 writer = new FileWriter(writeFile);
                 int size = result.length();
                 if (size > 2) {
@@ -957,11 +917,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 writer.close();
                 return retValue;
             } catch (IOException | OutOfMemoryError e) {
-                int taskLeft = atomicInteger.decrementAndGet();
+                /*int taskLeft = atomicInteger.decrementAndGet();
                 Constant.showLog("descRequest_replace_"+taskLeft);
                 if (taskLeft == 0) {
                     constant.showPD();
+                }*/
+                if(writeFile!=null) {
+                    writeFile.delete();
                 }
+                pd.dismiss();
                 try {
                     writer = new FileWriter(new File(sdFile, "Log.txt"));
                     writer.append(e.getMessage());
@@ -978,15 +942,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            pd.dismiss();
             if (s.equals("A")) {
                 new writeDB(parseType, to,atomicInteger).execute();
             } else if (s.equals("B")){
-                int taskLeft = atomicInteger.decrementAndGet();
+                /*int taskLeft = atomicInteger.decrementAndGet();
                 Constant.showLog("descRequest_replace_"+taskLeft);
                 if (taskLeft == 0) {
                     constant.showPD();
                     setData();
-                }
+                }*/
+                //setData();
+                String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+                int clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto),0);
+                int auto = db.getAutoTD();
+                String url1 = Constant.ipaddress + "/GetAllTicketDetail?clientAuto="+clientAuto+"&auto="+auto+"&type="+type;
+                Constant.showLog(url1);
+                new getTicketDetail(0,new AtomicInteger(1)).execute(url1);
             }else {
                 showDia(3);
             }
@@ -999,6 +971,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private String parseType;
         private int to;
         private AtomicInteger atomicInteger;
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Please Wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
 
         public writeDB(String _parseType, int _to, AtomicInteger _atomicInteger) {
             this.parseType = _parseType;
@@ -1016,11 +999,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 parseSizeNDesign(jp, to);
                 return "";
             } catch (Exception e) {
-                int taskLeft = atomicInteger.decrementAndGet();
+                /*int taskLeft = atomicInteger.decrementAndGet();
                 Constant.showLog("descRequest_"+taskLeft);
                 if (taskLeft == 0) {
                     constant.showPD();
-                }
+                }*/
+                pd.dismiss();
                 try {
                     FileWriter writer = new FileWriter(new File(sdFile, "Log.txt"));
                     writer.append(e.getMessage());
@@ -1038,24 +1022,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            pd.dismiss();
+
             if (s != null) {
                 if (s.equals("")) {
                     Constant.showLog("Success");
-                    int taskLeft = atomicInteger.decrementAndGet();
+                    /*int taskLeft = atomicInteger.decrementAndGet();
                     Constant.showLog("descRequest_"+taskLeft);
                     if (taskLeft == 0) {
                         constant.showPD();
-                        setData();
-                    }
+                        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+                        int clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto),0);
+                        int auto = db.getAutoTD();
+                        String url1 = Constant.ipaddress + "/GetTicketDetail?clientAuto="+clientAuto+"&auto="+auto+"&type="+type;
+                        Constant.showLog(url1);
+                        new getTicketDetail(0,new AtomicInteger(1)).execute(url1);
+                        //setData();
+                    }*/
+                    String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+                    int clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto),0);
+                    int auto = db.getAutoTD();
+                    String url1 = Constant.ipaddress + "/GetAllTicketDetail?clientAuto="+clientAuto+"&auto="+auto+"&type="+type;
+                    Constant.showLog(url1);
+                    new getTicketDetail(0,new AtomicInteger(1)).execute(url1);
+                    //setData();
                 } else {
                     showDia(3);
                 }
             } else {
-                int taskLeft = atomicInteger.decrementAndGet();
+                /*int taskLeft = atomicInteger.decrementAndGet();
                 Constant.showLog("descRequest_"+taskLeft);
                 if (taskLeft == 0) {
                     constant.showPD();
-                }
+                }*/
                 showDia(3);
             }
         }
@@ -1169,4 +1168,280 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private class getTicketDetail extends AsyncTask<String, Void, String> {
+
+        private int to;
+        private AtomicInteger atomicInteger;
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Please Wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        public getTicketDetail(int _to, AtomicInteger _atomicInteger) {
+            this.to = _to;
+            this.atomicInteger = _atomicInteger;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            return Post.POST(strings[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+            pd.dismiss();
+            if(response!=null) {
+                response = response.substring(1, response.length() - 1);
+                new readJSONTD(response, "SizeNDesign", to, atomicInteger).execute();
+            }else{
+                setData();
+            }
+        }
+    }
+
+    private class readJSONTD extends AsyncTask<Void, Void, String> {
+        private int to;
+        private String result, parseType;
+        private AtomicInteger atomicInteger;
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Please Wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        public readJSONTD(String _result, String _parseType, int _to, AtomicInteger _atomicInteger) {
+            this.result = _result;
+            this.parseType = _parseType;
+            this.to = _to;
+            this.atomicInteger = _atomicInteger;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            String retValue = "B";
+            File sdFile = Constant.checkFolder(Constant.folder_name);
+            FileWriter writer;
+            File writeFile = null;
+            try {
+                String search = "\\\\", replace = "";
+                writeFile = new File(sdFile, writeFilename);
+                writer = new FileWriter(writeFile);
+
+                int size = result.length();
+                if (size > 2) {
+                    Log.d("Log", "Replacing");
+                    int b = 50000;
+                    for (int i = 0; i < size; i++) {
+                        if (b >= size) {
+                            b = size;
+                        }
+                        String q = result.substring(i, b);
+                        String g = q.replaceAll(search, replace);
+                        System.gc();
+                        writer.append(g);
+                        i = b - 1;
+                        b = b + 50000;
+                    }
+                    retValue = "A";
+                }
+                writer.flush();
+                writer.close();
+                return retValue;
+            } catch (IOException | OutOfMemoryError e) {
+                /*int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_replace_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                }*/
+                if (writeFile!=null) {
+                    writeFile.delete();
+                }
+                pd.dismiss();
+                try {
+                    writer = new FileWriter(new File(sdFile, "Log.txt"));
+                    writer.append(e.getMessage());
+                    writer.flush();
+                    writer.close();
+                } catch (Exception e1) {
+                    e.printStackTrace();
+                }
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            pd.dismiss();
+            if (s.equals("A")) {
+                new writeDBTD(parseType, to,atomicInteger).execute();
+            } else if (s.equals("B")){
+                /*int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_replace_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                    setData();
+                }*/
+                setData();
+            }else {
+                showDia(3);
+            }
+        }
+    }
+
+    private class writeDBTD extends AsyncTask<Void, String, String> {
+
+        private File writeFile;
+        private String parseType;
+        private int to;
+        private AtomicInteger atomicInteger;
+
+        private ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Please Wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        public writeDBTD(String _parseType, int _to, AtomicInteger _atomicInteger) {
+            this.parseType = _parseType;
+            this.to = _to;
+            this.atomicInteger = _atomicInteger;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            File sdFile = Constant.checkFolder(Constant.folder_name);
+            JsonFactory f = new JsonFactory();
+            try {
+                writeFile = new File(sdFile, writeFilename);
+                JsonParser jp = f.createJsonParser(writeFile);
+                parseTicketDetail(jp, to);
+                return "";
+            } catch (Exception e) {
+                /*int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                }*/
+                pd.dismiss();
+                try {
+                    FileWriter writer = new FileWriter(new File(sdFile, "Log.txt"));
+                    writer.append(e.getMessage());
+                    writer.flush();
+                    writer.close();
+                } catch (Exception e1) {
+                    e.printStackTrace();
+                    return null;
+                }
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            pd.dismiss();
+            if (s != null) {
+                if (s.equals("")) {
+                    Constant.showLog("Success");
+                    /*int taskLeft = atomicInteger.decrementAndGet();
+                    Constant.showLog("descRequest_"+taskLeft);
+                    if (taskLeft == 0) {
+                        constant.showPD();
+                        setData();
+                    }*/
+                    setData();
+                } else {
+                    showDia(3);
+                }
+            } else {
+                /*int taskLeft = atomicInteger.decrementAndGet();
+                Constant.showLog("descRequest_"+taskLeft);
+                if (taskLeft == 0) {
+                    constant.showPD();
+                }*/
+                showDia(3);
+            }
+        }
+    }
+
+    private void parseTicketDetail(JsonParser jp, int to) {
+        try {
+            int count = 0;
+            List<TicketDetailClass> list = new ArrayList<>();
+            while (jp.nextToken() != JsonToken.END_ARRAY) {
+                count++;
+                TicketDetailClass ticketClass = new TicketDetailClass();
+                while (jp.nextToken() != JsonToken.END_OBJECT) {
+                    String token = jp.getCurrentName();
+                    if ("Auto".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setAuto(jp.getValueAsInt());
+                    } else if ("MastAuto".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setMastAuto(jp.getValueAsInt());
+                    } else if ("Description".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setDesc(jp.getText());
+                    } else if ("CrBy".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setCrby(jp.getText());
+                    } else if ("CrDate".equals(token)) {
+                        jp.nextToken();
+                        String crdate1 = jp.getText();
+                        ticketClass.setCrDate(crdate1);
+                        Date d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(crdate1);
+                        String crdate2 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(d);
+                        ticketClass.setCrDate1(crdate2);
+                    } else if ("CrTime".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setCrTime(jp.getText());
+                    } else if ("Type".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setType(jp.getText());
+                    } else if ("GenType".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setGenType(jp.getText());
+                    } else if ("Id".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setId(jp.getValueAsInt());
+                    } else if ("ClientAuto".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setClientAuto(jp.getValueAsInt());
+                    } else if ("PointType".equals(token)) {
+                        jp.nextToken();
+                        ticketClass.setPointType(jp.getText());
+                    }
+                }
+                list.add(ticketClass);
+            }
+            db.addTicketDetail(list);
+            Constant.showLog("" + count);
+        } catch (Exception e) {
+            writeLog("parseTicketDetail_" + e.getMessage());
+            e.printStackTrace();
+            showDia(3);
+        }
+    }
 }

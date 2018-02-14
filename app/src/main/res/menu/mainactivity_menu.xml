@@ -25,4 +25,7 @@
         android:title="@string/report_error"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/reach_to_md"
+          android:title="@string/reach_to_md"
+          app:showAsAction="never"/>
 </menu>

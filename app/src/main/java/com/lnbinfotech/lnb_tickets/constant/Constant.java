@@ -39,17 +39,16 @@ public class Constant {
             //ftp_directory = "SMVisit_Indus";
 
     //TODO: Check Ip AddressAd
-    //public static final String ipaddress = "http://172.30.1.38/LNBTCK_8_8/service.svc";
-
-    public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_8_8/service.svc";
+    public static final String ipaddress = "http://172.30.1.38/LNBTCK_10/service.svc";
+    //public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_10/service.svc";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
     public static int liveTestFlag = 0;
 
-    Activity activity;
-    Context context;
+    private Activity activity;
+    private Context context;
 
-    static ProgressDialog pd;
+    private static ProgressDialog pd;
 
     public static void showLog(String log) {
         if(liveTestFlag==0) {
@@ -98,7 +97,7 @@ public class Constant {
         if(Constant.liveTestFlag==1) {
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,SystemClock.elapsedRealtime()+AlarmManager.INTERVAL_FIFTEEN_MINUTES,AlarmManager.INTERVAL_FIFTEEN_MINUTES,pendingIntent);
         }else {
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 120000, 120000, pendingIntent);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 120000, 60*60*1000, pendingIntent);
         }
         Constant.showLog("Alarm Set");
         Date date = new Date(SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES);

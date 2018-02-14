@@ -4,8 +4,8 @@ package com.lnbinfotech.lnb_tickets.model;
 
 public class TicketDetailClass {
 
-    public String desc, crDate, crTime, type,crby;
-    public int auto, mastAuto;
+    public String desc, crDate, crTime, type,crby, genType, pointType, crDate1;
+    public int auto, mastAuto, id, clientAuto;
 
     public String getDesc() {
         return desc;
@@ -61,5 +61,45 @@ public class TicketDetailClass {
 
     public void setCrby(String crby) {
         this.crby = crby;
+    }
+
+    public String getGenType() {
+        return genType;
+    }
+
+    public void setGenType(String genType) {
+        this.genType = genType;
+    }
+
+    public String getPointType() {
+        return pointType;
+    }
+
+    public void setPointType(String pointType) {
+        this.pointType = pointType;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getClientAuto() {
+        return clientAuto;
+    }
+
+    public void setClientAuto(int clientAuto) {
+        this.clientAuto = clientAuto;
+    }
+
+    public String getCrDate1() {
+        return crDate1;
+    }
+
+    public void setCrDate1(String crDate1) {
+        this.crDate1 = crDate1;
     }
 }

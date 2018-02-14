@@ -188,6 +188,20 @@
                     android:gravity="top" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@drawable/black_border_curve_draw"
+                android:orientation="vertical"
+                android:layout_margin="@dimen/mobmargin5">
+
+                <Spinner
+                    android:id="@+id/sp_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="200dp"

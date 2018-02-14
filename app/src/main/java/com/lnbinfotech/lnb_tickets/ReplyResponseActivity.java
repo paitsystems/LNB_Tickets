@@ -1,12 +1,14 @@
 package com.lnbinfotech.lnb_tickets;
 
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,33 +22,43 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.lnbinfotech.lnb_tickets.adapter.AllTicketListAdapter;
 import com.lnbinfotech.lnb_tickets.adapter.ReplyResponseListAdapter;
 import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
+import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.model.TicketDetailClass;
 import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
 
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class ReplyResponseActivity extends AppCompatActivity implements View.OnClickListener {
 
-    ListView listView;
-    Constant constant;
-    Toast toast;
-    EditText ed_reply;
-    Button btn_reply;
-    ImageView img_reply;
-    ArrayList<TicketDetailClass> ticketDetailClassList;
-    ReplyResponseListAdapter adapter;
-
-    AdView mAdView;
+    private ListView listView;
+    private Constant constant;
+    private Toast toast;
+    private EditText ed_reply;
+    private Button btn_reply;
+    private ImageView img_reply;
+    private ArrayList<TicketDetailClass> ticketDetailClassList;
+    private ReplyResponseListAdapter adapter;
+    private AdView mAdView;
+    private String from;
+    private DBHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reply_response);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         init();
         img_reply.setOnClickListener(this);
@@ -55,23 +67,17 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         mAdView = (AdView) findViewById(R.id.adView);
 
         AdRequest adRequest;
-        if(Constant.liveTestFlag==1) {
+        if (Constant.liveTestFlag == 1) {
             adRequest = new AdRequest.Builder().build();
-        }else {
-            adRequest = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .addTestDevice("0558B791C50AB34B5650C3C48C9BD15E")
-                    .build();
+        } else {
+            adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).addTestDevice("0558B791C50AB34B5650C3C48C9BD15E").build();
         }
 
         mAdView.loadAd(adRequest);
 
-        loadData();
+        from = getIntent().getExtras().getString("from");
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
+        setData();
     }
 
     @Override
@@ -122,6 +128,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onBackPressed() {
+        ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_reply.getWindowToken(),0);
         new Constant(ReplyResponseActivity.this).doFinish();
     }
 
@@ -129,13 +136,14 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_reply.getWindowToken(),0);
                 new Constant(ReplyResponseActivity.this).doFinish();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    void init(){
+    private void init(){
         toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER,0,0);
         constant = new Constant(ReplyResponseActivity.this);
@@ -144,12 +152,17 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         btn_reply = (Button) findViewById(R.id.btn_reply);
         img_reply = (ImageView) findViewById(R.id.img_reply);
         ticketDetailClassList = new ArrayList<>();
+        db = new DBHandler(getApplicationContext());
     }
 
-    void loadData() {
+    private void loadData() {
         constant.showPD();
+        int auto,id;
+        auto = db.getAutoTD();
+        id = db.getIDTD();
         final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        String url1 = Constant.ipaddress + "/GetTicketDetail?mastAuto="+UpdateTicketActivity.auto+"&type="+type;
+        String url1 = Constant.ipaddress + "/GetTicketDetail?auto="+auto+"&mastAuto="+UpdateTicketActivity.auto
+                                            +"&id="+id+"&type="+type;
         Constant.showLog(url1);
         StringRequest request = new StringRequest(url1,
                 new Response.Listener<String>() {
@@ -160,13 +173,20 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                         result = result.replace("''", "");
                         result = result.substring(1, result.length() - 1);
                         ticketDetailClassList.clear();
-                        ticketDetailClassList = new ParseJSON(result,getApplicationContext()).parseTicketDetail();
-                        if (ticketDetailClassList.size()!= 0) {
-                            listView.setAdapter(null);
-                            adapter = new ReplyResponseListAdapter(ticketDetailClassList,getApplicationContext(),type);
-                            listView.setAdapter(adapter);
-                            listView.setSelection(listView.getAdapter().getCount()-1);
-                        }
+                        ticketDetailClassList = new ParseJSON(result, getApplicationContext()).parseTicketDetail();
+                        ticketDetailClassList.clear();
+                        setData();
+                        /*if(from.equals("U")) {
+                            if (ticketDetailClassList.size() != 0) {
+                                listView.setAdapter(null);
+                                adapter = new ReplyResponseListAdapter(ticketDetailClassList, getApplicationContext(), type);
+                                listView.setAdapter(adapter);
+                                listView.setSelection(listView.getAdapter().getCount() - 1);
+                            }
+                        }else {
+                            ticketDetailClassList.clear();
+                            setData();
+                        }*/
                         constant.showPD();
                     }
                 },
@@ -187,7 +207,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request,"ABC");
     }
 
-    void addTicketDetail(){
+    private void addTicketDetail(){
         try {
             constant.showPD();
             //int auto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
@@ -231,7 +251,43 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    void showDia(int a) {
+    private void setData(){
+        ticketDetailClassList.clear();
+        Cursor res = db.getParticularTicketDetail();
+        if(res.moveToFirst()){
+            do{
+                try {
+                    TicketDetailClass ticketDetailClass = new TicketDetailClass();
+                    ticketDetailClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketD_Auto)));
+                    ticketDetailClass.setMastAuto(res.getInt(res.getColumnIndex(DBHandler.TicketD_MastAuto)));
+                    ticketDetailClass.setDesc(res.getString(res.getColumnIndex(DBHandler.TicketD_Description)));
+                    ticketDetailClass.setCrby(res.getString(res.getColumnIndex(DBHandler.TicketD_CrBy)));
+                    String crdate1 = res.getString(res.getColumnIndex(DBHandler.TicketD_CrDate));
+                    ticketDetailClass.setCrDate(crdate1);
+                    ticketDetailClass.setCrTime(res.getString(res.getColumnIndex(DBHandler.TicketD_CrTime)));
+                    ticketDetailClass.setType(res.getString(res.getColumnIndex(DBHandler.TicketD_Type)));
+                    ticketDetailClass.setId(res.getInt(res.getColumnIndex(DBHandler.TicketD_Id)));
+                    ticketDetailClass.setClientAuto(res.getInt(res.getColumnIndex(DBHandler.TicketD_ClientAuto)));
+                    ticketDetailClass.setPointType(res.getString(res.getColumnIndex(DBHandler.TicketD_PointType)));
+
+                    Date d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(crdate1);
+                    String crdate2 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).format(d);
+                    ticketDetailClass.setCrDate1(crdate2);
+
+                    ticketDetailClassList.add(ticketDetailClass);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    writeLog("setData_"+e.getMessage());
+                }
+            }while (res.moveToNext());
+        }
+        final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
+        adapter = new ReplyResponseListAdapter(ticketDetailClassList,getApplicationContext(),type);
+        listView.setAdapter(adapter);
+        listView.setSelection(listView.getAdapter().getCount() - 1);
+    }
+
+    private void showDia(int a) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ReplyResponseActivity.this);
         if (a == 0) {
             builder.setMessage("Do You Want To Go Back?");
