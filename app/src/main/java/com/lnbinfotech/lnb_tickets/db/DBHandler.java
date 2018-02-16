@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.lnbinfotech.lnb_tickets.FirstActivity;
 import com.lnbinfotech.lnb_tickets.MainActivity;
+import com.lnbinfotech.lnb_tickets.R;
 import com.lnbinfotech.lnb_tickets.UpdateTicketActivity;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.interfaces.DatabaseUpgradeInterface;
@@ -27,7 +29,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public DatabaseUpgradeInterface dbInterface;
 
     public static final String Database_Name = "APITTECH.db";
-    public static final int Database_Version = 6;
+    public static final int Database_Version = 8;
 
     public static final String Ticket_Master_Table = "TicketMaster";
     public static final String TicketM_Auto = "Auto";
@@ -57,6 +59,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String TicketM_Branch = "Branch";
     public static final String TicketM_PointType = "PointType";
     public static final String TicketM_ModDate1 = "ModDate1";
+    public static final String TicketM_NickName = "NickName";
 
     public static final String Ticket_Detail_Table = "TicketDetail";
     public static final String TicketD_Auto = "Auto";
@@ -86,6 +89,8 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String SMLMAST_GroupId = "GroupId";
     public static final String SMLMAST_isHO = "isHO";
     public static final String SMLMAST_isHWapplicable = "isHWapplicable";
+    public static final String SMLMAST_NickName = "NickName";
+    public static final String SMLMAST_OtherMobNo = "OtherMobNo";
 
     private String create_table_master = "create table if not exists "+ Ticket_Master_Table+"("+
             TicketM_Auto+" int,"+TicketM_Id+" int,"+TicketM_ClientAuto+" int,"+TicketM_ClientName+" text,"+
@@ -108,7 +113,8 @@ public class DBHandler extends SQLiteOpenHelper {
             SMLMAST_Auto+" int,"+SMLMAST_ClientID+" text,"+SMLMAST_ClientName+" text,"+
             SMLMAST_Mobile+" text,"+SMLMAST_Email+" text,"+SMLMAST_FTPLocation+" text,"+
             SMLMAST_FTPUser+" text,"+SMLMAST_FTPPass+" text,"+SMLMAST_FTPImgFolder+" text,"+
-            SMLMAST_CustomerName+" text,"+SMLMAST_GroupId+" int,"+SMLMAST_isHO+" text,"+SMLMAST_isHWapplicable+" text);";
+            SMLMAST_CustomerName+" text,"+SMLMAST_GroupId+" int,"+SMLMAST_isHO+" text,"+
+            SMLMAST_isHWapplicable+" text,"+SMLMAST_NickName+ " text,"+ SMLMAST_OtherMobNo+" text);";
 
     public DBHandler(Context context) {
         super(context, Database_Name, null, Database_Version);
@@ -130,7 +136,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if(oldVersion<5){
+        if(oldVersion<7){
             String str1 = "alter table "+Ticket_Detail_Table+" add "+TicketD_Id+" int";
             String str2 = "alter table "+Ticket_Detail_Table+" add "+TicketD_ClientAuto+" int";
             String str3 = "alter table "+Ticket_Detail_Table+" add "+TicketD_PointType+" text";
@@ -139,12 +145,18 @@ public class DBHandler extends SQLiteOpenHelper {
             db.execSQL(str2);
             db.execSQL(str3);
             db.execSQL(str4);
-            Constant.showLog("Update Ticket Detail Table");
+            Constant.showLog("Update Ticket Detail Table 7");
         }
-        if(oldVersion<6){
-            db.execSQL(create_table_detail);
+        if(oldVersion<8){
+            String str2 = "alter table "+SMLMAST_Table+" add "+SMLMAST_NickName+" text";
+            String str3 = "alter table "+SMLMAST_Table+" add "+SMLMAST_OtherMobNo+" text";
+            db.execSQL(str2);
+            db.execSQL(str3);
+            Constant.showLog("Update Ticket Detail Table 8");
         }
-        dbInterface.dbUpgraded();
+        if(dbInterface!=null) {
+            dbInterface.dbUpgraded();
+        }
 
     }
 
@@ -760,6 +772,13 @@ public class DBHandler extends SQLiteOpenHelper {
         }
         res.close();
         return autoId;
+    }
+
+    public void updateNickName(String nickname, String omobno, String auto) {
+        ContentValues cv = new ContentValues();
+        cv.put(SMLMAST_NickName, nickname);
+        cv.put(SMLMAST_OtherMobNo, omobno);
+        getWritableDatabase().update(SMLMAST_Table,cv,SMLMAST_Auto+"=?",new String[]{auto});
     }
 }
 

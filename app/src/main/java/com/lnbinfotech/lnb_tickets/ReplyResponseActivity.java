@@ -213,11 +213,18 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
             //int auto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
             final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
             String crby = FirstActivity.pref.getString(getString(R.string.pref_ClientName), "");
+            String nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
             final String comment = ed_reply.getText().toString();
             String reply = URLEncoder.encode(comment, "UTF-8");
             crby = URLEncoder.encode(crby, "UTF-8");
+            nickname = URLEncoder.encode(nickname, "UTF-8");
+
+            if(nickname.equals("NA")){
+                nickname = crby;
+            }
+
             String url1 = Constant.ipaddress + "/AddTicketDetail?mastAuto=" + UpdateTicketActivity.auto +
-                    "&desc="+reply+"&CrBy="+crby+"&type="+type;
+                    "&desc="+reply+"&CrBy="+nickname+"&type="+type;
             Constant.showLog(url1);
             StringRequest request = new StringRequest(url1,
                     new Response.Listener<String>() {

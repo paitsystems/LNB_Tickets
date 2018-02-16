@@ -39,11 +39,11 @@ public class Constant {
             //ftp_directory = "SMVisit_Indus";
 
     //TODO: Check Ip AddressAd
-    public static final String ipaddress = "http://172.30.1.38/LNBTCK_10/service.svc";
-    //public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_10/service.svc";
+    //public static final String ipaddress = "http://172.30.1.38/LNBTCK_12/service.svc";
+    public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_12/service.svc";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
-    public static int liveTestFlag = 0;
+    public static int liveTestFlag = 1;
 
     private Activity activity;
     private Context context;

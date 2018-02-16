@@ -448,7 +448,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     private void generateTicket(){
         try {
             int clientAuto = 0, ok = 0;
-            String type, clientName = null, mobno = null, _subject = null, _description = null,
+            String type, clientName = null, nickname = null, mobno = null, _subject = null, _description = null,
                     branch, _imagePath = imagePath, _status, imgFolder, pointtype = null;
 
             type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
@@ -466,6 +466,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             if (type.equals("C")) {
                 clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
                 clientName = FirstActivity.pref.getString(getString(R.string.pref_ClientName), "0");
+                nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
                 mobno = FirstActivity.pref.getString(getString(R.string.pref_mobno), "");
                 _subject = ed_subject.getText().toString();
                 _description = ed_description.getText().toString();
@@ -484,6 +485,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     editor.putString(getString(R.string.pref_FTPImgFolder),imgFolder);
                     editor.apply();
                     clientName = FirstActivity.pref.getString(getString(R.string.pref_ClientName), "0");
+                    nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
                     mobno = FirstActivity.pref.getString(getString(R.string.pref_mobno), "");
                     _subject = ed_subject.getText().toString();
                     _description = ed_description.getText().toString();
@@ -492,6 +494,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             }
             if(ok == 1) {
                 clientName = URLEncoder.encode(clientName, "UTF-8");
+                nickname = URLEncoder.encode(nickname, "UTF-8");
                 _subject = URLEncoder.encode(_subject, "UTF-8");
                 _description = URLEncoder.encode(_description, "UTF-8");
                 _imagePath = URLEncoder.encode(_imagePath, "UTF-8");
@@ -500,11 +503,15 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 branch = URLEncoder.encode(branch, "UTF-8");
                 pointtype = URLEncoder.encode(pointtype, "UTF-8");
 
-                Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch+"-"+pointtype);
+                Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch+"-"+pointtype+"-"+nickname);
+
+                if(nickname.equals("NA")){
+                    nickname = clientName;
+                }
 
                 String url = Constant.ipaddress + "/AddTicketMaster?clientAuto=" + clientAuto +
                         "&subject=" + _subject + "&desc=" + _description + "&imagePath=" + _imagePath +
-                        "&status=" + _status + "&CrBy=" + clientName + "&type=" + type + "&mobno=" + mobno +
+                        "&status=" + _status + "&CrBy=" + nickname + "&type=" + type + "&mobno=" + mobno +
                         "&branch=" + branch + "&ptype="+pointtype;
 
                 writeLog("AddNewTicketActivity_generateTicket_" + url);

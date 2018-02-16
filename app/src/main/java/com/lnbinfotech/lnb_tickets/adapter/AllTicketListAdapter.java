@@ -11,22 +11,31 @@ import android.widget.TextView;
 import com.lnbinfotech.lnb_tickets.R;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 //Created by lnb on 8/12/2017.
 
 public class AllTicketListAdapter extends BaseAdapter {
 
-    Context context;
-    ArrayList<TicketMasterClass> pendingTicketClassList;
-    ArrayList<TicketMasterClass> _pendingTicketClassList;
+    private Context context;
+    private ArrayList<TicketMasterClass> pendingTicketClassList;
+    private ArrayList<TicketMasterClass> _pendingTicketClassList;
+    private Date todayDate;
 
-    public AllTicketListAdapter(Context _context, ArrayList<TicketMasterClass> _pendingTicketClassList){
+    public AllTicketListAdapter(Context _context, ArrayList<TicketMasterClass> _pendingTicketClassList) {
         this.context = _context;
         this.pendingTicketClassList = _pendingTicketClassList;
         this._pendingTicketClassList = new ArrayList<>();
         this._pendingTicketClassList.addAll(this.pendingTicketClassList);
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DATE);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+        todayDate = parseDate(day + "/" + month + "/" + year);
     }
 
     @Override
@@ -66,6 +75,7 @@ public class AllTicketListAdapter extends BaseAdapter {
             holder.tv_closed_date = (TextView) view.findViewById(R.id.tv_closed_date);
             holder.tv_closed_time = (TextView) view.findViewById(R.id.tv_closed_time);
             holder.lay_closed_by = (LinearLayout) view.findViewById(R.id.lay_closed_by);
+            holder.lay = (LinearLayout) view.findViewById(R.id.lay);
             holder.tv_point_type = (TextView) view.findViewById(R.id.tv_point_type);
 
             //holder.status_lay = (LinearLayout) view.findViewById(R.id.status_lay);
@@ -109,8 +119,17 @@ public class AllTicketListAdapter extends BaseAdapter {
                     holder.tv_closed_time.setText(_modtime);
                 }
             }
-        }else{
+        }else {
             //holder.tv_status.setBackground(context.getResources().getDrawable(R.drawable.status_btn_draw_red));
+            if (status.equals("Open") || status.equals("ReOpen") || status.equals("Pending")) {
+                String crdt = pendingTicketClass.getCrDate();
+                Date crDate = parseDate1(crdt);
+                if (todayDate.compareTo(crDate) == 0) {
+                    holder.lay.setBackgroundResource(R.color.lightyellow);
+                } else {
+                    holder.lay.setBackgroundResource(0);
+                }
+            }
             holder.tv_status.setTextColor(context.getResources().getColor(R.color.red));
             holder.lay_closed_by.setVisibility(View.GONE);
         }
@@ -125,7 +144,7 @@ public class AllTicketListAdapter extends BaseAdapter {
     private class ViewHolder{
         TextView tv_date, tv_time, tv_subject, tv_desc, tv_status, tv_comments, tv_ticket_no, tv_assignto,
                     tv_client_name,tv_cr_by, tv_closed_by, tv_closed_date, tv_closed_time, tv_point_type;
-        LinearLayout lay_closed_by;
+        LinearLayout lay_closed_by, lay;
     }
 
     public void filter(String searchText){
@@ -163,5 +182,25 @@ public class AllTicketListAdapter extends BaseAdapter {
         }else if(_pendingTicketClassList.size()!=0 && pendingTicketClassList.size()==0) {
             pendingTicketClassList.addAll(_pendingTicketClassList);
         }
+    }
+
+    private Date parseDate(String date){
+        Date d = null;
+        try {
+            d = new SimpleDateFormat("dd/M/yyyy", Locale.ENGLISH).parse(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return d;
+    }
+
+    private Date parseDate1(String date){
+        Date d = null;
+        try {
+            d = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH).parse(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return d;
     }
 }

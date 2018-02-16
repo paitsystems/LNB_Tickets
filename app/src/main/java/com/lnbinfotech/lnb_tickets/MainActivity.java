@@ -709,9 +709,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    FirstActivity.pref.edit().clear().commit();
-                    db.deleteTabel(DBHandler.Ticket_Master_Table);
-                    db.deleteTabel(DBHandler.SMLMAST_Table);
+                    //FirstActivity.pref.edit().clear().commit();
+                    //db.deleteTabel(DBHandler.Ticket_Master_Table);
+                    //db.deleteTabel(DBHandler.SMLMAST_Table);
                     new Constant(MainActivity.this).doFinish();
                     final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
                     try {
