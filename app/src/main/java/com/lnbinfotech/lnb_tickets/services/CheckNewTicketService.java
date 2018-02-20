@@ -71,21 +71,47 @@ public class CheckNewTicketService extends IntentService{
                 }
         );*/
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        int auto = db.getAutoTD();
-        String url1 = Constant.ipaddress + "/GetAllTicketDetail?clientAuto="+clientAuto+"&auto="+auto+"&type="+type;
+
+        final int tmAuto = db.getMaxAutoIdAsync(type);
+        final int tmCompleteAuto = db.getMaxCompleteAutoIdAsync(type);
+        final int tdAuto = db.getAutoTDAsync();
+        Constant.showLog("DB - "+tmAuto+"-"+tmCompleteAuto+"-"+tdAuto);
+
+        String url1 = Constant.ipaddress + "/GetAllTicketDetailAsync?clientAuto="+clientAuto+"&auto="+tdAuto+"&type="+type;
         Constant.showLog(url1);
         StringRequest request = new StringRequest(url1,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String result) {
                         Constant.showLog(result);
+                        String message = "";
                         result = result.replace("\\", "");
                         result = result.replace("''", "");
                         result = result.substring(1, result.length() - 1);
-                        List<TicketDetailClass> ticketDetailClassList = new ParseJSON(result, getApplicationContext()).parseTicketDetail();
-                        if(ticketDetailClassList.size()!=0){
-                            showNotification();
-                            writeLog("onHandleIntent_notificationShowed");
+                        String _data = new ParseJSON(result).parseGetCountData();
+                        if(_data!=null && !_data.equals("0")){
+                            String[] data = _data.split("\\^");
+                            int _total = Integer.parseInt(data[0]);
+                            int _comp = Integer.parseInt(data[1]);
+                            int _pending = Integer.parseInt(data[2]);
+                            int _message = Integer.parseInt(data[3]);
+                            int a = 0,b = 0,c = 0;
+                            if(_total>tmAuto){
+                                a = _total-tmAuto;
+                                message = message + "New " + a +" Ticket(s) Generated" + "\n";
+                            }
+                            if(_comp>tmCompleteAuto){
+                                b = _comp-tmCompleteAuto;
+                                message = message + b +" Ticket(s) Closed" +"\n";
+                            }
+                            if(_message>tdAuto){
+                                c = _message-tdAuto;
+                                message = message + "You Have "+ c + " New Message(s)" + "\n";
+                            }
+                            if(!message.equals("")){
+                                Constant.showLog(message);
+                                showNotification(message);
+                            }
                         }
                     }
                 },
@@ -102,17 +128,18 @@ public class CheckNewTicketService extends IntentService{
         queue.add(request);
     }
 
-    private void showNotification(){
+    private void showNotification(String msg){
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Intent intent = new Intent(getApplicationContext(),FirstActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),0,intent,0);
         Notification notification = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText("You Have New Message")
+                .setStyle(new Notification.BigTextStyle().bigText(msg))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setSound(uri)
                 .setAutoCancel(true)
                 .build();
+        notification.flags|=Notification.FLAG_AUTO_CANCEL;
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.notify(0,notification);
     }

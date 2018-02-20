@@ -228,17 +228,21 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void startMainActivity(){
+    private void startMainActivity() {
         SharedPreferences.Editor editor = FirstActivity.pref.edit();
-        if(cb_remember.isChecked()){
+        if (cb_remember.isChecked()) {
             editor.putBoolean(getString(R.string.pref_logged), true);
-        }else{
+        } else {
             editor.putBoolean(getString(R.string.pref_logged), false);
         }
         editor.apply();
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        if (FirstActivity.pref.contains(getString(R.string.pref_nickname))) {
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        } else {
+            startActivity(new Intent(getApplicationContext(), NickNameActivity.class));
+        }
         finish();
-        overridePendingTransition(R.anim.enter,R.anim.exit);
+        overridePendingTransition(R.anim.enter, R.anim.exit);
     }
 
     private void writeLog(String _data){

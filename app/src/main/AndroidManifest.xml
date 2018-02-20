@@ -81,9 +81,14 @@
             android:name=".ViewReachToMDActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".NickNameActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
 
         <service android:name=".services.DownloadImageService" />
         <service android:name=".services.CheckNewTicketService" />
+        <service android:name=".services.DataUpdateService" />
 
         <receiver android:name=".braodcasts.AutoUpdateBroadcastReceiver" />
         <receiver

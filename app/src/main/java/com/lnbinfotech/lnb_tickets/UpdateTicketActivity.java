@@ -291,17 +291,23 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             int clientAuto = ticketMasterClass.getClientAuto();
             String _finyr = ticketMasterClass.getFinyr();
             String _clientName = FirstActivity.pref.getString(getString(R.string.pref_ClientName), "0");
+            String _nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
             status = statusList.get(sp_status.getSelectedItemPosition());
             String _ticketno = ticketMasterClass.getTicketNo();
             String clientName  = URLEncoder.encode(_clientName,"UTF-8");
+            String nickame  = URLEncoder.encode(_nickname,"UTF-8");
             String finyr = URLEncoder.encode(_finyr,"UTF-8");
             String _status = URLEncoder.encode(status,"UTF-8");
             String ticketno = URLEncoder.encode(_ticketno,"UTF-8");
             String mobno = db.getMobile(clientAuto);
             //String mobno = FirstActivity.pref.getString(getString(R.string.pref_mobno), "");
 
+            if(nickame.equals("NA")){
+                nickame = clientName;
+            }
+
             String url = Constant.ipaddress+"/updateTicketStatus?auto=" + auto + "&id="+id+"&clientAuto="+clientAuto+
-                    "&finyr="+finyr+"&status="+_status+"&modBy="+clientName+"&ticketno="+ticketno+"&mobno="+mobno;
+                    "&finyr="+finyr+"&status="+_status+"&modBy="+nickame+"&ticketno="+ticketno+"&mobno="+mobno;
             Constant.showLog(url);
 
             //db.updateTicketStatus(auto,id,clientAuto,_finyr,status,_clientName,ticketno);

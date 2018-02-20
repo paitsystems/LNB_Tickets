@@ -115,6 +115,7 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new PendingFragments(),"Pending");
+        adapter.addFragment(new MessageFragment(),"Conversation");
         adapter.addFragment(new CompleteFragments(),"Complete");
         adapter.addFragment(new HoldFrangments(),"Hold");
         adapter.addFragment(new CancelFragments(),"Cancel");
@@ -124,7 +125,6 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
         if(type.equals("E")) {
             adapter.addFragment(new InternalPointFragment(), "Internal");
         }
-        adapter.addFragment(new MessageFragment(),"Message");
         pager.setAdapter(adapter);
     }
 

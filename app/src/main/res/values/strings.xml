@@ -36,6 +36,7 @@
 
     <string name="pref_IMEI">IMEI</string>
     <string name="pref_logged">logged</string>
+    <string name="pref_nickname">nickname</string>
     <string name="enter_client_id_here">Enter Client Id Here</string>
     <string name="verify">Verify</string>
     <string name="company_details">Company Details</string>
@@ -153,20 +154,22 @@
     <string name="banner_home_footer">ca-app-pub-3940256099942544/6300978111</string>
 
     <!--TODO: Uncomment for Test-->
-    <string name="main_screen_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <!--<string name="main_screen_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="add_new_ticket_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="ticket_list_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="update_ticket_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="massage_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="fullimg_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="reachtomd_activity_banner">ca-app-pub-3940256099942544/6300978111</string>-->
 
     <!--TODO: Uncomment for Live-->
-
-    <!--<string name="main_screen_banner">ca-app-pub-6568644984087031/6645892269</string>
+    <string name="main_screen_banner">ca-app-pub-6568644984087031/6645892269</string>
     <string name="add_new_ticket_banner">ca-app-pub-6568644984087031/1880828352</string>
     <string name="ticket_list_banner">ca-app-pub-6568644984087031/1905890843</string>
     <string name="update_ticket_banner">ca-app-pub-6568644984087031/3353336904</string>
     <string name="massage_activity_banner">ca-app-pub-6568644984087031/3932276625</string>
-    <string name="fullimg_activity_banner">ca-app-pub-6568644984087031/2197087773</string>-->
+    <string name="fullimg_activity_banner">ca-app-pub-6568644984087031/2197087773</string>
+    <string name="reachtomd_activity_banner">ca-app-pub-6568644984087031/9483707581</string>
+
 
 </resources>

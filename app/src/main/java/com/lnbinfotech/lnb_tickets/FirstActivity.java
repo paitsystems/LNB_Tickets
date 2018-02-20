@@ -64,10 +64,14 @@ public class FirstActivity extends AppCompatActivity {
             doFinish();
         }else {
             if (pref.contains(getString(R.string.pref_logged))) {
-                if (pref.getBoolean(getString(R.string.pref_logged), false)) {
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                if (pref.contains(getString(R.string.pref_nickname))) {
+                    if (pref.getBoolean(getString(R.string.pref_logged), false)) {
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    } else {
+                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    }
                 } else {
-                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    startActivity(new Intent(getApplicationContext(), NickNameActivity.class));
                 }
             } else {
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
