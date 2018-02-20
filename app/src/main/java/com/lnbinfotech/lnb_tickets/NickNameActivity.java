@@ -137,6 +137,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
             pd.dismiss();
             if(!s.equals("")) {
                 Constant.showLog(s);
+
                 if(s.equals("\"1\"")) {
                     DBHandler db = new DBHandler(getApplicationContext());
                     int clientauto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);

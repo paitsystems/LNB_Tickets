@@ -88,6 +88,7 @@
 
         <service android:name=".services.DownloadImageService" />
         <service android:name=".services.CheckNewTicketService" />
+        <service android:name=".services.DataUpdateService" />
 
         <receiver android:name=".braodcasts.AutoUpdateBroadcastReceiver" />
         <receiver

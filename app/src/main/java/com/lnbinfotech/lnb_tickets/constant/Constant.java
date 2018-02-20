@@ -39,8 +39,8 @@ public class Constant {
             //ftp_directory = "SMVisit_Indus";
 
     //TODO: Check Ip AddressAd
-    //public static final String ipaddress = "http://172.30.1.38/LNBTCK_12/service.svc";
-    public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_12/service.svc";
+    //public static final String ipaddress = "http://172.30.1.38/LNBTCK_14/service.svc";
+    public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_14/service.svc";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
     public static int liveTestFlag = 1;
@@ -91,7 +91,7 @@ public class Constant {
     }
 
     public void setRecurringAlarm() {
-        Intent intent = new Intent(context, AutoUpdateBroadcastReceiver.class);
+        /*Intent intent = new Intent(context, AutoUpdateBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if(Constant.liveTestFlag==1) {
@@ -104,7 +104,7 @@ public class Constant {
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
         String formatted = formatter.format(date);
         String s = "Alarm Set To " + formatted + "_";
-        writeLog(s);
+        writeLog(s);*/
     }
 
     public static void deleteLogFile() {

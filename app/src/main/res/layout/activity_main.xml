@@ -251,7 +251,7 @@
     </ScrollView>
 
     <TextView
-        android:text="Imergency Software Support Available Sunday Also"
+        android:text="Software Support Available On Sunday Also"
         style="@style/textViewMob"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

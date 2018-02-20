@@ -163,8 +163,6 @@
     <string name="reachtomd_activity_banner">ca-app-pub-3940256099942544/6300978111</string>-->
 
     <!--TODO: Uncomment for Live-->
-
-
     <string name="main_screen_banner">ca-app-pub-6568644984087031/6645892269</string>
     <string name="add_new_ticket_banner">ca-app-pub-6568644984087031/1880828352</string>
     <string name="ticket_list_banner">ca-app-pub-6568644984087031/1905890843</string>

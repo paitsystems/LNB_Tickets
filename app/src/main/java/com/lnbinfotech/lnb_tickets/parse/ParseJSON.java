@@ -47,7 +47,8 @@ public class ParseJSON {
                     String total = jsonArray.getJSONObject(i).getString("Total");
                     String complete = jsonArray.getJSONObject(i).getString("Complete");
                     String pending = jsonArray.getJSONObject(i).getString("Pending");
-                    data = total + "^" + complete + "^" + pending;
+                    String message = jsonArray.getJSONObject(i).getString("Message");
+                    data = total + "^" + complete + "^" + pending + "^" + message;
                 }
             }
         } catch (Exception e) {
@@ -99,7 +100,8 @@ public class ParseJSON {
             if (jsonArray.length() >= 1) {
                 int auto = 0, groupId = 0;
                 String ClientID=null,ClientName=null,FTPUser=null,FTPPass=null,FTPFolder=null,
-                        CustomerName=null, mobile="0", FTPLocation = null, type=null, isHWapplicable=null;
+                        CustomerName=null, mobile="0", FTPLocation = null, type=null, isHWapplicable=null,
+                        nickname=null, othermobno = null;
                 for (int i = 0; i < jsonArray.length(); i++) {
                     auto = jsonArray.getJSONObject(i).getInt("Auto");
                     ClientID = jsonArray.getJSONObject(i).getString("ClientID");
@@ -113,6 +115,8 @@ public class ParseJSON {
                     type = jsonArray.getJSONObject(i).getString("type");
                     isHWapplicable = jsonArray.getJSONObject(i).getString("isHWapplicable");
                     groupId = jsonArray.getJSONObject(i).getInt("GroupId");
+                    nickname = jsonArray.getJSONObject(i).getString("nickname");
+                    othermobno = jsonArray.getJSONObject(i).getString("othermobno");
                     result = 1;
                 }
                 SharedPreferences.Editor editor = FirstActivity.pref.edit();
@@ -138,6 +142,11 @@ public class ParseJSON {
                 editor.putString(context.getString(R.string.pref_emptype), type);
                 editor.putInt(context.getString(R.string.pref_groupid), groupId);
                 editor.putString(context.getString(R.string.pref_isHWapplicable), isHWapplicable);
+                if(nickname!=null) {
+                    if (!nickname.equals("NA")) {
+                        editor.putString(context.getString(R.string.pref_nickname), nickname);
+                    }
+                }
                 editor.apply();
             }
         } catch (Exception e) {

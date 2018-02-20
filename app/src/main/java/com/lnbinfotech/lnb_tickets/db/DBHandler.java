@@ -314,6 +314,23 @@ public class DBHandler extends SQLiteOpenHelper {
         return list;
     }
 
+    /*public int getMaxAutoId(String type){
+        int autoId = 0;
+        Cursor res;
+        if(type.equals("C")) {
+            String str = "select count("+TicketM_Id+") from "+Ticket_Master_Table;
+            res = getWritableDatabase().rawQuery(str, null);
+        }else {
+            String str = "select max("+TicketM_Auto+") from "+Ticket_Master_Table;
+            res = getWritableDatabase().rawQuery(str, null);
+        }
+        if(res.moveToFirst()){
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }*/
+
     public int getMaxAutoId(String type){
         int autoId = 0;
         Cursor res;
@@ -342,6 +359,83 @@ public class DBHandler extends SQLiteOpenHelper {
         res.close();
         return autoId;
     }
+
+
+    public int getMaxCompleteAutoId(String type){
+        int autoId = 0;
+        Cursor res;
+        if(type.equals("C")) {
+            String str = "select count("+TicketM_Id+") from "+Ticket_Master_Table +" where "+TicketM_Status+"='Closed'";
+            res = getWritableDatabase().rawQuery(str, null);
+        }else {
+            String str = "select count("+TicketM_Auto+") from "+Ticket_Master_Table +" where "+TicketM_Status+"='Closed'";
+            res = getWritableDatabase().rawQuery(str, null);
+        }
+        if(res.moveToFirst()){
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }
+
+    /*public int getAutoTD() {
+        int autoId = 0;
+        Cursor res;
+        String str = "select max(" + TicketD_Auto + ") from " + Ticket_Detail_Table;
+        res = getWritableDatabase().rawQuery(str, null);
+        if (res.moveToFirst()) {
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }*/
+
+    public int getMaxAutoIdAsync(String type){
+        int autoId = 0;
+        Cursor res;
+        if(type.equals("C")) {
+            String str = "select count("+TicketM_Id+") from "+Ticket_Master_Table;
+            res = getWritableDatabase().rawQuery(str, null);
+        }else {
+            String str = "select max("+TicketM_Auto+") from "+Ticket_Master_Table;
+            res = getWritableDatabase().rawQuery(str, null);
+        }
+        if(res.moveToFirst()){
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }
+
+    public int getMaxCompleteAutoIdAsync(String type){
+        int autoId = 0;
+        Cursor res;
+        if(type.equals("C")) {
+            String str = "select count("+TicketM_Id+") from "+Ticket_Master_Table +" where "+TicketM_Status+"='Closed'";
+            res = getWritableDatabase().rawQuery(str, null);
+        }else {
+            String str = "select count("+TicketM_Auto+") from "+Ticket_Master_Table +" where "+TicketM_Status+"='Closed'";
+            res = getWritableDatabase().rawQuery(str, null);
+        }
+        if(res.moveToFirst()){
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }
+
+    public int getAutoTDAsync() {
+        int autoId = 0;
+        Cursor res;
+        String str = "select max(" + TicketD_Auto + ") from " + Ticket_Detail_Table;
+        res = getWritableDatabase().rawQuery(str, null);
+        if (res.moveToFirst()) {
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }
+
 
     public String getCount(){
         String count  = "0-0-0";

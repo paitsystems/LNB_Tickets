@@ -40,7 +40,6 @@ import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.interfaces.DatabaseUpgradeInterface;
-import com.lnbinfotech.lnb_tickets.interfaces.ServerCallback;
 import com.lnbinfotech.lnb_tickets.log.CopyLog;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import com.lnbinfotech.lnb_tickets.mail.GMailSender;
@@ -49,12 +48,11 @@ import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 import com.lnbinfotech.lnb_tickets.model.ViewReachToMDClass;
 import com.lnbinfotech.lnb_tickets.parse.ParseJSON;
 import com.lnbinfotech.lnb_tickets.post.Post;
-import com.lnbinfotech.lnb_tickets.volleyrequests.VolleyRequests;
+import com.lnbinfotech.lnb_tickets.services.DataUpdateService;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
-import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -93,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         init();
-
-        new Constant(getApplicationContext()).setRecurringAlarm();
 
         btn_add.setOnClickListener(this);
         btn_view_all.setOnClickListener(this);
@@ -139,13 +135,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        Cursor cursor = SQLiteDatabase.openOrCreateDatabase(":memory:", null).rawQuery("select sqlite_version() AS sqlite_version", null);
+        /*Cursor cursor = SQLiteDatabase.openOrCreateDatabase(":memory:", null).rawQuery("select sqlite_version() AS sqlite_version", null);
         String sqliteVersion = "";
         while(cursor.moveToNext()){
             sqliteVersion += cursor.getString(0);
         }
         cursor.close();
-        Constant.showLog("SqliteVersion "+sqliteVersion);
+        Constant.showLog("SqliteVersion "+sqliteVersion);*/
+
+        //new Constant(getApplicationContext()).setRecurringAlarm();
+
     }
 
     @Override
@@ -290,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             result = result.replace("\\", "");
                             result = result.replace("''", "");
                             result = result.substring(1, result.length() - 1);
+                            constant.showPD();
                             if(new ParseJSON(result,getApplicationContext()).parseUserData() == 1){
                                 //showDia(4);
                                 db.deleteTabel(DBHandler.Ticket_Master_Table);
@@ -302,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 writeLog("MainActivity_refreshUserData_UnSuccess");
                                 showDia(5);
                             }
-                            constant.showPD();
                         }
                     },
                     new Response.ErrorListener() {
@@ -560,6 +559,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = FirstActivity.pref.edit();
         editor.putInt(getString(R.string.pref_ticketTotal),total);
         editor.apply();
+
+        Intent i= new Intent(getApplicationContext(), DataUpdateService.class);
+        startService(i);
     }
 
     private void showDia(int i){
