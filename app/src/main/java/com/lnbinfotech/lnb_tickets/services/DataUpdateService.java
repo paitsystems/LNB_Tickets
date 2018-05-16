@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.lnbinfotech.lnb_tickets.FirstActivity;
 import com.lnbinfotech.lnb_tickets.R;
+import com.lnbinfotech.lnb_tickets.constant.Constant;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,10 +39,14 @@ public class DataUpdateService extends Service {
         if(FirstActivity.pref.contains(getString(R.string.pref_emptype))) {
             String emptype = FirstActivity.pref.getString(getString(R.string.pref_emptype), "NA");
             if (!emptype.equals("NA")) {
-                if(emptype.equals("E")){
-                    period = 5*60*1000;
+                if(Constant.liveTestFlag==1) {
+                    if (emptype.equals("E")) {
+                        period = 5 * 60 * 1000;
+                    } else {
+                        period = 60 * 60 * 1000;
+                    }
                 }else{
-                    period = 30*60*1000;
+                    period = 15 * 60 * 1000;
                 }
             }
         }

@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    tools:context="com.lnbinfotech.lnb_tickets.AddAssetInfo">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical">
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/addasset_activity_banner" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/mobmargin5"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/textViewMob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/mobmargin2"
+                android:text="Location" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/mobmargin2"
+                android:orientation="vertical"
+                android:padding="@dimen/mobpadding5">
+
+                <EditText
+                    android:id="@+id/ed_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_map_marker"
+                    android:drawablePadding="@dimen/mobpadding5"
+                    android:hint=""
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_desktop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Brand Name" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_brandname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_apple"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint=""
+                        android:imeActionId="@+id/ed_processor"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Processor" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_processor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_computer_microprocessor"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint=""
+                        android:imeActionId="@+id/ed_ram"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="RAM" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_ram"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_ram"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint=""
+                        android:imeActionId="@+id/ed_harddisk"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Hard Disk"
+                    tools:text="Hard Disk" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_harddisk"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_hard_disk"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint="  "
+                        android:imeActionId="@+id/ed_osinstalled"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="OS Installed"
+                    tools:text="OS Installed" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_osinstalled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_windows"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint=" "
+                        android:imeActionId="@+id/ed_swinstalled"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="S/W Installed" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_swinstalled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_icon"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint=""
+                        android:imeActionId="@+id/ed_licensesw"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="License S/W Installed" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_licensesw"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_icon"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:hint=" "
+                        android:imeActionId="@+id/ed_remark"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_printer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Printer Name" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_printername"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_printer"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_printermodel"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Printer Model" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_printermodel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_four_dots"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_printermodelno"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Printer Serial No" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_printermodelno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_barcode_product"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_printertype"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Printer Type" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_printertype"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_four_dots"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_remark"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_router"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Router Name" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_routername"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_router"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_routermodel"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Router Model" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_routermodel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_four_dots"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_routermodelno"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Router Serial No" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_routermodelno"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_barcode_product"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_routertype"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Router Type" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_routertype"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_four_dots"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_remark"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_other"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/textViewMob"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:text="Other" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/mobmargin2"
+                    android:orientation="vertical"
+                    android:padding="@dimen/mobpadding5">
+
+                    <EditText
+                        android:id="@+id/ed_other"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_four_dots"
+                        android:drawablePadding="@dimen/mobpadding5"
+                        android:imeActionId="@+id/ed_remark"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/textViewMob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/mobmargin2"
+                android:text="Remark"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/mobmargin2"
+                android:orientation="vertical"
+                android:padding="@dimen/mobpadding5">
+
+                <EditText
+                    android:id="@+id/ed_remark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_underline_button"
+                    android:drawablePadding="@dimen/mobpadding5"
+                    android:elevation="1dp"
+                    android:hint=" "
+                    android:imeActionId="@+id/ed_usernm"
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/textViewMob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/mobmargin2"
+                android:text="User Name" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/mobmargin2"
+                android:orientation="vertical"
+                android:padding="@dimen/mobpadding5">
+
+                <EditText
+                    android:id="@+id/ed_usernm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_user"
+                    android:drawablePadding="@dimen/mobpadding5"
+                    android:elevation="1dp"
+                    android:hint=" "
+                    android:imeActionId="@+id/ed_contactno"
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/textViewMob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/mobmargin2"
+                android:text="Contact Number" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/mobmargin2"
+                android:orientation="vertical"
+                android:padding="@dimen/mobpadding5">
+
+                <EditText
+                    android:id="@+id/ed_contactno"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_contacts_book_outline"
+                    android:drawablePadding="@dimen/mobpadding5"
+                    android:hint=""
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/textViewMob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/mobmargin2"
+                android:drawableLeft="@drawable/ic_check_mark"
+                android:drawablePadding="@dimen/mobpadding5"
+                android:text="Status" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/mobmargin2"
+                android:background="@drawable/black_border_curve_draw"
+                android:orientation="horizontal"
+                android:padding="@dimen/mobpadding5">
+
+
+                <RadioButton
+                    android:id="@+id/rdo_active"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Active" />
+
+                <RadioButton
+                    android:id="@+id/rdo_inactive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="InActive" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/img"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/lay_img"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="vertical"
+                android:padding="@dimen/mobpadding5"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/img_updated"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:visibility="visible" />
+
+                    <ProgressBar
+                        android:id="@+id/pb"
+                        style="?android:attr/progressBarStyleLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_attachment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:drawableLeft="@drawable/ic_camera_alt_black_24dp"
+                    android:drawablePadding="1dp"
+                    android:text="Attachment"
+                    android:textColor="@color/white"
+                    android:visibility="visible"
+                    app:backgroundTint="@color/maroon" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btn_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:drawableLeft="@drawable/ic_save"
+                    android:drawablePadding="1dp"
+                    android:text="SAVE"
+                    android:textColor="@color/white"
+                    android:visibility="visible"
+                    app:backgroundTint="@color/maroon" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        style="@style/footerstyleMob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

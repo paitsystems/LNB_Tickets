@@ -24,7 +24,7 @@ public class AllTicketListAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<TicketMasterClass> pendingTicketClassList;
     private ArrayList<TicketMasterClass> _pendingTicketClassList;
-    private Date todayDate;
+    private Date todayDate, prev10Days, prev30Days;
 
     public AllTicketListAdapter(Context _context, ArrayList<TicketMasterClass> _pendingTicketClassList) {
         this.context = _context;
@@ -36,6 +36,21 @@ public class AllTicketListAdapter extends BaseAdapter {
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
         todayDate = parseDate(day + "/" + month + "/" + year);
+
+        calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE,-11);
+        day = calendar.get(Calendar.DATE);
+        month = calendar.get(Calendar.MONTH) + 1;
+        year = calendar.get(Calendar.YEAR);
+        prev10Days = parseDate(day + "/" + month + "/" + year);
+
+        calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE,-31);
+        day = calendar.get(Calendar.DATE);
+        month = calendar.get(Calendar.MONTH) + 1;
+        year = calendar.get(Calendar.YEAR);
+        prev30Days = parseDate(day + "/" + month + "/" + year);
+
     }
 
     @Override
@@ -125,8 +140,12 @@ public class AllTicketListAdapter extends BaseAdapter {
                 String crdt = pendingTicketClass.getCrDate();
                 Date crDate = parseDate1(crdt);
                 if (todayDate.compareTo(crDate) == 0) {
-                    holder.lay.setBackgroundResource(R.color.lightyellow);
-                } else {
+                    holder.lay.setBackgroundResource(R.color.lgreen);
+                } else if(prev10Days.before(crDate)){
+                    holder.lay.setBackgroundResource(R.color.lyellow);
+                } else if(prev30Days.before(crDate)){
+                    holder.lay.setBackgroundResource(R.color.lred);
+                }else{
                     holder.lay.setBackgroundResource(0);
                 }
             }

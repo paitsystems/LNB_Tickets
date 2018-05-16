@@ -22,7 +22,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.lnbinfotech.lnb_tickets.adapter.AllTicketListAdapter;
 import com.lnbinfotech.lnb_tickets.adapter.ReplyResponseListAdapter;
 import com.lnbinfotech.lnb_tickets.constant.AppSingleton;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
@@ -153,6 +152,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         img_reply = (ImageView) findViewById(R.id.img_reply);
         ticketDetailClassList = new ArrayList<>();
         db = new DBHandler(getApplicationContext());
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
     }
 
     private void loadData() {
@@ -219,7 +219,11 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
             crby = URLEncoder.encode(crby, "UTF-8");
             nickname = URLEncoder.encode(nickname, "UTF-8");
 
-            if(nickname.equals("NA")){
+            if(type.equals("C")) {
+                if (nickname.equals("NA")) {
+                    nickname = crby;
+                }
+            }else{
                 nickname = crby;
             }
 

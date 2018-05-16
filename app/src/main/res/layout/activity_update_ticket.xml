@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_margin="@dimen/mobmargin5">
--->
+        android:layout_margin="@dimen/mobmargin5">-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/mobmargin2"
-                android:src="@drawable/calendarp16" />
+                android:src="@drawable/ic_calendarbl" />
 
             <TextView
                 android:id="@+id/tv_date"
@@ -65,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/mobmargin2"
-                android:src="@drawable/clockdg16" />
+                android:src="@drawable/ic_clock" />
 
             <TextView
                 android:id="@+id/tv_time"
@@ -83,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/mobmargin2"
-                android:src="@drawable/ticketr16" />
+                android:src="@drawable/ic_ticket" />
 
             <TextView
                 android:id="@+id/tv_ticket_no"
@@ -223,7 +222,7 @@
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_update_ticket"
             app:backgroundTint="@color/maroon"
-            android:drawableLeft="@drawable/updatew24"
+            android:drawableLeft="@drawable/ic_upload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Update"
@@ -234,7 +233,7 @@
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_reply"
             app:backgroundTint="@color/maroon"
-            android:drawableLeft="@drawable/chatw24"
+            android:drawableLeft="@drawable/ic_chat"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Message"

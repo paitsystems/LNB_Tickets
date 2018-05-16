@@ -116,6 +116,7 @@ public class MDAllTicketListActivity extends AppCompatActivity implements View.O
         ed_search = (EditText) findViewById(R.id.ed_search);
         listView = (ListView) findViewById(R.id.listView);
         db = new DBHandler(getApplicationContext());
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
     }
 
     private void setData(){

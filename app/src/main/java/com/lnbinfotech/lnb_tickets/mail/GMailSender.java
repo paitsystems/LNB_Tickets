@@ -2,6 +2,8 @@ package com.lnbinfotech.lnb_tickets.mail;
 
 // Created by lnb on 8/23/2017.
 
+import com.lnbinfotech.lnb_tickets.constant.Constant;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

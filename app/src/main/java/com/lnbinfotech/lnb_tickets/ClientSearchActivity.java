@@ -25,12 +25,12 @@ import java.util.Locale;
 
 public class ClientSearchActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText ed_search;
-    ListView listView;
-    DBHandler db;
-    List<String> branchList;
-    AdView mAdView;
-    ClientSearchAdapter adapter;
+    private EditText ed_search;
+    private ListView listView;
+    private DBHandler db;
+    private List<String> branchList;
+    private AdView mAdView;
+    private ClientSearchAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,7 @@ public class ClientSearchActivity extends AppCompatActivity implements View.OnCl
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(listView.getWindowToken(),0);
                 AddNewTicketActivity.selBranch = (String) listView.getItemAtPosition(i);
+                AssetManagementActivity.isUpdated = 1;
                 new Constant(ClientSearchActivity.this).doFinish();
             }
         });
@@ -113,7 +114,7 @@ public class ClientSearchActivity extends AppCompatActivity implements View.OnCl
         return super.onOptionsItemSelected(item);
     }
 
-    void init() {
+    private void init() {
         ed_search = (EditText) findViewById(R.id.ed_search);
         listView = (ListView) findViewById(R.id.listView);
         db = new DBHandler(getApplicationContext());
@@ -126,7 +127,7 @@ public class ClientSearchActivity extends AppCompatActivity implements View.OnCl
         listView.setAdapter(adapter);
     }
 
-    void showDia(int a) {
+    private void showDia(int a) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ClientSearchActivity.this);
         if (a == 0) {
             builder.setMessage("Do You Want To Exit App?");

@@ -185,7 +185,7 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
         ed_description = (EditText) findViewById(R.id.ed_description);
         ed_refer_ticket = (EditText) findViewById(R.id.ed_refer_ticket);
         tv_refer_ticket = (TextView) findViewById(R.id.tv_ticket_refer);
-
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
         btn_send = (Button) findViewById(R.id.btn_send);
         img = (ImageView) findViewById(R.id.img);
         sp_status = (Spinner) findViewById(R.id.sp_status);

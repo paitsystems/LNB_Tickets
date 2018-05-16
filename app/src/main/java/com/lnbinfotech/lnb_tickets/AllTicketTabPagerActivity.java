@@ -111,6 +111,7 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
     }
 
     private void setViewPager(){
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
         String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
         String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -131,6 +132,7 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
     private void init() {
         tabLayout = (TabLayout) findViewById(R.id.tab);
         pager = (ViewPager) findViewById(R.id.pager);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
     }
 
     private void showDia(int a) {

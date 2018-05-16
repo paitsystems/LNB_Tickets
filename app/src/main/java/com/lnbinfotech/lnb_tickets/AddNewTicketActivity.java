@@ -185,6 +185,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onBackPressed() {
         wl.release();
+        AddNewTicketActivity.selBranch="";
         new Constant(AddNewTicketActivity.this).doFinish();
     }
 
@@ -287,6 +288,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         db = new DBHandler(getApplicationContext());
         sp_branch = (Spinner) findViewById(R.id.sp_branch);
         sp_status = (Spinner) findViewById(R.id.sp_status);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
 
         statusList = new ArrayList<>();
         statusList.add("Open");statusList.add("Closed");statusList.add("Pending");statusList.add("Scheduled");
@@ -505,7 +507,11 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
                 Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch+"-"+pointtype+"-"+nickname);
 
-                if(nickname.equals("NA")){
+                if(type.equals("C")) {
+                    if (nickname.equals("NA")) {
+                        nickname = clientName;
+                    }
+                }else{
                     nickname = clientName;
                 }
 
@@ -854,6 +860,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         ed_subject.requestFocus();
         ed_description.setText(null);
         img.setImageResource(0);
+        imagePath = "";
         img.setVisibility(View.GONE);
     }
 

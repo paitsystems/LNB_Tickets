@@ -8,6 +8,8 @@ import com.lnbinfotech.lnb_tickets.R;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.db.DBHandler;
 import com.lnbinfotech.lnb_tickets.log.WriteLog;
+import com.lnbinfotech.lnb_tickets.model.AssetClass;
+import com.lnbinfotech.lnb_tickets.model.FeedbackClass;
 import com.lnbinfotech.lnb_tickets.model.SMLMASTClass;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 import com.lnbinfotech.lnb_tickets.model.ShortDescClass;
@@ -18,6 +20,7 @@ import org.json.JSONArray;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 // Created by lnb on 8/11/2016.
@@ -36,6 +39,7 @@ public class ParseJSON {
         this.json = _json;
         this.context = _context;
         db = new DBHandler(_context);
+        FirstActivity.pref = context.getSharedPreferences(FirstActivity.PREF_NAME,Context.MODE_PRIVATE);
     }
 
     public String parseGetCountData() {
@@ -329,6 +333,138 @@ public class ParseJSON {
             writeLog("ParseJSON_parseTicketDetail_"+e.getMessage());
         }
         return list;
+    }
+
+    public String parseProdUsed() {
+        String data = null;
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    data = jsonArray.getJSONObject(i).getString("prodUsed");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeLog("ParseJSON_parseProdUsed_"+e.getMessage());
+        }
+        return data;
+    }
+
+    public List<AssetClass> parseAssetInfo() {
+        List<AssetClass> list = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    AssetClass asset = new AssetClass();
+                    asset.setAuto(jsonArray.getJSONObject(i).getInt("Auto"));
+                    asset.setId(jsonArray.getJSONObject(i).getInt("Id"));
+                    asset.setClientAuto(jsonArray.getJSONObject(i).getInt("ClientAuto"));
+                    asset.setMachineId(jsonArray.getJSONObject(i).getString("MachineId"));
+                    asset.setLocation(jsonArray.getJSONObject(i).getString("Location"));
+                    asset.setMachineType(jsonArray.getJSONObject(i).getString("MachineType"));
+                    asset.setBrandName(jsonArray.getJSONObject(i).getString("BrandName"));
+                    asset.setProcessor(jsonArray.getJSONObject(i).getString("Processor"));
+                    asset.setRAM(jsonArray.getJSONObject(i).getString("RAM"));
+                    asset.setHardDisk(jsonArray.getJSONObject(i).getString("HardDisk"));
+                    asset.setOS(jsonArray.getJSONObject(i).getString("OS"));
+                    asset.setSWInstalled(jsonArray.getJSONObject(i).getString("SWInstalled"));
+                    asset.setLicenseSW(jsonArray.getJSONObject(i).getString("LicenseSW"));
+                    asset.setImageName(jsonArray.getJSONObject(i).getString("ImageName"));
+                    asset.setPrinterName(jsonArray.getJSONObject(i).getString("PrinterName"));
+                    asset.setModel(jsonArray.getJSONObject(i).getString("Model"));
+                    asset.setModelNo(jsonArray.getJSONObject(i).getString("ModelNo"));
+                    asset.setPrinterType(jsonArray.getJSONObject(i).getString("PrinterType"));
+                    asset.setRouterName(jsonArray.getJSONObject(i).getString("RouterName"));
+                    asset.setRouterModel(jsonArray.getJSONObject(i).getString("RouterModel"));
+                    asset.setRouterModelNo(jsonArray.getJSONObject(i).getString("RouterModelNo"));
+                    asset.setRouterType(jsonArray.getJSONObject(i).getString("RouterType"));
+                    asset.setOther(jsonArray.getJSONObject(i).getString("Other"));
+                    asset.setCrBy(jsonArray.getJSONObject(i).getInt("CrBy"));
+                    asset.setCrDate(jsonArray.getJSONObject(i).getString("CrDate"));
+                    asset.setCrTime(jsonArray.getJSONObject(i).getString("CrTime"));
+                    asset.setActive(jsonArray.getJSONObject(i).getString("Active"));
+                    asset.setRemark(jsonArray.getJSONObject(i).getString("Remark"));
+                    asset.setUserNm(jsonArray.getJSONObject(i).getString("UserNm"));
+                    asset.setContactNo(jsonArray.getJSONObject(i).getString("ContactNo"));
+                    list.add(asset);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeLog("ParseJSON_parseAssetInfo_"+e.getMessage());
+        }
+        return list;
+    }
+
+    public int parseQuestBank(){
+        int ret = 0;
+        List<FeedbackClass> list = new ArrayList<>();
+        try{
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                DBHandler db = new DBHandler(context);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    FeedbackClass fClass = new FeedbackClass();
+                    fClass.setAuto(jsonArray.getJSONObject(i).getInt("Auto"));
+                    fClass.setQuestion(jsonArray.getJSONObject(i).getString("Question"));
+                    fClass.setCat1(jsonArray.getJSONObject(i).getString("Opt1"));
+                    fClass.setCat2(jsonArray.getJSONObject(i).getString("Opt2"));
+                    fClass.setCat3(jsonArray.getJSONObject(i).getString("Opt3"));
+                    fClass.setCat4(jsonArray.getJSONObject(i).getString("Opt4"));
+                    fClass.setCat5(jsonArray.getJSONObject(i).getString("Opt5"));
+                    fClass.setCat6(jsonArray.getJSONObject(i).getString("Opt6"));
+                    fClass.setStatus(jsonArray.getJSONObject(i).getString("Status"));
+                    fClass.setType(jsonArray.getJSONObject(i).getString("Type"));
+                    list.add(fClass);
+                }
+                db.addFEEDBACK(list);
+                ret = 1;
+            }
+        }catch (Exception e){
+            ret = 0;
+            e.printStackTrace();
+            writeLog("parseFEEDBACK()_"+e.getMessage());
+        }
+        return ret;
+    }
+
+    public String isFeedBackRequired() {
+        String data = null;
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    data = jsonArray.getJSONObject(i).getString("isFeedbackReq");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeLog("ParseJSON_isFeedBackRequired_"+e.getMessage());
+        }
+        return data;
+    }
+
+    public String getAccHead() {
+        String data = "";
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            if (jsonArray.length() >= 1) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    data = data + jsonArray.getJSONObject(i).getInt("Emp_Id") +"^";
+                    data = data + jsonArray.getJSONObject(i).getString("EmpFullName")+"^";
+                    data = data + jsonArray.getJSONObject(i).getString("Emp_Phno")+"^";
+                    data = data + jsonArray.getJSONObject(i).getString("Emp_mobno")+"^";
+                    data = data + jsonArray.getJSONObject(i).getString("EmpImgName")+"^";
+                    data = data + jsonArray.getJSONObject(i).getString("EmailId");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeLog("ParseJSON_isFeedBackRequired_"+e.getMessage());
+        }
+        return data;
     }
 
     private void writeLog(String _data){

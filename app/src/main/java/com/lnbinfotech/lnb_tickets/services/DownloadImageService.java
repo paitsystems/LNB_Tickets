@@ -66,6 +66,8 @@ public class DownloadImageService extends IntentService {
                 writeLog("DownloadImageService_onHandleIntent_ftpAddress_Not_Available");
             }
         } catch (Exception e) {
+            Intent intent1 = new Intent(BROADCAST);
+            sendBroadcast(intent1);
             e.printStackTrace();
             writeLog("DownloadImageService_onHandleIntent_"+e.getMessage());
         }

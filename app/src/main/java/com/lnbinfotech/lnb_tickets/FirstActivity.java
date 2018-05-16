@@ -22,7 +22,7 @@ public class FirstActivity extends AppCompatActivity {
     public static String PREF_NAME = "Tickets";
     private GetPermission permission;
     private Constant constant;
-    public static Context context;
+    private Context context;
     private Toast toast;
 
     @Override
@@ -59,16 +59,20 @@ public class FirstActivity extends AppCompatActivity {
     private void doThis(){
         if (!pref.contains(getString(R.string.pref_isHWapplicable))) {
             writeLog("FirstActivity_doThis_Pref_Deleted");
-            FirstActivity.pref.edit().clear().commit();
+            FirstActivity.pref.edit().clear().apply();
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             doFinish();
         }else {
             if (pref.contains(getString(R.string.pref_logged))) {
                 if (pref.contains(getString(R.string.pref_nickname))) {
-                    if (pref.getBoolean(getString(R.string.pref_logged), false)) {
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    } else {
-                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    if (pref.contains(getString(R.string.pref_nicknamebug))) {
+                        if (pref.getBoolean(getString(R.string.pref_logged), false)) {
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                        }
+                    }else{
+                        startActivity(new Intent(getApplicationContext(), NickNameActivity.class));
                     }
                 } else {
                     startActivity(new Intent(getApplicationContext(), NickNameActivity.class));
