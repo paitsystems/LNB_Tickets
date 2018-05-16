@@ -54,9 +54,10 @@ public class LoginActivity extends AppCompatActivity {
         cb_remember = (CheckBox) findViewById(R.id.remember);
         input = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         drawable = mEmailView.getBackground();
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
 
-        toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER,0,0);
+        toast = Toast.makeText(LoginActivity.this,"",Toast.LENGTH_LONG);
+        //toast.setGravity(Gravity.CENTER,0,0);
 
         mEmailView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -208,9 +209,9 @@ public class LoginActivity extends AppCompatActivity {
                         startMainActivity();
                         pd.dismiss();
                     }else {
+                        pd.dismiss();
                         toast.setText("Invalid Username/Password");
                         toast.show();
-                        pd.dismiss();
                     }
                 } catch (Exception e) {
                     writeLog("LoginActivity_UserLoginTask_"+e.getMessage());

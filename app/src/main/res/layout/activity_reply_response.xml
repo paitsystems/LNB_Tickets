@@ -52,11 +52,11 @@
                     android:id="@+id/ed_reply"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Message Here"
-                    android:maxLines="1"
-                    android:singleLine="true"
                     android:background="@null"
-                    android:inputType="textCapWords" />
+                    android:hint="Enter Message Here"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1"
+                    android:singleLine="true" />
             </LinearLayout>
 
             <ImageView
@@ -70,7 +70,7 @@
 
             <android.support.v7.widget.AppCompatButton
                 app:backgroundTint="@color/maroon"
-                android:drawableLeft="@drawable/sendw24"
+                android:drawableLeft="@drawable/ic_paper_plane"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Send"

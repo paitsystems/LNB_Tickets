@@ -126,6 +126,7 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
         toast.setGravity(Gravity.CENTER, 0, 0);
         listView = (ListView) findViewById(R.id.listView);
         ed_search = (EditText) findViewById(R.id.ed_search);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
     }
 
     private void loadData() {

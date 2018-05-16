@@ -5,9 +5,9 @@
 
     <style name="NewAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/maroon</item>
-        <item name="colorPrimaryDark">@color/maroon</item>
-        <item name="colorAccent">@color/maroon</item>
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/orange</item>
+        <item name="colorAccent">@color/orange</item>
 
     </style>
 
@@ -64,7 +64,7 @@
     </style>
 
     <style name="textViewMobM" parent="AppTheme">
-        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Small</item>
         <item name="android:textColor">@color/maroon</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -255,4 +255,9 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="customRatingBar" parent="@android:style/Widget.RatingBar">
+        <!--<item name="android:progressDrawable">@drawable/customratingstars</item>-->
+        <item name="android:minHeight">50dip</item>
+        <item name="android:maxHeight">50dip</item>
+    </style>
 </resources>

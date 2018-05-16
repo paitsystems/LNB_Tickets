@@ -12,6 +12,8 @@ import com.lnbinfotech.lnb_tickets.R;
 import com.lnbinfotech.lnb_tickets.UpdateTicketActivity;
 import com.lnbinfotech.lnb_tickets.constant.Constant;
 import com.lnbinfotech.lnb_tickets.interfaces.DatabaseUpgradeInterface;
+import com.lnbinfotech.lnb_tickets.model.FeedbackClass;
+import com.lnbinfotech.lnb_tickets.model.ReleaseNoteClass;
 import com.lnbinfotech.lnb_tickets.model.SMLMASTClass;
 import com.lnbinfotech.lnb_tickets.model.TicketDetailClass;
 import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
@@ -29,7 +31,8 @@ public class DBHandler extends SQLiteOpenHelper {
     public DatabaseUpgradeInterface dbInterface;
 
     public static final String Database_Name = "APITTECH.db";
-    public static final int Database_Version = 8;
+    //public static final int Database_Version = 9;
+    public static final int Database_Version = 10;
 
     public static final String Ticket_Master_Table = "TicketMaster";
     public static final String TicketM_Auto = "Auto";
@@ -92,6 +95,29 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String SMLMAST_NickName = "NickName";
     public static final String SMLMAST_OtherMobNo = "OtherMobNo";
 
+    public static final String SoftwareVersionDetail_Table = "SoftwareVersionDetail";
+    public static final String SVD_Auto = "Auto";
+    public static final String SVD_Version = "VersionNo";
+    public static final String SVD_Desc = "Description";
+    public static final String SVD_CrBy = "CrBy";
+    public static final String SVD_CrDate = "CrDate";
+    public static final String SVD_CrTime = "CrTime";
+    public static final String SVD_ModBy = "ModBy";
+    public static final String SVD_ModDate = "ModDate";
+    public static final String SVD_ModTime = "ModTime";
+
+    public static final String Table_QuestBank   = "QuestBank";
+    public static final String FED_AUTO = "Auto";
+    public static final String FED_QUESTION = "Question";
+    public static final String FED_CAT1 = "Cat1";
+    public static final String FED_CAT2 = "Cat2";
+    public static final String FED_CAT3 = "Cat3";
+    public static final String FED_CAT4 = "Cat4";
+    public static final String FED_CAT5 = "Cat5";
+    public static final String FED_CAT6 = "Cat6";
+    public static final String FED_STATUS = "Status";
+    public static final String FED_TYPE = "Type";
+
     private String create_table_master = "create table if not exists "+ Ticket_Master_Table+"("+
             TicketM_Auto+" int,"+TicketM_Id+" int,"+TicketM_ClientAuto+" int,"+TicketM_ClientName+" text,"+
             TicketM_FinYr+" text,"+
@@ -116,6 +142,13 @@ public class DBHandler extends SQLiteOpenHelper {
             SMLMAST_CustomerName+" text,"+SMLMAST_GroupId+" int,"+SMLMAST_isHO+" text,"+
             SMLMAST_isHWapplicable+" text,"+SMLMAST_NickName+ " text,"+ SMLMAST_OtherMobNo+" text);";
 
+    private String create_table_svd = "create table if not exists "+SoftwareVersionDetail_Table+"("+
+            SVD_Auto+" int,"+SVD_Version+" text,"+SVD_Desc+" text,"+SVD_CrBy+" int,"+SVD_CrDate+" text,"
+            +SVD_CrTime+" text,"+SVD_ModBy+" text,"+SVD_ModDate+" text,"+SVD_ModTime+" text)";
+
+    private String create_questbank_table = "create table if not exists "+Table_QuestBank+"("+FED_AUTO+" int,"+FED_QUESTION+" text,"+FED_CAT1+" text,"+
+            FED_CAT2+" text,"+FED_CAT3+" text,"+FED_CAT4+" text,"+FED_CAT5+" text,"+FED_CAT6+" text,"+FED_STATUS+" text,"+FED_TYPE+" text)";
+
     public DBHandler(Context context) {
         super(context, Database_Name, null, Database_Version);
     }
@@ -129,9 +162,13 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL(create_table_master);
         db.execSQL(create_table_detail);
         db.execSQL(create_table_smlmast);
+        db.execSQL(create_table_svd);
+        db.execSQL(create_questbank_table);
         Constant.showLog(create_table_smlmast);
         Constant.showLog(create_table_detail);
         Constant.showLog(create_table_master);
+        Constant.showLog(create_table_svd);
+        Constant.showLog(create_questbank_table);
     }
 
     @Override
@@ -154,9 +191,17 @@ public class DBHandler extends SQLiteOpenHelper {
             db.execSQL(str3);
             Constant.showLog("Update Ticket Detail Table 8");
         }
-        if(dbInterface!=null) {
-            dbInterface.dbUpgraded();
+        if(oldVersion<9){
+            db.execSQL(create_table_svd);
+            Constant.showLog("Update Ticket Detail Table 9");
         }
+        if(oldVersion<10){
+            db.execSQL(create_questbank_table);
+            Constant.showLog("Update Ticket Detail Table 10");
+        }
+        /*if(dbInterface!=null) {
+            dbInterface.dbUpgraded();
+        }*/
 
     }
 
@@ -290,6 +335,28 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void addFEEDBACK(List<FeedbackClass> fList) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        ContentValues cv = new ContentValues();
+        for (FeedbackClass fClass : fList) {
+            cv.put(FED_AUTO,fClass.getAuto());
+            cv.put(FED_QUESTION,fClass.getQuestion());
+            cv.put(FED_CAT1,fClass.getCat1());
+            cv.put(FED_CAT2,fClass.getCat2());
+            cv.put(FED_CAT3,fClass.getCat3());
+            cv.put(FED_CAT4,fClass.getCat4());
+            cv.put(FED_CAT5,fClass.getCat5());
+            cv.put(FED_CAT6,fClass.getCat6());
+            cv.put(FED_STATUS,fClass.getStatus());
+            cv.put(FED_TYPE,fClass.getType());
+            db.insert(Table_QuestBank,null,cv);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
     public int getSMLMASTMaxAuto(){
         int maxAuto = 0;
         String str = "Select max("+SMLMAST_Auto+") from "+SMLMAST_Table;
@@ -359,7 +426,6 @@ public class DBHandler extends SQLiteOpenHelper {
         res.close();
         return autoId;
     }
-
 
     public int getMaxCompleteAutoId(String type){
         int autoId = 0;
@@ -435,7 +501,6 @@ public class DBHandler extends SQLiteOpenHelper {
         res.close();
         return autoId;
     }
-
 
     public String getCount(){
         String count  = "0-0-0";
@@ -873,6 +938,93 @@ public class DBHandler extends SQLiteOpenHelper {
         cv.put(SMLMAST_NickName, nickname);
         cv.put(SMLMAST_OtherMobNo, omobno);
         getWritableDatabase().update(SMLMAST_Table,cv,SMLMAST_Auto+"=?",new String[]{auto});
+    }
+
+    public Cursor getReleaseNotes(){
+        String str = "select * from "+SoftwareVersionDetail_Table;
+        return getWritableDatabase().rawQuery(str,null);
+    }
+
+    public int getSVDMax() {
+        int autoId = 0;
+        Cursor res;
+        String str = "select max(" + SVD_Auto + ") from " + SoftwareVersionDetail_Table;
+        res = getWritableDatabase().rawQuery(str, null);
+        if (res.moveToFirst()) {
+            autoId = res.getInt(0);
+        }
+        res.close();
+        return autoId;
+    }
+
+    public void addReleaseNote(List<ReleaseNoteClass> noteList){
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        ContentValues cv = new ContentValues();
+        for(ReleaseNoteClass note : noteList) {
+            cv.put(SVD_Auto, note.getAuto());
+            cv.put(SVD_Version, note.getVersionNo());
+            cv.put(SVD_Desc, note.getDesc());
+            cv.put(SVD_CrBy, note.getCrby());
+            cv.put(SVD_CrDate, note.getCrDate());
+            cv.put(SVD_CrTime, note.getCrTime());
+            cv.put(SVD_ModBy, note.getModby());
+            cv.put(SVD_ModDate, note.getModDate());
+            cv.put(SVD_ModTime, note.getModTime());
+            db.insert(SoftwareVersionDetail_Table,null,cv);
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
+    public int getClientAuto(String clienID){
+        int auto = 0;
+        String str = "select "+SMLMAST_Auto+" from "+SMLMAST_Table+" where "+SMLMAST_ClientID+"='"+clienID+"'";
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if(res.moveToFirst()){
+            auto = res.getInt(0);
+        }
+        res.close();
+        return auto;
+    }
+
+    public Cursor getFeedQuestions(){
+        String str = "select distinct "+FED_AUTO+" from "+Table_QuestBank;
+        Constant.showLog(str);
+        return getWritableDatabase().rawQuery(str,null);
+    }
+
+    public String getQuestion(int auto){
+        String s = "";
+        String str = "select  "+FED_QUESTION+" from "+Table_QuestBank+" where "+FED_AUTO+"="+auto;
+        Constant.showLog(str);
+        Cursor res = getWritableDatabase().rawQuery(str,null);
+        if (res.moveToFirst()) {
+
+            s = res.getString(0);
+        }
+        res.close();
+        return  s;
+    }
+
+    public String getFedType1(String question){
+        String a = "";
+        String str = "select "+FED_TYPE+" from "+Table_QuestBank+" where "+FED_QUESTION+"='"+question+"'";
+        Constant.showLog(str);
+        Cursor cursor  = getWritableDatabase().rawQuery(str,null);
+        if (cursor.moveToFirst()) {
+
+            a = cursor.getString(0);
+        }
+        cursor.close();
+        return a;
+    }
+
+    public Cursor getQuesOPTIONS(int auto ){
+        String str = "select "+FED_CAT1+","+FED_CAT2+","+FED_CAT3+","+FED_CAT4+","+FED_CAT5+","+FED_CAT6+" from "+Table_QuestBank+" where "+FED_AUTO+" = "+auto;
+        Constant.showLog(str);
+        return getWritableDatabase().rawQuery(str,null);
     }
 }
 

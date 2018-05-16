@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1004202721199-tnmlau0sgk02n716kf584nbnc77pu4at.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lnbinfotech.lnb_tickets",
+            "certificate_hash": "246f950e9bd3935736fb3591181aa600d6eea631"
+          }
+        },
+        {
           "client_id": "1004202721199-ton34chfif1s78q2vcnkeksfh7a07t1n.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

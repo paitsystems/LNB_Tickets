@@ -177,6 +177,9 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                doFinish();
+                break;
             case R.id.share:
                 ArrayList<Uri> uri_list = new ArrayList<>();
                 uri_list.add(uri);
@@ -228,7 +231,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         sp_status = (Spinner) findViewById(R.id.sp_status);
         pb = (ProgressBar) findViewById(R.id.pb);
         db = new DBHandler(getApplicationContext());
-
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
         statusList = new ArrayList<>();
         statusList.add("Open");statusList.add("Closed");statusList.add("Pending");statusList.add("Scheduled");
         statusList.add("Hold");statusList.add("Cancel");statusList.add("ReOpen");statusList.add("ClientClosed");
@@ -241,7 +244,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 Constant.checkFolder(Constant.folder_name);
                 File f = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
                 pb.setVisibility(View.GONE);
-                img.setImageResource(R.drawable.bg);
+                img.setImageResource(R.drawable.ic_broken_image_black_24dp);
                 if(f.length()!=0) {
                     String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
                     img.setImageBitmap(scaleBitmap(_imagePath));
@@ -295,19 +298,24 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             status = statusList.get(sp_status.getSelectedItemPosition());
             String _ticketno = ticketMasterClass.getTicketNo();
             String clientName  = URLEncoder.encode(_clientName,"UTF-8");
-            String nickame  = URLEncoder.encode(_nickname,"UTF-8");
+            String nickname  = URLEncoder.encode(_nickname,"UTF-8");
             String finyr = URLEncoder.encode(_finyr,"UTF-8");
             String _status = URLEncoder.encode(status,"UTF-8");
             String ticketno = URLEncoder.encode(_ticketno,"UTF-8");
             String mobno = db.getMobile(clientAuto);
+            String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
             //String mobno = FirstActivity.pref.getString(getString(R.string.pref_mobno), "");
 
-            if(nickame.equals("NA")){
-                nickame = clientName;
+            if(type.equals("C")) {
+                if (nickname.equals("NA")) {
+                    nickname = clientName;
+                }
+            }else{
+                nickname = clientName;
             }
 
             String url = Constant.ipaddress+"/updateTicketStatus?auto=" + auto + "&id="+id+"&clientAuto="+clientAuto+
-                    "&finyr="+finyr+"&status="+_status+"&modBy="+nickame+"&ticketno="+ticketno+"&mobno="+mobno;
+                    "&finyr="+finyr+"&status="+_status+"&modBy="+nickname+"&ticketno="+ticketno+"&mobno="+mobno;
             Constant.showLog(url);
 
             //db.updateTicketStatus(auto,id,clientAuto,_finyr,status,_clientName,ticketno);
@@ -502,7 +510,6 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         }
         if(isAvailable == 0){
             if (ConnectivityTest.getNetStat(getApplicationContext())) {
-
                 String data = db.getFolder(ticketMasterClass.getClientAuto());
                 if(!data.equals("0")){
                     SharedPreferences.Editor editor = FirstActivity.pref.edit();
@@ -518,7 +525,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             } else {
                 pb.setVisibility(View.GONE);
                 writeLog("UpdateTicketActivity_setImage_Offline");
-                img.setImageResource(R.drawable.bg);
+                img.setImageResource(R.drawable.ic_broken_image_black_24dp);
                 toast.setText("You Are Offline");
                 toast.show();
             }
@@ -568,7 +575,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         } catch (Exception e) {
             e.printStackTrace();
             pb.setVisibility(View.GONE);
-            img.setImageResource(R.drawable.bg);
+            img.setImageResource(R.drawable.ic_broken_image_black_24dp);
             toast.show();
         }
         return resizedBitmap;
@@ -622,11 +629,17 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void doFinish(){
-        unregisterReceiver(receiver);
-        if(startService!=null) {
-            stopService(startService);
+        try {
+            if (receiver != null) {
+                unregisterReceiver(receiver);
+            }
+            if (startService != null) {
+                stopService(startService);
+            }
+            new Constant(UpdateTicketActivity.this).doFinish();
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        new Constant(UpdateTicketActivity.this).doFinish();
         /*finish();
         startActivity(new Intent(getApplicationContext(),AllTicketTabPagerActivity.class));
         overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);*/

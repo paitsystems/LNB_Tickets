@@ -18,10 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_weight="0.1"
-            android:maxLines="1"
-            android:singleLine="true"
+            android:background="@null"
             android:hint="Search TicketNo, Status etc..."
-            android:background="@null" />
+            android:inputType="textCapSentences"
+            android:maxLines="1"
+            android:singleLine="true" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -29,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0.9"
-            android:src="@drawable/search24" />
+            android:src="@drawable/ic_search" />
     </LinearLayout>
 
     <ListView

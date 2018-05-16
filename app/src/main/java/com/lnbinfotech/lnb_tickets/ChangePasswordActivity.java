@@ -169,6 +169,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         ed_new_password = (EditText) findViewById(R.id.ed_new_password);
         ed_re_new_password = (EditText) findViewById(R.id.ed_re_new_password);
         btn_update = (Button) findViewById(R.id.btn_update);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
     }
 
     private void showDia(int a) {

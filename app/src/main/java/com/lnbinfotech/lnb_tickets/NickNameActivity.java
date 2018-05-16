@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -42,6 +43,11 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
         }
 
         btn_set.setOnClickListener(this);
+
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        if (FirstActivity.pref.contains(getString(R.string.pref_nickname))){
+            showDia(3);
+        }
     }
 
     @Override
@@ -75,7 +81,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
         constant1 = new Constant(getApplicationContext());
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
-
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
         ed_nickname = (EditText) findViewById(R.id.ed_nickname);
         ed_omobno = (EditText) findViewById(R.id.ed_omobno);
         btn_set = (Button) findViewById(R.id.btn_set);
@@ -87,6 +93,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
         String omobno = ed_omobno.getText().toString();
         if(!nickname.equals("") && ! omobno.equals("")){
             if(omobno.length()==10) {
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(ed_nickname.getWindowToken(),0);
                 updateNickName(nickname, omobno);
             }else{
                 toast.setText("Please Enter Valid Mobile Number");
@@ -110,6 +117,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
             new updateNickName().execute(url);
         }catch (Exception e){
             e.printStackTrace();
+            writeLog(e.getMessage());
         }
     }
 
@@ -135,22 +143,26 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             pd.dismiss();
-            if(!s.equals("")) {
-                Constant.showLog(s);
-
-                if(s.equals("\"1\"")) {
-                    DBHandler db = new DBHandler(getApplicationContext());
-                    int clientauto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
-                    db.updateNickName(ed_nickname.getText().toString(),ed_omobno.getText().toString(), String.valueOf(clientauto));
-                    SharedPreferences.Editor editor = FirstActivity.pref.edit();
-                    editor.putString(getString(R.string.pref_nickname), ed_nickname.getText().toString());
-                    editor.apply();
-                    showDia(1);
-                }else{
-                    showDia(2);
+            if(s!=null) {
+                if (!s.equals("")) {
+                    Constant.showLog(s);
+                    if (s.equals("\"1\"")) {
+                        DBHandler db = new DBHandler(getApplicationContext());
+                        int clientauto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
+                        db.updateNickName(ed_nickname.getText().toString(), ed_omobno.getText().toString(), String.valueOf(clientauto));
+                        SharedPreferences.Editor editor = FirstActivity.pref.edit();
+                        editor.putString(getString(R.string.pref_nickname), ed_nickname.getText().toString());
+                        editor.putString(getString(R.string.pref_nicknamebug), "Y");
+                        editor.apply();
+                        writeLog(ed_nickname.getText().toString() + "-" + ed_omobno.getText().toString());
+                        showDia(1);
+                    } else {
+                        showDia(2);
+                    }
                 }
+            }else{
+                showDia(2);
             }
-
         }
     }
 
@@ -194,6 +206,15 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+        }else if (a == 3) {
+            builder.setTitle("Sorry For Inconvenience");
+            builder.setMessage("You Required To Reenter Nickname");
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

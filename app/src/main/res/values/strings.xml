@@ -37,6 +37,7 @@
     <string name="pref_IMEI">IMEI</string>
     <string name="pref_logged">logged</string>
     <string name="pref_nickname">nickname</string>
+    <string name="pref_prodused">prodUsed</string>
     <string name="enter_client_id_here">Enter Client Id Here</string>
     <string name="verify">Verify</string>
     <string name="company_details">Company Details</string>
@@ -123,6 +124,9 @@
     <string name="to_date">To Date</string>
     <string name="all_dates">All Dates</string>
     <string name="show">Show</string>
+    <string name="pref_isFeedReq">pref_isFeedReq</string>
+    <string name="pref_nicknamebug">nicknamebug</string>
+    <string name="pref_acchead">pref_acchead</string>
 
     <string-array name="navigationName">
         <item>Home</item>
@@ -148,8 +152,13 @@
     <string name="cess_per">Cess Per</string>
     <string name="report_error">Report Issue</string>
     <string name="reach_to_md">Reach To MD</string>
+    <string name="release_notes">Release Notes</string>
     <string name="clear_data">Clear Data</string>
     <string name="change_password">Change Password</string>
+    <string name="location">Location</string>
+    <string name="machinetype">MachineType</string>
+    <string name="machineid">MachineId</string>
+    <string name="asset">Asset Management</string>
 
     <string name="banner_home_footer">ca-app-pub-3940256099942544/6300978111</string>
 
@@ -160,7 +169,9 @@
     <string name="update_ticket_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="massage_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
     <string name="fullimg_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="reachtomd_activity_banner">ca-app-pub-3940256099942544/6300978111</string>-->
+    <string name="reachtomd_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="assetmanagement_activity_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="addasset_activity_banner">ca-app-pub-3940256099942544/6300978111</string>-->
 
     <!--TODO: Uncomment for Live-->
     <string name="main_screen_banner">ca-app-pub-6568644984087031/6645892269</string>
@@ -170,6 +181,8 @@
     <string name="massage_activity_banner">ca-app-pub-6568644984087031/3932276625</string>
     <string name="fullimg_activity_banner">ca-app-pub-6568644984087031/2197087773</string>
     <string name="reachtomd_activity_banner">ca-app-pub-6568644984087031/9483707581</string>
+    <string name="assetmanagement_activity_banner">ca-app-pub-6568644984087031/4297544990</string>
+    <string name="addasset_activity_banner">ca-app-pub-6568644984087031/9414140307</string>
 
 
 </resources>
