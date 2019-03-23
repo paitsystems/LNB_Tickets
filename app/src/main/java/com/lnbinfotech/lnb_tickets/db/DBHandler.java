@@ -578,7 +578,7 @@ public class DBHandler extends SQLiteOpenHelper {
             str = "select * from " + Ticket_Master_Table + " where " + TicketM_Status + " in ('Open','Pending','ReOpen') and " +
                     TicketM_PointType + "='H' order by " + TicketM_Auto + " desc";
         }
-
+        Constant.showLog("getPendingTicket Start");
         Cursor res = getWritableDatabase().rawQuery(str,null);
         if(res.moveToFirst()){
             do {
@@ -606,6 +606,7 @@ public class DBHandler extends SQLiteOpenHelper {
             }while (res.moveToNext());
         }
         res.close();
+        Constant.showLog("getPendingTicket Stop");
         return pendingTicketClassList;
     }
 

@@ -26,6 +26,13 @@ import com.lnbinfotech.lnb_tickets.model.TicketMasterClass;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
+
 public class PendingFragments extends Fragment{
 
     private ListView listView;
@@ -96,7 +103,47 @@ public class PendingFragments extends Fragment{
 
     public void setData(){
         Constant.showLog("setData");
+
         String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+
+        /*Observable<ArrayList<TicketMasterClass>> observable = Observable
+                .just(db.getPendingTicket(isHWApplicable));
+
+        Observer<ArrayList<TicketMasterClass>> observer = new Observer<ArrayList<TicketMasterClass>>() {
+            @Override
+            public void onCompleted() {
+                Constant.showLog("All data emitted.");
+            }
+            @Override
+            public void onError(Throwable e) {
+                Constant.showLog("Error received: " + e.getMessage());
+            }
+            @Override
+            public void onNext(ArrayList<TicketMasterClass> pendingTicketClassList) {
+                Constant.showLog("onNext");
+                adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                listView.setAdapter(adapter);
+                *//*if (pendingTicketClassList.size()!= 0) {
+                    if(searchText==null) {
+                        listView.setAdapter(null);
+                        adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                        listView.setAdapter(adapter);
+                    }else{
+                        listView.setAdapter(null);
+                        adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
+                        listView.setAdapter(adapter);
+                        if(adapter!=null) {
+                            adapter.filter(searchText);
+                        }
+                    }
+                }*//*
+            }
+        };
+
+        Subscription subscription = observable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);*/
 
         ArrayList<TicketMasterClass> pendingTicketClassList = db.getPendingTicket(isHWApplicable);
         if (pendingTicketClassList.size()!= 0) {

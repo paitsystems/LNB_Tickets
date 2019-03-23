@@ -46,7 +46,7 @@ public class Constant {
     public static final String imgIpaddress = "http://license.lnbinfotech.com/PAIT/";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
-    public static int liveTestFlag = 1;
+    public static int liveTestFlag = 0;
 
     private Activity activity;
     private Context context;

@@ -127,6 +127,7 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
             adapter.addFragment(new InternalPointFragment(), "Internal");
         }
         pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(1);
     }
 
     private void init() {
