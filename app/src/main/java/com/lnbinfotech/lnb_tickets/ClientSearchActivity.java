@@ -47,7 +47,7 @@ public class ClientSearchActivity extends AppCompatActivity implements View.OnCl
         }else {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .addTestDevice("0558B791C50AB34B5650C3C48C9BD15E")
+                    .addTestDevice(Constant.adMobID)
                     .build();
         }
 
@@ -115,8 +115,8 @@ public class ClientSearchActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void init() {
-        ed_search = (EditText) findViewById(R.id.ed_search);
-        listView = (ListView) findViewById(R.id.listView);
+        ed_search = findViewById(R.id.ed_search);
+        listView = findViewById(R.id.listView);
         db = new DBHandler(getApplicationContext());
         branchList = new ArrayList<>();
         branchList = db.getDistinctBranch();

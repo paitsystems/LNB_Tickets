@@ -71,31 +71,32 @@ public class AllTicketListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
-        if(view==null) {
+        if (view == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.list_item_all_ticket_list, null);
+            view = inflater.inflate(R.layout.list_item_open_tickets, null);
             //view = LayoutInflater.from(context).inflate(R.layout.list_item_all_ticket_list, viewGroup,false);
             holder = new ViewHolder();
-            holder.tv_date = (TextView) view.findViewById(R.id.tv_date);
-            holder.tv_time = (TextView) view.findViewById(R.id.tv_time);
-            holder.tv_subject = (TextView) view.findViewById(R.id.tv_subject);
-            holder.tv_desc = (TextView) view.findViewById(R.id.tv_desc);
-            holder.tv_status = (TextView) view.findViewById(R.id.tv_status);
-            holder.tv_comments = (TextView) view.findViewById(R.id.tv_comments);
-            holder.tv_ticket_no = (TextView) view.findViewById(R.id.tv_ticket_no);
-            holder.tv_assignto = (TextView) view.findViewById(R.id.tv_assignto);
-            holder.tv_client_name = (TextView) view.findViewById(R.id.tv_client_name);
-            holder.tv_cr_by = (TextView) view.findViewById(R.id.tv_cr_by);
-            holder.tv_closed_by = (TextView) view.findViewById(R.id.tv_closed_by);
-            holder.tv_closed_date = (TextView) view.findViewById(R.id.tv_closed_date);
-            holder.tv_closed_time = (TextView) view.findViewById(R.id.tv_closed_time);
-            holder.lay_closed_by = (LinearLayout) view.findViewById(R.id.lay_closed_by);
-            holder.lay = (LinearLayout) view.findViewById(R.id.lay);
-            holder.tv_point_type = (TextView) view.findViewById(R.id.tv_point_type);
+            holder.tv_date = view.findViewById(R.id.tv_date);
+            holder.tv_time = view.findViewById(R.id.tv_time);
+            holder.tv_subject = view.findViewById(R.id.tv_subject);
+            holder.tv_desc = view.findViewById(R.id.tv_desc);
+            holder.tv_status = view.findViewById(R.id.tv_status);
+            holder.tv_comments = view.findViewById(R.id.tv_comments);
+            holder.tv_ticket_no = view.findViewById(R.id.tv_ticket_no);
+            holder.tv_assignto = view.findViewById(R.id.tv_assignto);
+            holder.tv_client_name = view.findViewById(R.id.tv_client_name);
+            holder.tv_cr_by = view.findViewById(R.id.tv_cr_by);
+            holder.tv_closed_by = view.findViewById(R.id.tv_closed_by);
+            holder.tv_closed_date = view.findViewById(R.id.tv_closed_date);
+            holder.tv_closed_time = view.findViewById(R.id.tv_closed_time);
+            holder.lay_closed_by = view.findViewById(R.id.lay_closed_by);
+            holder.lay = view.findViewById(R.id.lay);
+            holder.tv_point_type = view.findViewById(R.id.tv_point_type);
+            holder.tv = view.findViewById(R.id.tv);
 
             //holder.status_lay = (LinearLayout) view.findViewById(R.id.status_lay);
             view.setTag(holder);
-        }else{
+        } else {
             holder = (ViewHolder) view.getTag();
         }
         TicketMasterClass pendingTicketClass = (TicketMasterClass) getItem(i);
@@ -103,23 +104,23 @@ public class AllTicketListAdapter extends BaseAdapter {
         holder.tv_date.setText(pendingTicketClass.getCrDate());
         String _time = pendingTicketClass.getCrTime();
         String time[] = _time.split("\\:");
-        if(time.length>1) {
-            String s = time[0]+":"+time[1];
+        if (time.length > 1) {
+            String s = time[0] + ":" + time[1];
             holder.tv_time.setText(s);
-        }else{
+        } else {
             holder.tv_time.setText(_time);
         }
         holder.tv_subject.setText(pendingTicketClass.getSubject());
         String desc = pendingTicketClass.getParticular();
-        if(desc.length()>100){
-            desc = desc.substring(0,99)+"...";
+        if (desc.length() > 100) {
+            desc = desc.substring(0, 99) + "...";
         }
         holder.tv_desc.setText(desc);
         String status = pendingTicketClass.getStatus();
-        if(status.equals("Closed")){
+        if (status.equals("Closed")) {
             //holder.tv_status.setBackground(context.getResources().getDrawable(R.drawable.status_btn_draw_green));
             holder.tv_status.setTextColor(context.getResources().getColor(R.color.darkgreen));
-            if(!pendingTicketClass.getModBy().equals("null")) {
+            if (!pendingTicketClass.getModBy().equals("null")) {
                 holder.lay_closed_by.setVisibility(View.VISIBLE);
                 holder.tv_closed_by.setText(pendingTicketClass.getModBy());
                 holder.tv_closed_date.setText(pendingTicketClass.getModDate());
@@ -134,19 +135,23 @@ public class AllTicketListAdapter extends BaseAdapter {
                     holder.tv_closed_time.setText(_modtime);
                 }
             }
-        }else {
+        } else {
             //holder.tv_status.setBackground(context.getResources().getDrawable(R.drawable.status_btn_draw_red));
             if (status.equals("Open") || status.equals("ReOpen") || status.equals("Pending")) {
                 String crdt = pendingTicketClass.getCrDate();
                 Date crDate = parseDate1(crdt);
                 if (todayDate.compareTo(crDate) == 0) {
-                    holder.lay.setBackgroundResource(R.color.lgreen);
-                } else if(prev10Days.before(crDate)){
-                    holder.lay.setBackgroundResource(R.color.lyellow);
-                } else if(prev30Days.before(crDate)){
-                    holder.lay.setBackgroundResource(R.color.lred);
-                }else{
-                    holder.lay.setBackgroundResource(0);
+                    //holder.lay.setBackgroundResource(R.color.lgreen);
+                    holder.tv.setBackgroundResource(R.color.darkgreen);
+                } else if (prev10Days.before(crDate)) {
+                    //holder.lay.setBackgroundResource(R.color.lyellow);
+                    holder.tv.setBackgroundResource(R.color.lightyellow);
+                } else if (prev30Days.before(crDate)) {
+                    //holder.lay.setBackgroundResource(R.color.lred);
+                    holder.tv.setBackgroundResource(R.color.red);
+                } else {
+                    //holder.lay.setBackgroundResource(0);
+                    holder.tv.setBackgroundResource(R.color.red);
                 }
             }
             holder.tv_status.setTextColor(context.getResources().getColor(R.color.red));
@@ -161,7 +166,7 @@ public class AllTicketListAdapter extends BaseAdapter {
     }
 
     private class ViewHolder{
-        TextView tv_date, tv_time, tv_subject, tv_desc, tv_status, tv_comments, tv_ticket_no, tv_assignto,
+        TextView tv, tv_date, tv_time, tv_subject, tv_desc, tv_status, tv_comments, tv_ticket_no, tv_assignto,
                     tv_client_name,tv_cr_by, tv_closed_by, tv_closed_date, tv_closed_time, tv_point_type;
         LinearLayout lay_closed_by, lay;
     }
@@ -188,11 +193,11 @@ public class AllTicketListAdapter extends BaseAdapter {
                         pendingTicketClassList.add(ticketMasterClass);
                     } else if (ticketMasterClass.getAssignTO().toLowerCase(Locale.getDefault()).contains(searchText)) {
                         pendingTicketClassList.add(ticketMasterClass);
-                    }else if (ticketMasterClass.getClientName().toLowerCase(Locale.getDefault()).contains(searchText)) {
+                    } else if (ticketMasterClass.getClientName().toLowerCase(Locale.getDefault()).contains(searchText)) {
                         pendingTicketClassList.add(ticketMasterClass);
-                    }else if (ticketMasterClass.getCrBy().toLowerCase(Locale.getDefault()).contains(searchText)) {
+                    } else if (ticketMasterClass.getCrBy().toLowerCase(Locale.getDefault()).contains(searchText)) {
                         pendingTicketClassList.add(ticketMasterClass);
-                    }else if (ticketMasterClass.getModBy().toLowerCase(Locale.getDefault()).contains(searchText)) {
+                    } else if (ticketMasterClass.getModBy().toLowerCase(Locale.getDefault()).contains(searchText)) {
                         pendingTicketClassList.add(ticketMasterClass);
                     }
                 }

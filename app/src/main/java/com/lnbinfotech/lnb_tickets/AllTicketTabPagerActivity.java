@@ -39,7 +39,7 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        mAdView = (AdView) findViewById(R.id.adView);
+        mAdView = findViewById(R.id.adView);
 
         AdRequest adRequest;
         if(Constant.liveTestFlag==1) {
@@ -131,8 +131,8 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
     }
 
     private void init() {
-        tabLayout = (TabLayout) findViewById(R.id.tab);
-        pager = (ViewPager) findViewById(R.id.pager);
+        tabLayout = findViewById(R.id.tab);
+        pager = findViewById(R.id.pager);
         FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
     }
 

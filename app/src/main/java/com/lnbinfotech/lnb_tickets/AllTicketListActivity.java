@@ -64,7 +64,7 @@ public class AllTicketListActivity extends AppCompatActivity {
         }else {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .addTestDevice("0558B791C50AB34B5650C3C48C9BD15E")
+                    .addTestDevice(Constant.adMobID)
                     .build();
         }
 

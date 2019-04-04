@@ -41,8 +41,8 @@ public class Constant {
             //ftp_directory = "SMVisit_Indus";
 
     //TODO: Check Ip AddressAd
-    //public static final String ipaddress = "http://172.30.1.38/LNBTCK_16/service.svc";
-    public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_16/service.svc";
+    public static final String ipaddress = "http://172.30.1.209/LNBTCK_17/service.svc";
+    //public static final String ipaddress = "http://license.lnbinfotech.com/LNBTCK_17/service.svc";
     public static final String imgIpaddress = "http://license.lnbinfotech.com/PAIT/";
 
     //TODO: Check liveTestFlag 1-Live, 0-Test
@@ -50,6 +50,21 @@ public class Constant {
 
     private Activity activity;
     private Context context;
+
+    public static int TIMEOUT_CON = 10*1000;
+    public static int TIMEOUT_SO = 2*60*1000;
+
+    public static final String TOPIC_GLOBAL = "global";
+
+    // broadcast receiver intent filters
+    public static final String REGISTRATION_COMPLETE = "registrationComplete";
+    public static final String PUSH_NOTIFICATION = "pushNotification";
+
+    // id to handle the notification in the notification tray
+    public static final int NOTIFICATION_ID = 100;
+    public static final int NOTIFICATION_ID_BIG_IMAGE = 101;
+
+    public static String adMobID = "708F6C21B022DA1BAA0E0E6AF569D356";
 
     private static ProgressDialog pd;
 

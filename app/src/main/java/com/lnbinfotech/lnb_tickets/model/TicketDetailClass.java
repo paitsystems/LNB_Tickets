@@ -2,10 +2,34 @@ package com.lnbinfotech.lnb_tickets.model;
 
 // Created by lnb on 8/18/2017.
 
+import com.google.gson.annotations.SerializedName;
+
 public class TicketDetailClass {
 
-    public String desc, crDate, crTime, type,crby, genType, pointType, crDate1;
-    public int auto, mastAuto, id, clientAuto;
+    @SerializedName("Description")
+    public String desc;
+    @SerializedName("CrDate")
+    public String crDate;
+    @SerializedName("CrTime")
+    public String crTime;
+    @SerializedName("Type")
+    public String type;
+    @SerializedName("CrBy")
+    public String crby;
+    @SerializedName("GenType")
+    public String genType;
+    @SerializedName("PointType")
+    public String pointType;
+    @SerializedName("CrDate1")
+    public String crDate1;
+    @SerializedName("Auto")
+    public int auto;
+    @SerializedName("MastAuto")
+    public int mastAuto;
+    @SerializedName("Id")
+    public int id;
+    @SerializedName("ClientAuto")
+    public int clientAuto;
 
     public String getDesc() {
         return desc;

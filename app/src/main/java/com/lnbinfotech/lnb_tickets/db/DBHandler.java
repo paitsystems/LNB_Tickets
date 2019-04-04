@@ -259,6 +259,7 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         ContentValues cv = new ContentValues();
+        int count = 0;
         for(TicketMasterClass ticketMaster : ticketMasterList) {
             cv.put(TicketM_Auto, ticketMaster.getAuto());
             cv.put(TicketM_Id, ticketMaster.getId());
@@ -288,7 +289,9 @@ public class DBHandler extends SQLiteOpenHelper {
             cv.put(TicketM_PointType, ticketMaster.getPointtype());
             cv.put(TicketM_ModDate1, ticketMaster.getModdate1());
             db.insert(Ticket_Master_Table,null,cv);
+            count++;
         }
+        Constant.showLog("Count "+count);
         db.setTransactionSuccessful();
         db.endTransaction();
         db.close();
@@ -315,6 +318,7 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         ContentValues cv = new ContentValues();
+        int count =0;
         for(TicketDetailClass ticketDetail : ticketDetailList) {
             cv.put(TicketD_Auto, ticketDetail.getAuto());
             cv.put(TicketD_MastAuto, ticketDetail.getMastAuto());
@@ -329,7 +333,9 @@ public class DBHandler extends SQLiteOpenHelper {
             cv.put(TicketD_PointType, ticketDetail.getPointType());
             cv.put(TicketD_CrDate1, ticketDetail.getCrDate1());
             db.insert(Ticket_Detail_Table, null, cv);
+            count++;
         }
+        Constant.showLog("Count "+count);
         db.setTransactionSuccessful();
         db.endTransaction();
         db.close();

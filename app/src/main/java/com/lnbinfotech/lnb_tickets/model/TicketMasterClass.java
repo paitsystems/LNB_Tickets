@@ -2,14 +2,66 @@ package com.lnbinfotech.lnb_tickets.model;
 
 //Created by lnb on 8/12/2017.
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class TicketMasterClass implements Serializable{
 
-    public String finyr, ticketNo,Particular,Subject,ImagePAth,Status,CrBy,CrDate,CrTime,ModBy,
-            ModDate,ModTime, type, genType, assignTO, assignTODate, assignTOTime, assignBy, assignByDate,
-            assignByTime,branch, clientName, pointtype, moddate1;
-    public int auto, id, clientAuto;
+    @SerializedName("finyr")
+    public String finyr;
+    @SerializedName("ticketNo")
+    public String ticketNo;
+    @SerializedName("Particular")
+    public String Particular;
+    @SerializedName("Subject")
+    public String Subject;
+    @SerializedName("ImagePAth")
+    public String ImagePAth;
+    @SerializedName("Status")
+    public String Status;
+    @SerializedName("CrBy")
+    public String CrBy;
+    @SerializedName("CrDate")
+    public String CrDate;
+    @SerializedName("CrTime")
+    public String CrTime;
+    @SerializedName("ModBy")
+    public String ModBy;
+    @SerializedName("ModDate")
+    public String ModDate;
+    @SerializedName("ModTime")
+    public String ModTime;
+    @SerializedName("type")
+    public String type;
+    @SerializedName("GenType")
+    public String genType;
+    @SerializedName("AssignTo")
+    public String assignTO;
+    @SerializedName("AssignDate")
+    public String assignTODate;
+    @SerializedName("AssignTime")
+    public String assignTOTime;
+    @SerializedName("Assignby")
+    public String assignBy;
+    @SerializedName("AssignbyDate")
+    public String assignByDate;
+    @SerializedName("AssignbyTime")
+    public String assignByTime;
+    @SerializedName("Branch")
+    public String branch;
+    @SerializedName("ClientName")
+    public String clientName;
+    @SerializedName("PointType")
+    public String pointtype;
+    @SerializedName("ModDate1")
+    public String moddate1;
+    @SerializedName("auto")
+    public int auto;
+    @SerializedName("id")
+    public int id;
+    @SerializedName("ClientAuto")
+    public int clientAuto;
 
     public String getTicketNo() {
         return ticketNo;

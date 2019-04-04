@@ -167,7 +167,7 @@ public class ParseJSON {
         try {
             JSONArray jsonArray = new JSONArray(json);
             if (jsonArray.length() >= 1) {
-                //db.deleteTabel(DBHandler.SMLMAST_Table);
+                db.deleteTabel(DBHandler.SMLMAST_Table);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     SMLMASTClass custClass = new SMLMASTClass();
                     custClass.setAuto(jsonArray.getJSONObject(i).getInt("Auto"));
