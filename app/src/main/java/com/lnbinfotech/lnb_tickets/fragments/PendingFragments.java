@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -50,6 +51,8 @@ public class PendingFragments extends Fragment{
     private EditText ed_search;
     public static int selPos;
     private String searchText = null;
+    private int pagecount = 5;
+    private ArrayList<TicketMasterClass> pendingTicketClassList;
 
     public PendingFragments(){
 
@@ -69,8 +72,26 @@ public class PendingFragments extends Fragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_pending,container,false);
+        View view = inflater.inflate(R.layout.fragment_pending, container, false);
         listView = view.findViewById(R.id.listView);
+
+        Button btnLoadMore = new Button(getContext());
+        btnLoadMore.setText("Load More");
+        listView.addFooterView(btnLoadMore);
+
+        btnLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagecount++;
+                String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable), "");
+                int a = pendingTicketClassList.size()-5;
+                pendingTicketClassList.clear();
+                pendingTicketClassList.addAll(db.getPendingTicketLM(isHWApplicable, pagecount));
+                listView.setAdapter(adapter);
+                listView.setSelection(a);
+            }
+        });
+
         db = new DBHandler(getContext());
         ed_search = view.findViewById(R.id.ed_search);
         ed_search.addTextChangedListener(new TextWatcher() {
@@ -82,7 +103,7 @@ public class PendingFragments extends Fragment{
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 searchText = ed_search.getText().toString().toLowerCase(Locale.getDefault());
-                if(adapter!=null) {
+                if (adapter != null) {
                     adapter.filter(searchText);
                 }
             }
@@ -98,11 +119,11 @@ public class PendingFragments extends Fragment{
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selPos = i;
                 TicketMasterClass pendingTicketClass = (TicketMasterClass) listView.getItemAtPosition(i);
-                /*Intent intent = new Intent(getContext(),UpdateTicketActivity.class);
-                intent.putExtra("data",pendingTicketClass);
+                Intent intent = new Intent(getContext(), UpdateTicketActivity.class);
+                intent.putExtra("data", pendingTicketClass);
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.enter,R.anim.exit);*/
-                showTicket(pendingTicketClass);
+                getActivity().overridePendingTransition(R.anim.enter, R.anim.exit);
+                //showTicket(pendingTicketClass);
             }
         });
 
@@ -209,46 +230,8 @@ public class PendingFragments extends Fragment{
 
         String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
 
-        /*Observable<ArrayList<TicketMasterClass>> observable = Observable
-                .just(db.getPendingTicket(isHWApplicable));
-
-        Observer<ArrayList<TicketMasterClass>> observer = new Observer<ArrayList<TicketMasterClass>>() {
-            @Override
-            public void onCompleted() {
-                Constant.showLog("All data emitted.");
-            }
-            @Override
-            public void onError(Throwable e) {
-                Constant.showLog("Error received: " + e.getMessage());
-            }
-            @Override
-            public void onNext(ArrayList<TicketMasterClass> pendingTicketClassList) {
-                Constant.showLog("onNext");
-                adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
-                listView.setAdapter(adapter);
-                *//*if (pendingTicketClassList.size()!= 0) {
-                    if(searchText==null) {
-                        listView.setAdapter(null);
-                        adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
-                        listView.setAdapter(adapter);
-                    }else{
-                        listView.setAdapter(null);
-                        adapter = new AllTicketListAdapter(getContext(), pendingTicketClassList);
-                        listView.setAdapter(adapter);
-                        if(adapter!=null) {
-                            adapter.filter(searchText);
-                        }
-                    }
-                }*//*
-            }
-        };
-
-        Subscription subscription = observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);*/
-
-        ArrayList<TicketMasterClass> pendingTicketClassList = db.getPendingTicket(isHWApplicable);
+        //ArrayList<TicketMasterClass> pendingTicketClassList = db.getPendingTicket(isHWApplicable);
+        pendingTicketClassList = db.getPendingTicketLM(isHWApplicable,pagecount);
         if (pendingTicketClassList.size()!= 0) {
             if(searchText==null) {
                 listView.setAdapter(null);

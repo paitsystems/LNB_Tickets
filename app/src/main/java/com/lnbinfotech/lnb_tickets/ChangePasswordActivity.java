@@ -72,8 +72,8 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         return super.onOptionsItemSelected(item);
     }
 
-    private void verifyPassword(){
-        String old_pass = FirstActivity.pref.getString(getString(R.string.pref_password),"");
+    private void verifyPassword() {
+        String old_pass = FirstActivity.pref.getString(getString(R.string.pref_password), "");
         String old_pass1 = ed_old_password.getText().toString();
         String new_pass = ed_new_password.getText().toString();
         String new_pass1 = ed_re_new_password.getText().toString();
@@ -85,40 +85,40 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             ed_old_password.setError(getString(R.string.error_field_required));
             focusView = ed_old_password;
             cancel = true;
-        }else if (TextUtils.isEmpty(new_pass)) {
+        } else if (TextUtils.isEmpty(new_pass)) {
             ed_new_password.setError(getString(R.string.error_field_required));
             focusView = ed_new_password;
             cancel = true;
-        }else if (TextUtils.isEmpty(new_pass1)) {
+        } else if (TextUtils.isEmpty(new_pass1)) {
             ed_re_new_password.setError(getString(R.string.error_field_required));
             focusView = ed_re_new_password;
             cancel = true;
         }
         if (cancel) {
             focusView.requestFocus();
-        }else{
-            if(old_pass.equals(old_pass1)){
-                if(new_pass.equals(new_pass1)){
+        } else {
+            if (old_pass.equals(old_pass1)) {
+                if (new_pass.equals(new_pass1)) {
                     updatePassword(new_pass);
-                }else{
+                } else {
                     toast.setText("New Password Does Not Macth");
                     toast.show();
                 }
-            }else{
+            } else {
                 toast.setText("Old Password Does Not Macth");
                 toast.show();
             }
         }
     }
 
-    private void updatePassword(final String new_pass){
+    private void updatePassword(final String new_pass) {
         constant.showPD();
         try {
-            String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-            int auto = FirstActivity.pref.getInt(getString(R.string.pref_auto),0);
-            String newpass = URLEncoder.encode(new_pass,"UTF-8");
-            String url = Constant.ipaddress + "/UpdatePassword?auto="+auto+"&type="+type+"&newpass="+newpass;
-            writeLog("ChangePasswordActivity_updatePassword_"+url);
+            String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+            int auto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
+            String newpass = URLEncoder.encode(new_pass, "UTF-8");
+            String url = Constant.ipaddress + "/UpdatePassword?auto=" + auto + "&type=" + type + "&newpass=" + newpass;
+            writeLog("ChangePasswordActivity_updatePassword_" + url);
             Constant.showLog(url);
             StringRequest request = new StringRequest(url,
                     new Response.Listener<String>() {
@@ -127,13 +127,13 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                             Constant.showLog(result);
                             result = result.replace("\\", "");
                             result = result.replace("''", "");
-                            result = result.replace("\"","");
-                            if(!result.equals("0") && !result.equals("")){
+                            result = result.replace("\"", "");
+                            if (!result.equals("0") && !result.equals("")) {
                                 SharedPreferences.Editor editor = FirstActivity.pref.edit();
                                 editor.putString(getString(R.string.pref_password), new_pass);
                                 editor.apply();
                                 showDia(1);
-                            }else{
+                            } else {
                                 showDia(3);
                             }
                             Constant.showLog(result);
@@ -143,7 +143,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            writeLog("ChangePasswordActivity_updatePassword_volley_"+ error.getMessage());
+                            writeLog("ChangePasswordActivity_updatePassword_volley_" + error.getMessage());
                             error.printStackTrace();
                             constant.showPD();
                             showDia(3);
@@ -152,8 +152,8 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             );
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
             queue.add(request);
-        }catch (Exception e){
-            writeLog("ChangePasswordActivity_updatePassword_"+e.getMessage());
+        } catch (Exception e) {
+            writeLog("ChangePasswordActivity_updatePassword_" + e.getMessage());
             e.printStackTrace();
             toast.setText("Something Went Wrong");
             toast.show();
@@ -165,11 +165,11 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         constant1 = new Constant(getApplicationContext());
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
-        ed_old_password = (EditText) findViewById(R.id.ed_old_passord);
-        ed_new_password = (EditText) findViewById(R.id.ed_new_password);
-        ed_re_new_password = (EditText) findViewById(R.id.ed_re_new_password);
-        btn_update = (Button) findViewById(R.id.btn_update);
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        ed_old_password = findViewById(R.id.ed_old_passord);
+        ed_new_password = findViewById(R.id.ed_new_password);
+        ed_re_new_password = findViewById(R.id.ed_re_new_password);
+        btn_update = findViewById(R.id.btn_update);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
     }
 
     private void showDia(int a) {
@@ -184,7 +184,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                     dialog.dismiss();
                 }
             });
-        }else if (a == 3) {
+        } else if (a == 3) {
             builder.setMessage("Error While Updating Password");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override

@@ -86,7 +86,7 @@ public class ReleaseNoteDetailActivity extends AppCompatActivity implements View
         constant1 = new Constant(getApplicationContext());
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
-        exListView = (ExpandableListView) findViewById(R.id.expandableListView);
+        exListView = findViewById(R.id.expandableListView);
         db = new DBHandler(getApplicationContext());
         parentIdList = new ArrayList<>();
         parentIdchildListMap = new HashMap<>();
@@ -118,6 +118,7 @@ public class ReleaseNoteDetailActivity extends AppCompatActivity implements View
     }
 
     private void loadData() {
+        //db.deleteTabel(DBHandler.SoftwareVersionDetail_Table);
         int auto = db.getSVDMax();
         String url = Constant.ipaddress + "/GetReleaseNote?auto=" + auto;
         Constant.showLog(url);
@@ -148,7 +149,11 @@ public class ReleaseNoteDetailActivity extends AppCompatActivity implements View
             pd.dismiss();
             if (s != null) {
                 try {
+                    s = s.replace("\\\\r", "");
+                    s = s.replace("\\\\t", "");
+                    s = s.replace("\\\\n", "\n");
                     s = s.replace("\\", "");
+                    s = s.replace("''", "");
                     s = s.replace("''", "");
                     s = s.substring(1, s.length() - 1);
                     JSONArray jsonArray = new JSONArray(s);

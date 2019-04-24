@@ -85,14 +85,14 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onResume() {
         super.onResume();
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.resume();
         }
     }
 
     @Override
     protected void onPause() {
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.pause();
         }
         super.onPause();
@@ -100,7 +100,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
 
     @Override
     protected void onDestroy() {
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.destroy();
         }
         super.onDestroy();
@@ -110,17 +110,17 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_reply:
-                if(!ed_reply.getText().toString().equals("") && ed_reply.getText().toString().length()!=0) {
+                if (!ed_reply.getText().toString().equals("") && ed_reply.getText().toString().length() != 0) {
                     addTicketDetail();
-                }else{
+                } else {
                     toast.setText("Please Enter Message");
                     toast.show();
                 }
                 break;
             case R.id.img_reply:
-                if(!ed_reply.getText().toString().equals("") && ed_reply.getText().toString().length()!=0) {
+                if (!ed_reply.getText().toString().equals("") && ed_reply.getText().toString().length() != 0) {
                     addTicketDetail();
-                }else{
+                } else {
                     toast.setText("Please Enter Message");
                     toast.show();
                 }
@@ -130,7 +130,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onBackPressed() {
-        ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_reply.getWindowToken(),0);
+        ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_reply.getWindowToken(), 0);
         new Constant(ReplyResponseActivity.this).doFinish();
     }
 
@@ -138,34 +138,34 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_reply.getWindowToken(),0);
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_reply.getWindowToken(), 0);
                 new Constant(ReplyResponseActivity.this).doFinish();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void init(){
-        toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER,0,0);
+    private void init() {
+        toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         constant = new Constant(ReplyResponseActivity.this);
-        listView = (ListView) findViewById(R.id.listView);
-        ed_reply = (EditText) findViewById(R.id.ed_reply);
-        btn_reply = (Button) findViewById(R.id.btn_reply);
-        img_reply = (ImageView) findViewById(R.id.img_reply);
+        listView = findViewById(R.id.listView);
+        ed_reply = findViewById(R.id.ed_reply);
+        btn_reply = findViewById(R.id.btn_reply);
+        img_reply = findViewById(R.id.img_reply);
         ticketDetailClassList = new ArrayList<>();
         db = new DBHandler(getApplicationContext());
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
     }
 
     private void loadData() {
         constant.showPD();
-        int auto,id;
+        int auto, id;
         auto = db.getAutoTD();
         id = db.getIDTD();
-        final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        String url1 = Constant.ipaddress + "/GetTicketDetail?auto="+auto+"&mastAuto="+UpdateTicketActivity.auto
-                                            +"&id="+id+"&type="+type;
+        final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+        String url1 = Constant.ipaddress + "/GetTicketDetail?auto=" + auto + "&mastAuto=" + UpdateTicketActivity.auto
+                + "&id=" + id + "&type=" + type;
         Constant.showLog(url1);
         StringRequest request = new StringRequest(url1,
                 new Response.Listener<String>() {
@@ -196,7 +196,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("ReplyResponseActivity_loadData_volley_"+error.getMessage());
+                        writeLog("ReplyResponseActivity_loadData_volley_" + error.getMessage());
                         error.printStackTrace();
                         constant.showPD();
                         showDia(3);
@@ -207,10 +207,10 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         //RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         //queue.add(request);
 
-        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request,"ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request, "ABC");
     }
 
-    private void addTicketDetail(){
+    private void addTicketDetail() {
         try {
             constant.showPD();
             //int auto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
@@ -222,16 +222,16 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
             crby = URLEncoder.encode(crby, "UTF-8");
             nickname = URLEncoder.encode(nickname, "UTF-8");
 
-            if(type.equals("C")) {
+            if (type.equals("C")) {
                 if (nickname.equals("NA")) {
                     nickname = crby;
                 }
-            }else{
+            } else {
                 nickname = crby;
             }
 
             String url1 = Constant.ipaddress + "/AddTicketDetail?mastAuto=" + UpdateTicketActivity.auto +
-                    "&desc="+reply+"&CrBy="+nickname+"&type="+type;
+                    "&desc=" + reply + "&CrBy=" + nickname + "&type=" + type;
             Constant.showLog(url1);
             StringRequest request = new StringRequest(url1,
                     new Response.Listener<String>() {
@@ -240,7 +240,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                             Constant.showLog(result);
                             result = result.replace("\\", "");
                             result = result.replace("''", "");
-                            result = result.replace("\"","");
+                            result = result.replace("\"", "");
                             Constant.showLog(result);
                             ed_reply.setText(null);
                             loadData();
@@ -250,7 +250,7 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            writeLog("ReplyResponseActivity_addTicketDetail_volley_"+error.getMessage());
+                            writeLog("ReplyResponseActivity_addTicketDetail_volley_" + error.getMessage());
                             error.printStackTrace();
                             constant.showPD();
                             showDia(3);
@@ -260,16 +260,16 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
 
             RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
             queue.add(request);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setData(){
+    private void setData() {
         ticketDetailClassList.clear();
         Cursor res = db.getParticularTicketDetail();
-        if(res.moveToFirst()){
-            do{
+        if (res.moveToFirst()) {
+            do {
                 try {
                     TicketDetailClass ticketDetailClass = new TicketDetailClass();
                     ticketDetailClass.setAuto(res.getInt(res.getColumnIndex(DBHandler.TicketD_Auto)));
@@ -289,14 +289,14 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                     ticketDetailClass.setCrDate1(crdate2);
 
                     ticketDetailClassList.add(ticketDetailClass);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
-                    writeLog("setData_"+e.getMessage());
+                    writeLog("setData_" + e.getMessage());
                 }
-            }while (res.moveToNext());
+            } while (res.moveToNext());
         }
-        final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        adapter = new ReplyResponseListAdapter(ticketDetailClassList,getApplicationContext(),type);
+        final String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+        adapter = new ReplyResponseListAdapter(ticketDetailClassList, getApplicationContext(), type);
         listView.setAdapter(adapter);
         listView.setSelection(listView.getAdapter().getCount() - 1);
     }
@@ -318,7 +318,8 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
                     dialog.dismiss();
                 }
             });
-        }if (a == 3) {
+        }
+        if (a == 3) {
             builder.setMessage("Error While Replying...");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
@@ -337,8 +338,8 @@ public class ReplyResponseActivity extends AppCompatActivity implements View.OnC
         builder.create().show();
     }
 
-    private void writeLog(String _data){
-        new WriteLog().writeLog(getApplicationContext(),_data);
+    private void writeLog(String _data) {
+        new WriteLog().writeLog(getApplicationContext(), _data);
     }
 
 }

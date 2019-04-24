@@ -262,8 +262,7 @@
                             android:gravity="left"
                             android:text="T1718000999"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textColor="@color/black"
-                            android:textStyle="bold" />
+                            android:textColor="@color/black" />
 
                         <TextView
                             android:id="@+id/tv_date"
@@ -287,8 +286,7 @@
                             android:layout_height="wrap_content"
                             android:text="Subject"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textColor="@color/black"
-                            android:textStyle="bold" />
+                            android:textColor="@color/black" />
 
                         <TextView
                             android:id="@+id/tv_desc"

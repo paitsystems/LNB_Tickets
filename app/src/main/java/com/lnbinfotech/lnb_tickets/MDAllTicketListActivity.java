@@ -57,7 +57,7 @@ public class MDAllTicketListActivity extends AppCompatActivity implements View.O
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String text = ed_search.getText().toString().toLowerCase(Locale.getDefault());
-                if(adapter!=null) {
+                if (adapter != null) {
                     adapter.filter(text);
                 }
             }
@@ -71,9 +71,9 @@ public class MDAllTicketListActivity extends AppCompatActivity implements View.O
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(listView.getWindowToken(),0);
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(listView.getWindowToken(), 0);
                 TicketMasterClass ticketMast = (TicketMasterClass) listView.getItemAtPosition(i);
-                String str = ticketMast.getTicketNo()+"-"+ticketMast.getParticular();
+                String str = ticketMast.getTicketNo() + "-" + ticketMast.getParticular();
                 Constant.showLog(str);
                 ReachToMDActivity.ticketRefer = str;
                 new Constant(MDAllTicketListActivity.this).doFinish();
@@ -113,27 +113,27 @@ public class MDAllTicketListActivity extends AppCompatActivity implements View.O
         constant1 = new Constant(getApplicationContext());
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
-        ed_search = (EditText) findViewById(R.id.ed_search);
-        listView = (ListView) findViewById(R.id.listView);
+        ed_search = findViewById(R.id.ed_search);
+        listView = findViewById(R.id.listView);
         db = new DBHandler(getApplicationContext());
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
     }
 
-    private void setData(){
+    private void setData() {
         ticketMastList = new ArrayList<>();
         Cursor res = db.getAllMDTicket();
-        if(res.moveToFirst()){
-            do{
+        if (res.moveToFirst()) {
+            do {
                 TicketMasterClass ticketMastClass = new TicketMasterClass();
                 ticketMastClass.setTicketNo(res.getString(res.getColumnIndex(DBHandler.TicketM_TicketNo)));
                 ticketMastClass.setParticular(res.getString(res.getColumnIndex(DBHandler.TicketM_Particular)));
                 ticketMastClass.setCrDate(res.getString(res.getColumnIndex(DBHandler.TicketM_CrDate)));
                 ticketMastClass.setStatus(res.getString(res.getColumnIndex(DBHandler.TicketM_Status)));
                 ticketMastList.add(ticketMastClass);
-            }while(res.moveToNext());
+            } while (res.moveToNext());
         }
         res.close();
-        adapter = new MDAllticketListAdapter( getApplicationContext(),ticketMastList);
+        adapter = new MDAllticketListAdapter(getApplicationContext(), ticketMastList);
         listView.setAdapter(adapter);
 
     }

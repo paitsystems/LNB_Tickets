@@ -44,8 +44,8 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
 
         btn_set.setOnClickListener(this);
 
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
-        if (FirstActivity.pref.contains(getString(R.string.pref_nickname))){
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
+        if (FirstActivity.pref.contains(getString(R.string.pref_nickname))) {
             showDia(3);
         }
     }
@@ -81,47 +81,47 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
         constant1 = new Constant(getApplicationContext());
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
-        ed_nickname = (EditText) findViewById(R.id.ed_nickname);
-        ed_omobno = (EditText) findViewById(R.id.ed_omobno);
-        btn_set = (Button) findViewById(R.id.btn_set);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
+        ed_nickname = findViewById(R.id.ed_nickname);
+        ed_omobno = findViewById(R.id.ed_omobno);
+        btn_set = findViewById(R.id.btn_set);
 
     }
 
-    private void validation(){
+    private void validation() {
         String nickname = ed_nickname.getText().toString();
         String omobno = ed_omobno.getText().toString();
-        if(!nickname.equals("") && ! omobno.equals("")){
-            if(omobno.length()==10) {
-                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(ed_nickname.getWindowToken(),0);
+        if (!nickname.equals("") && !omobno.equals("")) {
+            if (omobno.length() == 10) {
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(ed_nickname.getWindowToken(), 0);
                 updateNickName(nickname, omobno);
-            }else{
+            } else {
                 toast.setText("Please Enter Valid Mobile Number");
                 toast.show();
             }
-        }else{
+        } else {
             toast.setText("Please Enter Details");
             toast.show();
         }
     }
 
-    private void updateNickName(String nickname, String omobno){
+    private void updateNickName(String nickname, String omobno) {
         try {
             int clientauto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
             String empType = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
             nickname = URLEncoder.encode(nickname, "UTF-8");
-            omobno = URLEncoder.encode(omobno,"UTF-8");
-            String url = Constant.ipaddress + "/GetNickName?auto="+clientauto+"&type="+empType+"&empId="+clientauto
-                    +"&nickname="+nickname+"&omobno="+omobno;
+            omobno = URLEncoder.encode(omobno, "UTF-8");
+            String url = Constant.ipaddress + "/GetNickName?auto=" + clientauto + "&type=" + empType + "&empId=" + clientauto
+                    + "&nickname=" + nickname + "&omobno=" + omobno;
             Constant.showLog(url);
             new updateNickName().execute(url);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             writeLog(e.getMessage());
         }
     }
 
-    private class updateNickName extends AsyncTask<String,Void,String>{
+    private class updateNickName extends AsyncTask<String, Void, String> {
 
         private ProgressDialog pd;
 
@@ -143,7 +143,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             pd.dismiss();
-            if(s!=null) {
+            if (s != null) {
                 if (!s.equals("")) {
                     Constant.showLog(s);
                     if (s.equals("\"1\"")) {
@@ -160,7 +160,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
                         showDia(2);
                     }
                 }
-            }else{
+            } else {
                 showDia(2);
             }
         }
@@ -184,19 +184,19 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
                     dialog.dismiss();
                 }
             });
-        }else if (a == 1) {
+        } else if (a == 1) {
             builder.setMessage("NickName Updated Successfully");
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     finish();
-                    startActivity(new Intent(getApplicationContext(),MainActivity.class));
-                    overridePendingTransition(R.anim.enter,R.anim.exit);
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    overridePendingTransition(R.anim.enter, R.anim.exit);
                     dialog.dismiss();
                 }
             });
 
-        }else if (a == 2) {
+        } else if (a == 2) {
             builder.setMessage("Error While Updating NickName");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
@@ -211,7 +211,7 @@ public class NickNameActivity extends AppCompatActivity implements View.OnClickL
                     dialog.dismiss();
                 }
             });
-        }else if (a == 3) {
+        } else if (a == 3) {
             builder.setTitle("Sorry For Inconvenience");
             builder.setMessage("You Required To Reenter Nickname");
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {

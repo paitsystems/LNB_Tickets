@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class FeedbackActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Constant constant, constant1;
@@ -87,15 +86,15 @@ public class FeedbackActivity extends AppCompatActivity implements View.OnClickL
         });
 
         Cursor res = db.getFeedQuestions();
-        if(res.getCount()>0){
+        if (res.getCount() > 0) {
             getFeedData();
             setQues();
             //saveAnswers();
-        }else{
-            if(ConnectivityTest.getNetStat(getApplicationContext())){
+        } else {
+            if (ConnectivityTest.getNetStat(getApplicationContext())) {
                 String url = "1";
                 new getQuestBank().execute(url);
-            }else{
+            } else {
                 toast.setText("You Are Offline");
                 toast.show();
             }
@@ -220,30 +219,30 @@ public class FeedbackActivity extends AppCompatActivity implements View.OnClickL
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         // ratingBar = (RatingBar) findViewById(R.id.ratingBar);
-        ratingBar2 = (RatingBar) findViewById(R.id.ratingBar2);
-        tv_rating_value1 = (TextView) findViewById(R.id.tv_rating_value1);
-        tv_rating_value2 = (TextView) findViewById(R.id.tv_rating_value2);
-        tv_cat1 = (TextView) findViewById(R.id.tv_cat1);
-        tv_cat2 = (TextView) findViewById(R.id.tv_cat2);
-        tv_cat3 = (TextView) findViewById(R.id.tv_cat3);
-        tv_cat4 = (TextView) findViewById(R.id.tv_cat4);
-        tv_cat5 = (TextView) findViewById(R.id.tv_cat5);
-        tv_q1 = (TextView) findViewById(R.id.tv_q1);
-        tv_q2 = (TextView) findViewById(R.id.tv_q2);
-        btn_submit = (AppCompatButton) findViewById(R.id.btn_submit);
-        btn_next = (AppCompatButton) findViewById(R.id.btn_next);
-        img_feed = (ImageView) findViewById(R.id.img_feed);
-        img_terrible = (ImageView) findViewById(R.id.img_terrible);
-        img_okay = (ImageView) findViewById(R.id.img_okay);
-        img_bad = (ImageView) findViewById(R.id.img_bad);
-        img_good = (ImageView) findViewById(R.id.img_good);
-        img_awesome = (ImageView) findViewById(R.id.img_awesome);
-        img_rating_val = (ImageView) findViewById(R.id.img_rating_val);
-        lay_feed = (LinearLayout) findViewById(R.id.lay_feed);
-        lay_smily = (LinearLayout) findViewById(R.id.lay_smily);
-        lay_rating = (LinearLayout) findViewById(R.id.lay_rating);
-        lay_sugg = (LinearLayout) findViewById(R.id.lay_sugg);
-        ed_description = (EditText) findViewById(R.id.ed_description);
+        ratingBar2 = findViewById(R.id.ratingBar2);
+        tv_rating_value1 = findViewById(R.id.tv_rating_value1);
+        tv_rating_value2 = findViewById(R.id.tv_rating_value2);
+        tv_cat1 = findViewById(R.id.tv_cat1);
+        tv_cat2 = findViewById(R.id.tv_cat2);
+        tv_cat3 = findViewById(R.id.tv_cat3);
+        tv_cat4 = findViewById(R.id.tv_cat4);
+        tv_cat5 = findViewById(R.id.tv_cat5);
+        tv_q1 = findViewById(R.id.tv_q1);
+        tv_q2 = findViewById(R.id.tv_q2);
+        btn_submit = findViewById(R.id.btn_submit);
+        btn_next = findViewById(R.id.btn_next);
+        img_feed = findViewById(R.id.img_feed);
+        img_terrible = findViewById(R.id.img_terrible);
+        img_okay = findViewById(R.id.img_okay);
+        img_bad = findViewById(R.id.img_bad);
+        img_good = findViewById(R.id.img_good);
+        img_awesome = findViewById(R.id.img_awesome);
+        img_rating_val = findViewById(R.id.img_rating_val);
+        lay_feed = findViewById(R.id.lay_feed);
+        lay_smily = findViewById(R.id.lay_smily);
+        lay_rating = findViewById(R.id.lay_rating);
+        lay_sugg = findViewById(R.id.lay_sugg);
+        ed_description = findViewById(R.id.ed_description);
         QList = new ArrayList<>();
     }
 
@@ -369,11 +368,11 @@ public class FeedbackActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void saveData() {
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
         int clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
         String nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
-        String contactNo  = FirstActivity.pref.getString(getString(R.string.pref_contactNo), "0");
-        String imeino= new Constant(getApplicationContext()).getIMEINo1();
+        String contactNo = FirstActivity.pref.getString(getString(R.string.pref_contactNo), "0");
+        String imeino = new Constant(getApplicationContext()).getIMEINo1();
         String data = "";
         for (int i = 0; i < QList.size(); i++) {
             data = data + QList.get(i) + "^" + fed_map.get(QList.get(i)) + ",";
@@ -381,7 +380,7 @@ public class FeedbackActivity extends AppCompatActivity implements View.OnClickL
         data = data.substring(0, data.length() - 1);
         Constant.showLog("data-" + data);
 
-        String url = clientAuto + "|Branch|" + nickname + "|" + contactNo + "|" + imeino +"|" + sugg + "|" + data;
+        String url = clientAuto + "|Branch|" + nickname + "|" + contactNo + "|" + imeino + "|" + sugg + "|" + data;
         Constant.showLog(url);
 
         if (ConnectivityTest.getNetStat(getApplicationContext())) {
@@ -608,17 +607,17 @@ public class FeedbackActivity extends AppCompatActivity implements View.OnClickL
             try {
                 Constant.showLog(result);
                 String str = new JSONObject(result).getString("GetFeedBackQuestionResult");
-                str = str.replace("\\","");
-                JSONArray jsonArray =  new JSONArray(str);
-                Constant.showLog(str+"-"+jsonArray.length());
-                if(jsonArray.length()>=1) {
+                str = str.replace("\\", "");
+                JSONArray jsonArray = new JSONArray(str);
+                Constant.showLog(str + "-" + jsonArray.length());
+                if (jsonArray.length() >= 1) {
                     db.deleteTabel(DBHandler.Table_QuestBank);
                     int ret = new ParseJSON(str, getApplicationContext()).parseQuestBank();
-                    if(ret == 1) {
+                    if (ret == 1) {
                         getFeedData();
                         setQues();
                     }
-                }else {
+                } else {
                     toast.setText("Data Not Available");
                     toast.show();
                 }

@@ -50,9 +50,9 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        if(ConnectivityTest.getNetStat(getApplicationContext())){
+        if (ConnectivityTest.getNetStat(getApplicationContext())) {
             loadData();
-        }else{
+        } else {
             toast.setText("You Are Offline");
             toast.show();
         }
@@ -66,7 +66,7 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String text = ed_search.getText().toString().toLowerCase(Locale.getDefault());
-                if(adapter!=null) {
+                if (adapter != null) {
                     adapter.filter(text);
                 }
             }
@@ -80,16 +80,16 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(listView.getWindowToken(),0);
+                ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(listView.getWindowToken(), 0);
                 ViewReachToMDClass ticketMast = (ViewReachToMDClass) listView.getItemAtPosition(i);
-                String str = ticketMast.getTicketNo()+"-"+ticketMast.getParticular();
+                String str = ticketMast.getTicketNo() + "-" + ticketMast.getParticular();
                 Constant.showLog(str);
                 Intent intent = new Intent(getApplicationContext(), ReachToMDActivity.class);
-                intent.putExtra("type","E");
+                intent.putExtra("type", "E");
                 ReachToMDActivity.ticketRefer = ticketMast.getTicketNo();
-                intent.putExtra("data",ticketMast);
+                intent.putExtra("data", ticketMast);
                 startActivity(intent);
-                overridePendingTransition(R.anim.enter,R.anim.exit);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
             }
         });
     }
@@ -124,9 +124,9 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
         constant1 = new Constant(getApplicationContext());
         toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
-        listView = (ListView) findViewById(R.id.listView);
-        ed_search = (EditText) findViewById(R.id.ed_search);
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        listView = findViewById(R.id.listView);
+        ed_search = findViewById(R.id.ed_search);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
     }
 
     private void loadData() {
@@ -139,12 +139,12 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
             clientAuto = FirstActivity.pref.getInt(getString(R.string.pref_auto), 0);
         }
 
-        String url = Constant.ipaddress + "/GetNewQueryMaster?clientAuto="+clientAuto+"&userType="+emp_type+"&autoId=0&crDate=12/Feb/2018";
+        String url = Constant.ipaddress + "/GetNewQueryMaster?clientAuto=" + clientAuto + "&userType=" + emp_type + "&autoId=0&crDate=12/Feb/2018";
         Constant.showLog(url);
         new getQueryData().execute(url);
     }
 
-    private class getQueryData extends AsyncTask<String,Void,String> {
+    private class getQueryData extends AsyncTask<String, Void, String> {
 
         private ProgressDialog pd;
 
@@ -166,10 +166,10 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             pd.dismiss();
-            if(!result.equals("")) {
+            if (!result.equals("")) {
                 result = result.replace("\\", "");
                 result = result.replace("''", "");
-                result = result.substring(1,result.length()-1);
+                result = result.substring(1, result.length() - 1);
                 Constant.showLog(result);
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -197,16 +197,16 @@ public class ViewReachToMDActivity extends AppCompatActivity implements View.OnC
                     toast.show();
                     writeLog("ParseJSON_parseQuery_" + e.getMessage());
                 }
-            }else{
+            } else {
                 toast.setText("No Record Available");
                 toast.show();
             }
         }
     }
 
-    private void setData(){
+    private void setData() {
         listView.setAdapter(null);
-        adapter = new ViewReachToMDAdapter(getApplicationContext(),list);
+        adapter = new ViewReachToMDAdapter(getApplicationContext(), list);
         listView.setAdapter(adapter);
     }
 

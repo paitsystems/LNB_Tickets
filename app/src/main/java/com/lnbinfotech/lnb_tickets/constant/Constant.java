@@ -19,6 +19,7 @@ import com.lnbinfotech.lnb_tickets.log.WriteLog;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -157,6 +158,23 @@ public class Constant {
             e.printStackTrace();
         }
         return imeino;
+    }
+
+    public static String finYr() {
+        String finYr = "";
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        Constant.showLog("Financial month : " + month);
+        String _year = String.valueOf(year);
+        year = Integer.parseInt(_year.substring(1,_year.length()));
+        if (month < 3) {
+            finYr = (year - 1) + "" + year;
+            Constant.showLog("Financial Year : " + finYr);
+        } else {
+            finYr = year + "" + (year + 1);
+            Constant.showLog("Financial Year : " + finYr);
+        }
+        return finYr;
     }
 
     private void writeLog(String _data) {

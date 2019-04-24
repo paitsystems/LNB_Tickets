@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -34,6 +35,8 @@ public class HardwarePointFragment extends Fragment {
     private EditText ed_search;
     public static int selPos;
     private String searchText = null;
+    private int pagecount = 5;
+    private ArrayList<TicketMasterClass> pendingTicketClassList;
 
     public HardwarePointFragment(){
 
@@ -55,9 +58,27 @@ public class HardwarePointFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_hardware,container,false);
-        listView = (ListView) view.findViewById(R.id.listView);
+        listView = view.findViewById(R.id.listView);
         db = new DBHandler(getContext());
-        ed_search = (EditText) view.findViewById(R.id.ed_search);
+
+        Button btnLoadMore = new Button(getContext());
+        btnLoadMore.setText("Load More");
+        listView.addFooterView(btnLoadMore);
+
+        btnLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagecount++;
+                String isHWApplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable), "");
+                int a = pendingTicketClassList.size()-5;
+                pendingTicketClassList.clear();
+                pendingTicketClassList.addAll(db.getHardwarePointLM(pagecount));
+                listView.setAdapter(adapter);
+                listView.setSelection(a);
+            }
+        });
+
+        ed_search = view.findViewById(R.id.ed_search);
         ed_search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -95,7 +116,7 @@ public class HardwarePointFragment extends Fragment {
     }
 
     private void setData(){
-        ArrayList<TicketMasterClass> pendingTicketClassList = db.getHardwarePoint();
+        pendingTicketClassList = db.getHardwarePointLM(pagecount);
         if (pendingTicketClassList.size()!= 0) {
             if(searchText==null) {
                 listView.setAdapter(null);

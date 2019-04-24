@@ -62,9 +62,9 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
         mAdView = (AdView) findViewById(R.id.adView);
 
         AdRequest adRequest;
-        if(Constant.liveTestFlag==1) {
+        if (Constant.liveTestFlag == 1) {
             adRequest = new AdRequest.Builder().build();
-        }else {
+        } else {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .addTestDevice(Constant.adMobID)
@@ -77,10 +77,10 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String type = statusList.get(i);
-                if(type.equals("Ticket Query")){
+                if (type.equals("Ticket Query")) {
                     ed_refer_ticket.setVisibility(View.VISIBLE);
                     //tv_refer_ticket.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     ed_refer_ticket.setVisibility(View.GONE);
                     //tv_refer_ticket.setVisibility(View.GONE);
                 }
@@ -95,7 +95,7 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
         empType = getIntent().getExtras().getString("type");
         viewReachToMD = (ViewReachToMDClass) getIntent().getSerializableExtra("data");
 
-        if(empType.equals("E")){
+        if (empType.equals("E")) {
             sp_status.setEnabled(false);
             sp_status.setClickable(false);
             ed_description.setFocusable(false);
@@ -105,7 +105,7 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
             ed_refer_ticket.setEnabled(false);
             btn_send.setVisibility(View.GONE);
             setData();
-        }else{
+        } else {
             sp_status.setEnabled(true);
             sp_status.setClickable(true);
             ed_description.setFocusable(true);
@@ -120,10 +120,10 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
     protected void onResume() {
         super.onResume();
         constant = new Constant(ReachToMDActivity.this);
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.resume();
         }
-        if(ed_refer_ticket.getVisibility()==View.VISIBLE){
+        if (ed_refer_ticket.getVisibility() == View.VISIBLE) {
             ed_refer_ticket.setText(ticketRefer);
             ed_description.requestFocus();
         }
@@ -135,7 +135,7 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onPause() {
         super.onPause();
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.pause();
         }
     }
@@ -144,7 +144,7 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
     protected void onDestroy() {
         super.onDestroy();
 
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.destroy();
         }
     }
@@ -153,8 +153,8 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ed_refer_ticket:
-                startActivity(new Intent(getApplicationContext(),MDAllTicketListActivity.class));
-                overridePendingTransition(R.anim.enter,R.anim.exit);
+                startActivity(new Intent(getApplicationContext(), MDAllTicketListActivity.class));
+                overridePendingTransition(R.anim.enter, R.anim.exit);
                 break;
             case R.id.btn_send:
                 generateQuery();
@@ -185,16 +185,20 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
         ed_description = (EditText) findViewById(R.id.ed_description);
         ed_refer_ticket = (EditText) findViewById(R.id.ed_refer_ticket);
         tv_refer_ticket = (TextView) findViewById(R.id.tv_ticket_refer);
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
         btn_send = (Button) findViewById(R.id.btn_send);
         img = (ImageView) findViewById(R.id.img);
         sp_status = (Spinner) findViewById(R.id.sp_status);
 
         statusList = new ArrayList<>();
-        statusList.add("Enquiry");statusList.add("Feedback");statusList.add("Other");
-        statusList.add("Query");statusList.add("Ticket Query");statusList.add("Suggestion");
+        statusList.add("Enquiry");
+        statusList.add("Feedback");
+        statusList.add("Other");
+        statusList.add("Query");
+        statusList.add("Ticket Query");
+        statusList.add("Suggestion");
 
-        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(),R.layout.custom_spinner,statusList));
+        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(), R.layout.custom_spinner, statusList));
 
         btn_send.setOnClickListener(this);
         ed_refer_ticket.setOnClickListener(this);
@@ -208,7 +212,7 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
         });*/
     }
 
-    private void generateQuery(){
+    private void generateQuery() {
         try {
             int clientAuto = 0;
             String type, _description = null, _imagePath = "NA", ticketNo;
@@ -217,10 +221,10 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
 
             type = statusList.get(sp_status.getSelectedItemPosition());
             ticketNo = ed_refer_ticket.getText().toString();
-            if(!ticketNo.equals("")){
+            if (!ticketNo.equals("")) {
                 String ticketArr[] = ticketNo.split("\\-");
                 ticketNo = ticketArr[0];
-            }else{
+            } else {
                 ticketNo = "NA";
             }
 
@@ -251,13 +255,13 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
                 toast.setText("Network Connection Error");
                 toast.show();
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             writeLog("ReachToMDActivity_generateTicket_" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private class saveQuery extends AsyncTask<String,Void,String> {
+    private class saveQuery extends AsyncTask<String, Void, String> {
 
         private ProgressDialog pd;
 
@@ -293,12 +297,12 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    private void setData(){
+    private void setData() {
         ed_refer_ticket.setText(ticketRefer);
         ed_description.setText(viewReachToMD.getParticular());
         String spType = viewReachToMD.getType();
-        for(int i=0;i<statusList.size();i++){
-            if(spType.equals(statusList.get(i))){
+        for (int i = 0; i < statusList.size(); i++) {
+            if (spType.equals(statusList.get(i))) {
                 sp_status.setSelection(i);
                 break;
             }
@@ -323,19 +327,19 @@ public class ReachToMDActivity extends AppCompatActivity implements View.OnClick
                     dialog.dismiss();
                 }
             });
-        }else if (a == 1) {
+        } else if (a == 1) {
             builder.setMessage("Query Save Successfully");
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_send.getWindowToken(),0);
+                    ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_send.getWindowToken(), 0);
                     new Constant(ReachToMDActivity.this).doFinish();
 
                     dialog.dismiss();
                 }
             });
 
-        }else if (a == 2) {
+        } else if (a == 2) {
             builder.setMessage("Error While Saving Data");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override

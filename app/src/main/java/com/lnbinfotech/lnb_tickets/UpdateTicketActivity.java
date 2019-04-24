@@ -95,9 +95,9 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         mAdView = (AdView) findViewById(R.id.adView);
 
         AdRequest adRequest;
-        if(Constant.liveTestFlag==1) {
+        if (Constant.liveTestFlag == 1) {
             adRequest = new AdRequest.Builder().build();
-        }else {
+        } else {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .addTestDevice(Constant.adMobID)
@@ -116,7 +116,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         super.onResume();
         constant = new Constant(UpdateTicketActivity.this);
         isDiaShowed = 0;
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.resume();
         }
     }
@@ -124,7 +124,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onPause() {
         super.onPause();
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.pause();
         }
     }
@@ -133,7 +133,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     protected void onDestroy() {
         super.onDestroy();
 
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.destroy();
         }
     }
@@ -145,18 +145,18 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 updateStatus();
                 break;
             case R.id.btn_reply:
-                Intent intent1 = new Intent(getApplicationContext(),ReplyResponseActivity.class);
-                intent1.putExtra("from","U");
+                Intent intent1 = new Intent(getApplicationContext(), ReplyResponseActivity.class);
+                intent1.putExtra("from", "U");
                 startActivity(intent1);
-                overridePendingTransition(R.anim.enter,R.anim.exit);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
                 break;
             case R.id.img:
-                if(!imageName.equals("") && imageName!=null) {
+                if (!imageName.equals("") && imageName != null) {
                     Intent intent = new Intent(getApplicationContext(), FullImageActivity.class);
                     intent.putExtra("imagename", imageName);
                     startActivity(intent);
                     overridePendingTransition(R.anim.enter, R.anim.exit);
-                }else{
+                } else {
                     toast.show();
                 }
                 break;
@@ -170,7 +170,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.updateticketactivity_menu,menu);
+        getMenuInflater().inflate(R.menu.updateticketactivity_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -191,15 +191,15 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 String status = ticketMasterClass.getStatus();
                 String crDate = ticketMasterClass.getCrDate();
 
-                String text = "Created By :- "+crBy+"\n"+ "Description :- "+particular+"\n"+
-                        "TicketNo :- "+ticketNo+"\n"+"Branch :- "+branch+"\n"+"Status :- "+status+
-                        "\n"+"Created Date :- "+crDate;
+                String text = "Created By :- " + crBy + "\n" + "Description :- " + particular + "\n" +
+                        "TicketNo :- " + ticketNo + "\n" + "Branch :- " + branch + "\n" + "Status :- " + status +
+                        "\n" + "Created Date :- " + crDate;
 
                 intent.putExtra(Intent.EXTRA_TEXT, text);
-                if(uri!=null) {
+                if (uri != null) {
                     intent.setType("image/*");
                     intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uri_list);
-                }else {
+                } else {
                     intent.setType("text/plain");
                 }
                 intent.setPackage("com.whatsapp");
@@ -219,25 +219,31 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void init() {
-        tv_subject = (TextView) findViewById(R.id.tv_subject);
-        ed_description = (EditText) findViewById(R.id.ed_description);
-        tv_ticket_no = (TextView) findViewById(R.id.tv_ticket_no);
-        tv_date = (TextView) findViewById(R.id.tv_date);
-        tv_time = (TextView) findViewById(R.id.tv_time);
-        btn_update_ticket = (Button) findViewById(R.id.btn_update_ticket);
-        btn_reply = (Button) findViewById(R.id.btn_reply);
-        img = (ImageView) findViewById(R.id.img);
+        tv_subject = findViewById(R.id.tv_subject);
+        ed_description = findViewById(R.id.ed_description);
+        tv_ticket_no = findViewById(R.id.tv_ticket_no);
+        tv_date = findViewById(R.id.tv_date);
+        tv_time = findViewById(R.id.tv_time);
+        btn_update_ticket = findViewById(R.id.btn_update_ticket);
+        btn_reply = findViewById(R.id.btn_reply);
+        img = findViewById(R.id.img);
         //listView = (ListView) findViewById(R.id.listView);
-        sp_status = (Spinner) findViewById(R.id.sp_status);
-        pb = (ProgressBar) findViewById(R.id.pb);
+        sp_status = findViewById(R.id.sp_status);
+        pb = findViewById(R.id.pb);
         db = new DBHandler(getApplicationContext());
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
         statusList = new ArrayList<>();
-        statusList.add("Open");statusList.add("Closed");statusList.add("Pending");statusList.add("Scheduled");
-        statusList.add("Hold");statusList.add("Cancel");statusList.add("ReOpen");statusList.add("ClientClosed");
-        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(),R.layout.custom_spinner,statusList));
-        toast = Toast.makeText(getApplicationContext(),"File Not Found",Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER,0,0);
+        statusList.add("Open");
+        statusList.add("Closed");
+        statusList.add("Pending");
+        statusList.add("Scheduled");
+        statusList.add("Hold");
+        statusList.add("Cancel");
+        statusList.add("ReOpen");
+        statusList.add("ClientClosed");
+        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(), R.layout.custom_spinner, statusList));
+        toast = Toast.makeText(getApplicationContext(), "File Not Found", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
 
         receiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
@@ -245,11 +251,11 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 File f = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
                 pb.setVisibility(View.GONE);
                 img.setImageResource(R.drawable.ic_broken_image_black_24dp);
-                if(f.length()!=0) {
+                if (f.length() != 0) {
                     String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
                     img.setImageBitmap(scaleBitmap(_imagePath));
-                }else{
-                    writeLog("UpdateTicketActivity_onReceive_File_Not_Found_"+f.getAbsolutePath());
+                } else {
+                    writeLog("UpdateTicketActivity_onReceive_File_Not_Found_" + f.getAbsolutePath());
                     toast.show();
                 }
             }
@@ -260,34 +266,34 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
 
     }
 
-    private void setData(){
+    private void setData() {
         auto = ticketMasterClass.auto;
         tv_subject.setText(ticketMasterClass.getSubject());
         tv_ticket_no.setText(ticketMasterClass.getTicketNo());
         tv_date.setText(ticketMasterClass.getCrDate());
         String _time = ticketMasterClass.getCrTime();
         String time[] = _time.split("\\:");
-        if(time.length>1) {
-            String s = time[0]+":"+time[1];
+        if (time.length > 1) {
+            String s = time[0] + ":" + time[1];
             tv_time.setText(s);
-        }else{
+        } else {
             tv_time.setText(_time);
         }
         //tv_time.setText(ticketMasterClass.getCrTime());
         ed_description.setText(ticketMasterClass.getParticular());
         imageName = ticketMasterClass.getImagePAth();
-        for (int i=0; i<statusList.size();i++){
-            if(statusList.get(i).equals(ticketMasterClass.getStatus())){
+        for (int i = 0; i < statusList.size(); i++) {
+            if (statusList.get(i).equals(ticketMasterClass.getStatus())) {
                 sp_status.setSelection(i);
                 break;
             }
         }
-        if(!imageName.equals("") && imageName!=null) {
+        if (!imageName.equals("") && imageName != null) {
             setImage();
         }
     }
 
-    private void updateStatus(){
+    private void updateStatus() {
         constant.showPD();
         try {
             int id = ticketMasterClass.getId();
@@ -297,25 +303,25 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             String _nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
             status = statusList.get(sp_status.getSelectedItemPosition());
             String _ticketno = ticketMasterClass.getTicketNo();
-            String clientName  = URLEncoder.encode(_clientName,"UTF-8");
-            String nickname  = URLEncoder.encode(_nickname,"UTF-8");
-            String finyr = URLEncoder.encode(_finyr,"UTF-8");
-            String _status = URLEncoder.encode(status,"UTF-8");
-            String ticketno = URLEncoder.encode(_ticketno,"UTF-8");
+            String clientName = URLEncoder.encode(_clientName, "UTF-8");
+            String nickname = URLEncoder.encode(_nickname, "UTF-8");
+            String finyr = URLEncoder.encode(_finyr, "UTF-8");
+            String _status = URLEncoder.encode(status, "UTF-8");
+            String ticketno = URLEncoder.encode(_ticketno, "UTF-8");
             String mobno = db.getMobile(clientAuto);
             String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
             //String mobno = FirstActivity.pref.getString(getString(R.string.pref_mobno), "");
 
-            if(type.equals("C")) {
+            if (type.equals("C")) {
                 if (nickname.equals("NA")) {
                     nickname = clientName;
                 }
-            }else{
+            } else {
                 nickname = clientName;
             }
 
-            String url = Constant.ipaddress+"/updateTicketStatus?auto=" + auto + "&id="+id+"&clientAuto="+clientAuto+
-                    "&finyr="+finyr+"&status="+_status+"&modBy="+nickname+"&ticketno="+ticketno+"&mobno="+mobno;
+            String url = Constant.ipaddress + "/updateTicketStatus?auto=" + auto + "&id=" + id + "&clientAuto=" + clientAuto +
+                    "&finyr=" + finyr + "&status=" + _status + "&modBy=" + nickname + "&ticketno=" + ticketno + "&mobno=" + mobno;
             Constant.showLog(url);
 
             //db.updateTicketStatus(auto,id,clientAuto,_finyr,status,_clientName,ticketno);
@@ -327,11 +333,11 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                             Constant.showLog(result);
                             result = result.replace("\\", "");
                             result = result.replace("''", "");
-                            result = result.replace("\"","");
-                            if(!result.equals("0") && !result.equals("")){
+                            result = result.replace("\"", "");
+                            if (!result.equals("0") && !result.equals("")) {
                                 //showDia(1);
                                 loadData();
-                            }else{
+                            } else {
                                 showDia(3);
                             }
                             Constant.showLog(result);
@@ -341,7 +347,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            writeLog("UpdateTicketActivity_updateStatus_volley_"+ error.getMessage());
+                            writeLog("UpdateTicketActivity_updateStatus_volley_" + error.getMessage());
                             error.printStackTrace();
                             constant.showPD();
                             showDia(3);
@@ -352,30 +358,30 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
             //RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
             //queue.add(request);
 
-            AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request,"ABC");
+            AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(request, "ABC");
 
-        }catch (Exception e){
-            writeLog("UpdateTicketActivity_updateStatus_"+ e.getMessage());
+        } catch (Exception e) {
+            writeLog("UpdateTicketActivity_updateStatus_" + e.getMessage());
             e.printStackTrace();
             constant.showPD();
         }
     }
 
-    private void loadData(){
+    private void loadData() {
         constant.showPD();
         final AtomicInteger atomicInteger = new AtomicInteger(3);
-        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        String isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+        String type = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+        String isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable), "");
         isDiaShowed = 0;
         int autoId = db.getMaxAutoId(type);
         String moddate1 = db.getLatestModDate1();
 
-        String url2 = Constant.ipaddress+"/GetTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
-                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable;
-        String url3 = Constant.ipaddress+"/GetCustNameBranch?groupId="+FirstActivity.pref.getInt(getString(R.string.pref_groupid),0)+
-                "&auto="+db.getSMLMASTMaxAuto();
-        String url4 = Constant.ipaddress+"/GetUpdatedTicketMaster?clientAuto="+FirstActivity.pref.getInt(getString(R.string.pref_auto),0)+
-                "&type="+type+"&autoId="+autoId+"&isHWapplicable="+isHWapplicable+"&moddate="+moddate1;
+        String url2 = Constant.ipaddress + "/GetTicketMaster?clientAuto=" + FirstActivity.pref.getInt(getString(R.string.pref_auto), 0) +
+                "&type=" + type + "&autoId=" + autoId + "&isHWapplicable=" + isHWapplicable;
+        String url3 = Constant.ipaddress + "/GetCustNameBranch?groupId=" + FirstActivity.pref.getInt(getString(R.string.pref_groupid), 0) +
+                "&auto=" + db.getSMLMASTMaxAuto();
+        String url4 = Constant.ipaddress + "/GetUpdatedTicketMaster?clientAuto=" + FirstActivity.pref.getInt(getString(R.string.pref_auto), 0) +
+                "&type=" + type + "&autoId=" + autoId + "&isHWapplicable=" + isHWapplicable + "&moddate=" + moddate1;
 
         Constant.showLog(url2);
         Constant.showLog(url3);
@@ -400,13 +406,13 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("UpdateTicketActivity_loadData_descRequest_"+ error.getMessage());
+                        writeLog("UpdateTicketActivity_loadData_descRequest_" + error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
-                        if(taskLeft==0) {
+                        if (taskLeft == 0) {
                             constant.showPD();
                         }
-                        if(isDiaShowed!=1) {
+                        if (isDiaShowed != 1) {
                             showDia(3);
                             isDiaShowed = 1;
                         }
@@ -421,7 +427,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                         Constant.showLog(result);
                         result = result.replace("\\", "");
                         result = result.replace("''", "");
-                        result = result.substring(1,result.length()-1);
+                        result = result.substring(1, result.length() - 1);
                         new ParseJSON(result, getApplicationContext()).parseSMLMASTData();
                         int taskLeft = atomicInteger.decrementAndGet();
                         if (taskLeft == 0) {
@@ -433,13 +439,13 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("UpdateTicketActivity_loadData_custRequest_"+ error.getMessage());
+                        writeLog("UpdateTicketActivity_loadData_custRequest_" + error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
-                        if(taskLeft==0) {
+                        if (taskLeft == 0) {
                             constant.showPD();
                         }
-                        if(isDiaShowed!=1) {
+                        if (isDiaShowed != 1) {
                             showDia(3);
                             isDiaShowed = 1;
                         }
@@ -466,13 +472,13 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("UpdateTicketActivity_loadData_updateRequest_"+ error.getMessage());
+                        writeLog("UpdateTicketActivity_loadData_updateRequest_" + error.getMessage());
                         error.printStackTrace();
                         int taskLeft = atomicInteger.decrementAndGet();
-                        if(taskLeft==0) {
+                        if (taskLeft == 0) {
                             constant.showPD();
                         }
-                        if(isDiaShowed!=1) {
+                        if (isDiaShowed != 1) {
                             showDia(3);
                             isDiaShowed = 1;
                         }
@@ -480,9 +486,9 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 }
         );
 
-        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(descRequest,"ABC");
-        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(custRequest,"ABC");
-        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(updateRequest,"ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(descRequest, "ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(custRequest, "ABC");
+        AppSingleton.getInstance(getApplicationContext()).addToRequestQueue(updateRequest, "ABC");
 
         /*RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         queue.add(descRequest);
@@ -490,14 +496,14 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         queue.add(updateRequest);*/
     }
 
-    private void setImage(){
+    private void setImage() {
         File file = Constant.checkFolder(Constant.folder_name);
         File fileArray[] = file.listFiles();
         int isAvailable = 0;
-        if(fileArray.length!=0){
-            for(File f:fileArray){
-                if(f.getName().equals(imageName)) {
-                    if(f.length()!=0) {
+        if (fileArray.length != 0) {
+            for (File f : fileArray) {
+                if (f.getName().equals(imageName)) {
+                    if (f.length() != 0) {
                         String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + imageName);
                         img.setImageBitmap(scaleBitmap(_imagePath));
                         File fi1 = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + "/" + imageName);
@@ -508,17 +514,17 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         }
-        if(isAvailable == 0){
+        if (isAvailable == 0) {
             if (ConnectivityTest.getNetStat(getApplicationContext())) {
                 String data = db.getFolder(ticketMasterClass.getClientAuto());
-                if(!data.equals("0")){
+                if (!data.equals("0")) {
                     SharedPreferences.Editor editor = FirstActivity.pref.edit();
-                    editor.putString(getString(R.string.pref_FTPImgFolder),data);
+                    editor.putString(getString(R.string.pref_FTPImgFolder), data);
                     editor.apply();
                 }
                 pb.setVisibility(View.VISIBLE);
-                startService = new Intent(getApplicationContext(),DownloadImageService.class);
-                startService.putExtra("imageName",imageName);
+                startService = new Intent(getApplicationContext(), DownloadImageService.class);
+                startService.putExtra("imageName", imageName);
                 writeLog("UpdateTicketActivity_setImage_DownloadImageService_Started");
                 startService(startService);
                 Constant.showLog("Service Started");
@@ -598,7 +604,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                     dialog.dismiss();
                 }
             });
-        }else if (a == 1) {
+        } else if (a == 1) {
             builder.setMessage("Status Updated Successfully");
             builder.setPositiveButton("Go Back", new DialogInterface.OnClickListener() {
                 @Override
@@ -609,7 +615,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                     dialog.dismiss();
                 }
             });
-        }else if (a == 3) {
+        } else if (a == 3) {
             builder.setMessage("Error While Updating status");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
@@ -628,7 +634,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         builder.create().show();
     }
 
-    private void doFinish(){
+    private void doFinish() {
         try {
             if (receiver != null) {
                 unregisterReceiver(receiver);
@@ -637,7 +643,7 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
                 stopService(startService);
             }
             new Constant(UpdateTicketActivity.this).doFinish();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         /*finish();
@@ -645,8 +651,8 @@ public class UpdateTicketActivity extends AppCompatActivity implements View.OnCl
         overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);*/
     }
 
-    private void writeLog(String _data){
-        new WriteLog().writeLog(getApplicationContext(),_data);
+    private void writeLog(String _data) {
+        new WriteLog().writeLog(getApplicationContext(), _data);
     }
 
 }

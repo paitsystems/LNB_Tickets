@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -62,7 +63,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AddNewTicketActivity extends AppCompatActivity implements View.OnClickListener{
+public class AddNewTicketActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText ed_subject, ed_description, ed_search;
     private LinearLayout lay_attachment, lay_branch_search, lay_pointtype;
@@ -104,9 +105,9 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         mAdView = (AdView) findViewById(R.id.adView);
 
         AdRequest adRequest;
-        if(Constant.liveTestFlag==1) {
+        if (Constant.liveTestFlag == 1) {
             adRequest = new AdRequest.Builder().build();
-        }else {
+        } else {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .addTestDevice(Constant.adMobID)
@@ -115,7 +116,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
         mAdView.loadAd(adRequest);
 
-        if(getSupportActionBar()!=null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -123,10 +124,10 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.resume();
         }
-        if(selBranch!=null){
+        if (selBranch != null) {
             ed_search.setText(selBranch);
         }
         constant = new Constant(AddNewTicketActivity.this);
@@ -134,7 +135,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onPause() {
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.pause();
         }
         super.onPause();
@@ -142,7 +143,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     protected void onDestroy() {
-        if(mAdView!=null){
+        if (mAdView != null) {
             mAdView.destroy();
         }
         super.onDestroy();
@@ -150,13 +151,13 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.lay_attachment:
                 showDia(5);
                 break;
             case R.id.ed_search:
-                startActivity(new Intent(getApplicationContext(),ClientSearchActivity.class));
-                overridePendingTransition(R.anim.enter,R.anim.exit);
+                startActivity(new Intent(getApplicationContext(), ClientSearchActivity.class));
+                overridePendingTransition(R.anim.enter, R.anim.exit);
                 break;
             case R.id.btn_attachment:
                 showDia(5);
@@ -185,13 +186,13 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onBackPressed() {
         wl.release();
-        AddNewTicketActivity.selBranch="";
+        AddNewTicketActivity.selBranch = "";
         new Constant(AddNewTicketActivity.this).doFinish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 wl.release();
                 new Constant(AddNewTicketActivity.this).doFinish();
@@ -203,7 +204,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==REQUEST_IMAGE_TAKE && resultCode==RESULT_OK){
+        if (requestCode == REQUEST_IMAGE_TAKE && resultCode == RESULT_OK) {
             try {
                 img.setVisibility(View.VISIBLE);
                 String _imagePath = getRealPathFromURI(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + File.separator + "temp.jpg");
@@ -226,26 +227,26 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 Bitmap bitmap;
                 BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
                 bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(), bitmapOptions);
-                File file = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name,imagePath);
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name, imagePath);
                 try {
                     outFile = new FileOutputStream(file);
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 15, outFile);
                     outFile.flush();
                     outFile.close();
                 } catch (Exception e) {
-                    writeLog("AddNewTicketActivity_onActivityResult_outFile_"+e.getMessage());
+                    writeLog("AddNewTicketActivity_onActivityResult_outFile_" + e.getMessage());
                     e.printStackTrace();
                 }
-            }catch (Exception e){
-                writeLog("AddNewTicketActivity_onActivityResult_"+e.getMessage());
+            } catch (Exception e) {
+                writeLog("AddNewTicketActivity_onActivityResult_" + e.getMessage());
                 e.printStackTrace();
             }
-        }else if (requestCode == REQUEST_IMAGE_PICK_UP && resultCode == RESULT_OK && data!=null) {
+        } else if (requestCode == REQUEST_IMAGE_PICK_UP && resultCode == RESULT_OK && data != null) {
             try {
                 Uri selectedImage = data.getData();
                 String[] filepathcoloum = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getContentResolver().query(selectedImage, filepathcoloum, null, null, null);
-                if(cursor!=null) {
+                if (cursor != null) {
                     if (cursor.moveToFirst()) {
                         int columnindex = cursor.getColumnIndex(filepathcoloum[0]);
                         String imgDecodedString = cursor.getString(columnindex);
@@ -259,11 +260,11 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                         copyImage(sourcefile, destinationfile);
                         cursor.close();
                     }
-                }else{
+                } else {
                     toast.setText("Please Try Again");
                     toast.show();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 toast.setText("Something Went Wrong");
                 toast.show();
@@ -271,52 +272,58 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private void init(){
+    private void init() {
         selBranch = null;
-        btn_generate_ticket = (Button) findViewById(R.id.btn_generate_ticket);
-        btn_attachment = (Button) findViewById(R.id.btn_attachment);
-        ed_search = (EditText) findViewById(R.id.ed_search);
-        ed_subject = (EditText) findViewById(R.id.ed_subject);
-        ed_description = (EditText) findViewById(R.id.ed_description);
-        lay_attachment = (LinearLayout) findViewById(R.id.lay_attachment);
-        lay_branch_search = (LinearLayout) findViewById(R.id.lay_branch_search);
-        lay_pointtype = (LinearLayout) findViewById(R.id.lay_pointtype);
-        img = (ImageView) findViewById(R.id.img);
-        toast = Toast.makeText(getApplicationContext(),"",Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER,0,0);
+        btn_generate_ticket = findViewById(R.id.btn_generate_ticket);
+        btn_attachment = findViewById(R.id.btn_attachment);
+        ed_search = findViewById(R.id.ed_search);
+        ed_subject = findViewById(R.id.ed_subject);
+        ed_description = findViewById(R.id.ed_description);
+        lay_attachment = findViewById(R.id.lay_attachment);
+        lay_branch_search = findViewById(R.id.lay_branch_search);
+        lay_pointtype = findViewById(R.id.lay_pointtype);
+        img = findViewById(R.id.img);
+        toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
         constant = new Constant(AddNewTicketActivity.this);
         db = new DBHandler(getApplicationContext());
-        sp_branch = (Spinner) findViewById(R.id.sp_branch);
-        sp_status = (Spinner) findViewById(R.id.sp_status);
-        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME,MODE_PRIVATE);
+        sp_branch = findViewById(R.id.sp_branch);
+        sp_status = findViewById(R.id.sp_status);
+        FirstActivity.pref = getSharedPreferences(FirstActivity.PREF_NAME, MODE_PRIVATE);
 
         statusList = new ArrayList<>();
-        statusList.add("Open");statusList.add("Closed");statusList.add("Pending");statusList.add("Scheduled");
-        statusList.add("Hold");statusList.add("Cancel");statusList.add("ReOpen");statusList.add("ClientClosed");
-        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(),R.layout.custom_spinner,statusList));
+        statusList.add("Open");
+        statusList.add("Closed");
+        statusList.add("Pending");
+        statusList.add("Scheduled");
+        statusList.add("Hold");
+        statusList.add("Cancel");
+        statusList.add("ReOpen");
+        statusList.add("ClientClosed");
+        sp_status.setAdapter(new ArrayAdapter<>(getApplicationContext(), R.layout.custom_spinner, statusList));
 
         pm = (PowerManager) getSystemService(POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,"Log");
+        wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Log");
         wl.acquire();
 
-        rdo_sw = (RadioButton) findViewById(R.id.rdo_sw);
-        rdo_hw = (RadioButton) findViewById(R.id.rdo_hw);
-        rdo_it = (RadioButton) findViewById(R.id.rdo_it);
+        rdo_sw = findViewById(R.id.rdo_sw);
+        rdo_hw = findViewById(R.id.rdo_hw);
+        rdo_it = findViewById(R.id.rdo_it);
 
-        empType = FirstActivity.pref.getString(getString(R.string.pref_emptype),"");
-        isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable),"");
+        empType = FirstActivity.pref.getString(getString(R.string.pref_emptype), "");
+        isHWapplicable = FirstActivity.pref.getString(getString(R.string.pref_isHWapplicable), "");
 
-        if(empType.equals("C")){
+        if (empType.equals("C")) {
             rdo_it.setVisibility(View.GONE);
-            if(isHWapplicable.equals("S")){
+            if (isHWapplicable.equals("S")) {
                 rdo_sw.setVisibility(View.VISIBLE);
                 rdo_sw.setChecked(true);
                 rdo_hw.setVisibility(View.GONE);
-            }else if(isHWapplicable.equals("H")){
+            } else if (isHWapplicable.equals("H")) {
                 rdo_sw.setVisibility(View.GONE);
                 rdo_hw.setVisibility(View.VISIBLE);
                 rdo_hw.setChecked(true);
-            }else if(isHWapplicable.equals("SH")){
+            } else if (isHWapplicable.equals("SH")) {
                 rdo_sw.setVisibility(View.VISIBLE);
                 rdo_hw.setVisibility(View.VISIBLE);
             }
@@ -331,38 +338,57 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }*/
     }
 
-    private void takeimage(){
+    private void takeimage() {
+        /*Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File f = Constant.checkFolder(Constant.folder_name);
+        f = new File(f.getAbsolutePath(), "temp.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+        startActivityForResult(intent, REQUEST_IMAGE_TAKE);*/
+
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File f = Constant.checkFolder(Constant.folder_name);
         f = new File(f.getAbsolutePath(),"temp.jpg");
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+        Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName()
+                + ".provider", f);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(intent,REQUEST_IMAGE_TAKE);
+        overridePendingTransition(R.anim.enter, R.anim.exit);
     }
 
-    private void openGallery(){
-        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(gallery,REQUEST_IMAGE_PICK_UP);
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, REQUEST_IMAGE_PICK_UP);
+        /*Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File f = Constant.checkFolder(Constant.folder_name);
+        f = new File(f.getAbsolutePath(),"temp.jpg");
+        Uri photoURI = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName()
+                + ".provider", f);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(intent,REQUEST_IMAGE_PICK_UP);
+        overridePendingTransition(R.anim.enter, R.anim.exit);*/
     }
 
-    private void copyImage(File source, File destination){
+    private void copyImage(File source, File destination) {
         try {
             FileChannel sourcechannel, destinationchannel;
             sourcechannel = new FileInputStream(source).getChannel();
             destinationchannel = new FileOutputStream(destination).getChannel();
-            if(sourcechannel!=null){
-                destinationchannel.transferFrom(sourcechannel,0,sourcechannel.size());
+            if (sourcechannel != null) {
+                destinationchannel.transferFrom(sourcechannel, 0, sourcechannel.size());
             }
-            if(sourcechannel!=null){
+            if (sourcechannel != null) {
                 sourcechannel.close();
             }
             destinationchannel.close();
             setImage(destination, 1);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setImage(File f, int i){
+    private void setImage(File f, int i) {
         OutputStream outFile;
         try {
             img.setVisibility(View.VISIBLE);
@@ -372,8 +398,8 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             Bitmap bmp = scaleBitmap(f.getAbsolutePath());
             img.setImageBitmap(bmp);
             File file;
-            if(i == 0) {
-                String OImgPath = Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name+"/";
+            if (i == 0) {
+                String OImgPath = Environment.getExternalStorageDirectory() + File.separator + Constant.folder_name + "/";
                 if (f.delete()) {
                     Log.d("log", "log");
                 }
@@ -381,11 +407,11 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 SimpleDateFormat sdf = new SimpleDateFormat("dd_MMM_yyyy_HH_mm_ss", Locale.ENGLISH);
                 Date resultdate = new Date(datetime);
                 String clientID = FirstActivity.pref.getString(getString(R.string.pref_clientID), "");
-                String fname = clientID+"_" + sdf.format(resultdate);
+                String fname = clientID + "_" + sdf.format(resultdate);
                 file = new File(OImgPath, "/" + fname + ".jpg");
                 //imagePath = file.getAbsolutePath();
                 imagePath = fname + ".jpg";
-            }else{
+            } else {
                 file = f;
                 imagePath = f.getAbsolutePath();
                 imagePath = f.getName();
@@ -414,23 +440,23 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             toast.setText("Please Select Branch");
             view = ed_search;
             check = false;
-        }else if (_subject.equals("") || _subject.length() == 0) {
+        } else if (_subject.equals("") || _subject.length() == 0) {
             toast.setText("Please Enter Subject");
             view = ed_subject;
             check = false;
-        }else if (_description.equals("") || _description.length() == 0) {
+        } else if (_description.equals("") || _description.length() == 0) {
             view = ed_description;
             toast.setText("Please Enter Description");
             check = false;
         }
 
-        if(empType.equals("C")) {
+        if (empType.equals("C")) {
             if (!rdo_sw.isChecked() && !rdo_hw.isChecked()) {
                 toast.setText("Please Select Point Type");
                 check = false;
                 view = rdo_sw;
             }
-        }else{
+        } else {
             if (!rdo_sw.isChecked() && !rdo_hw.isChecked() && !rdo_it.isChecked()) {
                 toast.setText("Please Select Point Type");
                 check = false;
@@ -438,16 +464,16 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             }
         }
 
-        if(check){
-            ((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_generate_ticket.getWindowToken(),0);
+        if (check) {
+            ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(btn_generate_ticket.getWindowToken(), 0);
             generateTicket();
-        }else{
+        } else {
             view.requestFocus();
             toast.show();
         }
     }
 
-    private void generateTicket(){
+    private void generateTicket() {
         try {
             int clientAuto = 0, ok = 0;
             String type, clientName = null, nickname = null, mobno = null, _subject = null, _description = null,
@@ -457,11 +483,11 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
 
             _status = statusList.get(sp_status.getSelectedItemPosition());
 
-            if(rdo_sw.isChecked()){
+            if (rdo_sw.isChecked()) {
                 pointtype = "S";
-            }else if(rdo_hw.isChecked()){
+            } else if (rdo_hw.isChecked()) {
                 pointtype = "H";
-            }else if(rdo_it.isChecked()){
+            } else if (rdo_it.isChecked()) {
                 pointtype = "I";
             }
 
@@ -479,12 +505,12 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 //branch = branchList.get(sp_branch.getSelectedItemPosition());
                 branch = ed_search.getText().toString();
                 String _data = db.getAutoFolder(branch);
-                if(!_data.equals("0")) {
+                if (!_data.equals("0")) {
                     String data[] = _data.split("\\^");
                     clientAuto = Integer.parseInt(data[0]);
                     imgFolder = data[1];
                     SharedPreferences.Editor editor = FirstActivity.pref.edit();
-                    editor.putString(getString(R.string.pref_FTPImgFolder),imgFolder);
+                    editor.putString(getString(R.string.pref_FTPImgFolder), imgFolder);
                     editor.apply();
                     clientName = FirstActivity.pref.getString(getString(R.string.pref_ClientName), "0");
                     nickname = FirstActivity.pref.getString(getString(R.string.pref_nickname), "NA");
@@ -494,7 +520,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     ok = 1;
                 }
             }
-            if(ok == 1) {
+            if (ok == 1) {
                 clientName = URLEncoder.encode(clientName, "UTF-8");
                 nickname = URLEncoder.encode(nickname, "UTF-8");
                 _subject = URLEncoder.encode(_subject, "UTF-8");
@@ -505,20 +531,20 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 branch = URLEncoder.encode(branch, "UTF-8");
                 pointtype = URLEncoder.encode(pointtype, "UTF-8");
 
-                Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch+"-"+pointtype+"-"+nickname);
+                Constant.showLog(clientAuto + "-" + _subject + "-" + _description + "-" + _imagePath + "-" + branch + "-" + pointtype + "-" + nickname);
 
-                if(type.equals("C")) {
+                if (type.equals("C")) {
                     if (nickname.equals("NA")) {
                         nickname = clientName;
                     }
-                }else{
+                } else {
                     nickname = clientName;
                 }
 
                 String url = Constant.ipaddress + "/AddTicketMaster?clientAuto=" + clientAuto +
                         "&subject=" + _subject + "&desc=" + _description + "&imagePath=" + _imagePath +
                         "&status=" + _status + "&CrBy=" + nickname + "&type=" + type + "&mobno=" + mobno +
-                        "&branch=" + branch + "&ptype="+pointtype;
+                        "&branch=" + branch + "&ptype=" + pointtype;
 
                 writeLog("AddNewTicketActivity_generateTicket_" + url);
                 Constant.showLog(url);
@@ -545,18 +571,18 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     toast.setText("Network Connection Error");
                     toast.show();
                 }
-            }else{
+            } else {
                 writeLog("AddNewTicketActivity_generateTicket_auto_0");
                 toast.setText("Unable To Save Ticket");
                 toast.show();
             }
-        }catch (Exception e){
-            writeLog("AddNewTicketActivity_generateTicket_"+e.getMessage());
+        } catch (Exception e) {
+            writeLog("AddNewTicketActivity_generateTicket_" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void saveTicket(String url){
+    private void saveTicket(String url) {
         constant.showPD();
         StringRequest request = new StringRequest(url,
                 new Response.Listener<String>() {
@@ -567,7 +593,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                         result = result.replace("''", "");
                         result = result.replace("\"", "");
                         Constant.showLog(result);
-                        if(atomicInteger.decrementAndGet()==0) {
+                        if (atomicInteger.decrementAndGet() == 0) {
                             constant.showPD();
                             if (!result.equals("0") && !result.equals("")) {
                                 writeLog("AddNewTicketActivity_saveTicket_Success");
@@ -583,9 +609,9 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        writeLog("AddNewTicketActivity_saveTicket_volley_"+ error.getMessage());
+                        writeLog("AddNewTicketActivity_saveTicket_volley_" + error.getMessage());
                         error.printStackTrace();
-                        if(atomicInteger.decrementAndGet()==0){
+                        if (atomicInteger.decrementAndGet() == 0) {
                             constant.showPD();
                         }
                         showDia(2);
@@ -596,7 +622,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         queue.add(request);
     }
 
-    private class UploadImage extends AsyncTask<Void,Void,String>{
+    private class UploadImage extends AsyncTask<Void, Void, String> {
 
         private ProgressDialog pd;
 
@@ -614,7 +640,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
             String result;
             try {
                 String ftpaddress = FirstActivity.pref.getString(getString(R.string.pref_FTPLocation), "");
-                if(!ftpaddress.equals("")) {
+                if (!ftpaddress.equals("")) {
                     String ftpuser = FirstActivity.pref.getString(getString(R.string.pref_FTPUser), "");
                     String ftppass = FirstActivity.pref.getString(getString(R.string.pref_FTPPass), "");
                     String ftpfolder = FirstActivity.pref.getString(getString(R.string.pref_FTPImgFolder), "");
@@ -630,14 +656,14 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     client.disconnect();
                     result = "1";
                     writeLog("AddNewTicketActivity_UploadImage_Success");
-                }else{
-                    writeLog("AddNewTicketActivity_UploadImage_"+ftpaddress);
+                } else {
+                    writeLog("AddNewTicketActivity_UploadImage_" + ftpaddress);
                     result = "2";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 result = "0";
-                writeLog("AddNewTicketActivity_UploadImage_"+e.getMessage());
+                writeLog("AddNewTicketActivity_UploadImage_" + e.getMessage());
             }
             return result;
         }
@@ -673,7 +699,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private class saveTicket extends AsyncTask<String,Void,String>{
+    private class saveTicket extends AsyncTask<String, Void, String> {
 
         private ProgressDialog pd;
 
@@ -703,7 +729,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                 writeLog("AddNewTicketActivity_saveTicket_Success");
                 if (!imagePath.equals("") && imagePath != null) {
                     new UploadImage().execute();
-                }else{
+                } else {
                     showDia(1);
                 }
             } else {
@@ -758,10 +784,10 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         return resizedBitmap;
     }
 
-    private void showDia(int a){
+    private void showDia(int a) {
         AlertDialog.Builder builder = new AlertDialog.Builder(AddNewTicketActivity.this);
         builder.setCancelable(false);
-        if(a==0) {
+        if (a == 0) {
             builder.setMessage("Do You Want To Go Back?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
@@ -776,7 +802,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     dialog.dismiss();
                 }
             });
-        }else if(a==1) {
+        } else if (a == 1) {
             builder.setMessage("Ticket Generated Successfully");
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
@@ -787,7 +813,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     clearFields();
                 }
             });
-        }else if(a==2) {
+        } else if (a == 2) {
             builder.setMessage("Error While Generating Ticket");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
@@ -802,7 +828,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     dialog.dismiss();
                 }
             });
-        }else if(a==3) {
+        } else if (a == 3) {
             builder.setMessage("Error While Generating Ticket");
             builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
                 @Override
@@ -819,7 +845,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     dialog.dismiss();
                 }
             });
-        }else if(a==4) {
+        } else if (a == 4) {
             builder.setTitle("Invalid FTP Server");
             builder.setMessage("Please Contact Support Team");
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -829,7 +855,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     new Constant(AddNewTicketActivity.this).doFinish();
                 }
             });
-        }else if(a==5) {
+        } else if (a == 5) {
             builder.setMessage("Select Attachment From...");
             builder.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
                 @Override
@@ -845,7 +871,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
                     takeimage();
                 }
             });
-            builder.setNeutralButton("Cancel",new DialogInterface.OnClickListener() {
+            builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
@@ -855,7 +881,7 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         builder.create().show();
     }
 
-    private void clearFields(){
+    private void clearFields() {
         ed_subject.setText(null);
         ed_subject.requestFocus();
         ed_description.setText(null);
@@ -864,8 +890,8 @@ public class AddNewTicketActivity extends AppCompatActivity implements View.OnCl
         img.setVisibility(View.GONE);
     }
 
-    private void writeLog(String _data){
-        new WriteLog().writeLog(getApplicationContext(),_data);
+    private void writeLog(String _data) {
+        new WriteLog().writeLog(getApplicationContext(), _data);
     }
 
 }

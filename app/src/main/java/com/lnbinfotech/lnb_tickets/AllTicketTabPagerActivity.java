@@ -42,9 +42,9 @@ public class AllTicketTabPagerActivity extends AppCompatActivity implements View
         mAdView = findViewById(R.id.adView);
 
         AdRequest adRequest;
-        if(Constant.liveTestFlag==1) {
+        if (Constant.liveTestFlag == 1) {
             adRequest = new AdRequest.Builder().build();
-        }else {
+        } else {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .addTestDevice("0558B791C50AB34B5650C3C48C9BD15E")
